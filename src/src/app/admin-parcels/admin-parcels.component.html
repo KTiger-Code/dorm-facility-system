@@ -1,5 +1,13 @@
 <h2>📦 รายการพัสดุทั้งหมด (Admin)</h2>
 
+<form (ngSubmit)="addParcel()" class="add-form">
+  <label>ห้องพัก:</label>
+  <input type="text" [(ngModel)]="newParcel.room_number" name="room_number" required><br>
+  <label>รายละเอียดพัสดุ:</label>
+  <input type="text" [(ngModel)]="newParcel.description" name="description" required><br>
+  <button type="submit">เพิ่มพัสดุ</button>
+</form>
+
 <label>
   🔍 ค้นหาห้อง:
   <input [(ngModel)]="searchRoom" (ngModelChange)="applyFilter()" placeholder="เช่น A101">

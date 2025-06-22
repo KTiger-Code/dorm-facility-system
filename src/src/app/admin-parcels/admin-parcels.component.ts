@@ -14,6 +14,7 @@ export class AdminParcelsComponent implements OnInit {
   allParcels: any[]      = [];
   filteredParcels: any[] = [];
   searchRoom: string     = '';
+  newParcel = { room_number: '', description: '' };
 
   constructor(private http: HttpClient) {}
 
@@ -51,5 +52,15 @@ export class AdminParcelsComponent implements OnInit {
     const next = !parcel.picked_up;
     this.http.patch(`/api/parcels/${parcel.id}`, { picked_up: next }, this.getAuth())
       .subscribe(() => this.fetchAllParcels());
+  }
+
+  addParcel() {
+    this.http.post('/api/parcels', this.newParcel, this.getAuth())
+      .subscribe({
+        next: () => {
+          this.newParcel = { room_number: '', description: '' };
+          this.fetchAllParcels();
+        }
+      });
   }
 }

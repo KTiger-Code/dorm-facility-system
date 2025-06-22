@@ -1,18 +1,5 @@
-<h2>แจ้งเตือนพัสดุ</h2>
+<h2>รายการพัสดุของคุณ</h2>
 
-<form (ngSubmit)="addParcel()">
-  <label>ห้องพัก:</label>
-  <input type="text" [(ngModel)]="newParcel.room_number" name="room_number" required /><br>
-
-  <label>รายละเอียดพัสดุ:</label>
-  <input type="text" [(ngModel)]="newParcel.description" name="description" required /><br>
-
-  <button type="submit">แจ้งพัสดุ</button>
-</form>
-
-<hr>
-
-<h3>รายการพัสดุที่แจ้งแล้ว</h3>
 <ul>
   <li *ngFor="let p of parcels">
     📦 {{ p.description }}<br>
