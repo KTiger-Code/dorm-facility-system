@@ -1,0 +1,14 @@
+<h2>สแกน QR เพื่อเช็คอิน</h2>
+
+<zxing-scanner
+  (scanSuccess)="onCodeResult($event)"
+  [torch]="true"
+  [tryHarder]="true"
+></zxing-scanner>
+
+<div *ngIf="scannedResult">
+  <p>ข้อมูล QR: {{ scannedResult }}</p>
+</div>
+
+<p *ngIf="successMessage" style="color: green">{{ successMessage }}</p>
+<p *ngIf="errorMessage" style="color: red">{{ errorMessage }}</p>

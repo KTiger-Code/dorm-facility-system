@@ -1,0 +1,43 @@
+<h2>จัดการการจอง (Admin)</h2>
+
+<label>🔍 ค้นหาห้อง:
+  <input [(ngModel)]="filterRoom" placeholder="A101">
+</label>
+
+<table>
+  <thead>
+    <tr>
+      <th>ห้อง</th>
+      <th>กิจกรรม</th>
+      <th>วันที่</th>
+      <th>เวลา</th>
+      <th>จำนวนคน</th>
+      <th>จัดการ</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let b of filtered">
+      <td>{{ b.room_number }}</td>
+      <td>
+        <input [(ngModel)]="b.facility_name">
+      </td>
+      <td>
+        <input type="date" [(ngModel)]="b.booking_date">
+      </td>
+      <td>
+        <input type="time" [(ngModel)]="b.time_slot_start"> –
+        <input type="time" [(ngModel)]="b.time_slot_end">
+      </td>
+      <td>
+        <input type="number" min="1" [(ngModel)]="b.number_of_people">
+      </td>
+      <td>
+        <button (click)="save()">บันทึก</button>
+        <button (click)="delete(b.id)">ลบ</button>
+      </td>
+    </tr>
+    <tr *ngIf="filtered.length===0">
+      <td colspan="6">ยังไม่มีการจอง</td>
+    </tr>
+  </tbody>
+</table>

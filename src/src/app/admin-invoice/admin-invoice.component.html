@@ -1,0 +1,86 @@
+<h2>จัดการใบแจ้งหนี้ (Admin)</h2>
+
+<form [formGroup]="form" (ngSubmit)="save()">
+  <div class="row">
+    <label>
+      ห้อง:
+      <input type="text" formControlName="room_number" placeholder="พิมพ์เลขห้อง" />
+    </label>
+    <label>
+      เดือน/ปี:
+      <input formControlName="month_year" placeholder="YYYY-MM" />
+    </label>
+  </div>
+
+  <div class="row">
+    <label>ค่าน้ำ:      <input type="number" formControlName="water_fee" /></label>
+    <label>ค่าไฟ:       <input type="number" formControlName="electricity_fee" /></label>
+    <label>ค่าส่วนกลาง: <input type="number" formControlName="common_fee" /></label>
+    <label>ค่าเช่าห้อง:  <input type="number" formControlName="room_rent" /></label>
+  </div>
+
+  <div formArrayName="extra_charges" class="extras">
+    <div *ngFor="let grp of extras.controls; let i = index" [formGroupName]="i">
+      <input formControlName="label" placeholder="คำอธิบายเพิ่มเติม" />
+      <input type="number" formControlName="amount" placeholder="จำนวนเงิน" />
+      <button type="button" (click)="removeExtra(i)">ลบ</button>
+    </div>
+    <button type="button" (click)="addExtra()">+ เพิ่มค่าใช้จ่ายอื่นๆ</button>
+  </div>
+
+  <button type="submit">
+    {{ form.value.id ? 'อัปเดตใบแจ้งหนี้' : 'สร้างใบแจ้งหนี้ใหม่' }}
+  </button>
+</form>
+
+<hr>
+
+<label>
+  ค้นหาเฉพาะห้อง:
+  <input type="text" [(ngModel)]="searchRoom" placeholder="พิมพ์เลขห้องเพื่อกรอง" />
+</label>
+
+<table>
+  <thead>
+    <tr>
+      <th>ห้อง</th>
+      <th>เดือน/ปี</th>
+      <th>ค่าน้ำ</th>
+      <th>ค่าไฟ</th>
+      <th>ค่าส่วนกลาง</th>
+      <th>ค่าเช่าห้อง</th>
+      <th>อื่นๆ</th>
+      <th>รวม</th>
+      <th>ชำระแล้ว</th>
+      <th>จัดการ</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let inv of filteredInvoices()">
+      <td>{{ inv.room_number }}</td>
+      <td>{{ inv.month_year }}</td>
+      <td>{{ inv.water_fee       | number:'1.2-2' }} ฿</td>
+      <td>{{ inv.electricity_fee | number:'1.2-2' }} ฿</td>
+      <td>{{ inv.common_fee      | number:'1.2-2' }} ฿</td>
+      <td>{{ inv.room_rent       | number:'1.2-2' }} ฿</td>
+      <td>
+        <ng-container *ngIf="inv.extra_charges.length; else noExtras">
+          <span *ngFor="let ex of inv.extra_charges; let last = last">
+            {{ ex.label }}: {{ ex.amount | number:'1.2-2' }} ฿<span *ngIf="!last">, </span>
+          </span>
+        </ng-container>
+        <ng-template #noExtras>–</ng-template>
+      </td>
+      <td>{{ total(inv) | number:'1.2-2' }} ฿</td>
+      <td>
+        <input type="checkbox"
+               [checked]="inv.paid"
+               (change)="togglePaid(inv)" />
+      </td>
+      <td>
+        <button (click)="edit(inv)">แก้ไข</button>
+        <button (click)="delete(inv.id)">ลบ</button>
+      </td>
+    </tr>
+  </tbody>
+</table>

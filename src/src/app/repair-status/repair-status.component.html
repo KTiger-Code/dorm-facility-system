@@ -1,0 +1,9 @@
+<h2>สถานะการแจ้งซ่อม</h2>
+
+<ul>
+  <li *ngFor="let r of repairs">
+    <strong>ห้อง:</strong> {{ r.room_number }} |
+    <strong>หัวข้อ:</strong> {{ r.title }} |
+    <strong>สถานะ:</strong> {{ r.status }}
+  </li>
+</ul>

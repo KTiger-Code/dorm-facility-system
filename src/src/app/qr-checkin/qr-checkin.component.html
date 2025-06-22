@@ -1,0 +1,14 @@
+<h2>QR Code สำหรับเช็คอิน</h2>
+
+<label>กรอกหมายเลขห้อง:</label>
+<input type="text" [(ngModel)]="roomNumber" placeholder="เช่น A101" />
+
+<br><br>
+<button (click)="generateQR()">สร้าง QR Code</button>
+
+<div *ngIf="qrData">
+  <p>{{ qrData }}</p>
+  <qrcode [qrdata]="qrData" [width]="256"></qrcode>
+</div>
+
+<p style="margin-top: 10px; color: green;" *ngIf="successMessage">{{ successMessage }}</p>

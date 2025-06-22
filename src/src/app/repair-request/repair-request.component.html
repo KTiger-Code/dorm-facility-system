@@ -1,0 +1,18 @@
+<h2>แจ้งซ่อมเฟอร์นิเจอร์</h2>
+
+<form (ngSubmit)="submitRepair()">
+  <input type="text" [(ngModel)]="title"       name="title"       placeholder="หัวข้อปัญหา" required>
+  <input type="text" [(ngModel)]="description" name="description" placeholder="รายละเอียดปัญหา" required>
+  <button type="submit">ส่งแจ้งซ่อม</button>
+</form>
+
+<hr>
+
+<h3>รายการแจ้งซ่อมของคุณ</h3>
+<ul>
+  <li *ngFor="let r of repairs">
+    <strong>ห้อง:</strong> {{ r.room_number }} |
+    <strong>ปัญหา:</strong> {{ r.title }} |
+    <strong>สถานะ:</strong> {{ r.status }}
+  </li>
+</ul>

@@ -1,0 +1,22 @@
+<h2>ข่าวสารจากหอพัก</h2>
+
+<ul class="announcements">
+  <li *ngFor="let a of announcements" class="announcement-item">
+    <div class="meta">
+      <span class="timestamp">
+        {{ a.posted_at 
+           | date:'d MMM yyyy, HH:mm':'':'th-TH' }}
+      </span>
+      &nbsp;|&nbsp;
+      <span class="author">
+        โดย {{ a.posted_by_name }}
+      </span>
+    </div>
+    <h3 class="title">{{ a.title }}</h3>
+    <p class="content">{{ a.content }}</p>
+  </li>
+</ul>
+
+<ng-container *ngIf="announcements.length === 0">
+  <p>ยังไม่มีข่าวสารใหม่</p>
+</ng-container>

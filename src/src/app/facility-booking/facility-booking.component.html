@@ -1,0 +1,32 @@
+<h2>การจองบริการส่วนกลาง</h2>
+
+<form (ngSubmit)="bookFacility()">
+  <label>กิจกรรม:</label>
+  <input type="text" [(ngModel)]="newBooking.facility_name" name="facility_name" required /><br>
+
+  <label>วันที่:</label>
+  <input type="date" [(ngModel)]="newBooking.booking_date" name="booking_date" required /><br>
+
+  <label>เวลาเริ่ม:</label>
+  <input type="time" [(ngModel)]="newBooking.time_slot_start" name="time_slot_start" required /><br>
+
+  <label>เวลาสิ้นสุด:</label>
+  <input type="time" [(ngModel)]="newBooking.time_slot_end" name="time_slot_end" required /><br>
+
+  <label>จำนวนคน:</label>
+  <input type="number" [(ngModel)]="newBooking.number_of_people" name="number_of_people" min="1" required /><br>
+
+  <button type="submit">จอง</button>
+</form>
+
+<hr>
+
+<h3>รายการที่จองแล้ว</h3>
+<ul>
+  <li *ngFor="let b of bookings">
+    <strong>{{ b.facility_name }}</strong> —
+    {{ formatDate(b.booking_date) }}
+    เวลา {{ b.time_slot_start }} – {{ b.time_slot_end }} น.
+    ({{ b.number_of_people }} คน)
+  </li>
+</ul>

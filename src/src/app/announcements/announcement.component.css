@@ -1,0 +1,23 @@
+.announcements {
+  list-style: none;
+  padding: 0;
+}
+
+.announcement-item {
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 1rem;
+}
+
+.meta {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.title {
+  margin: 0.25rem 0;
+}
+
+.content {
+  margin: 0.5rem 0 0;
+}

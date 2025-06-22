@@ -1,0 +1,31 @@
+<h2>📦 รายการพัสดุทั้งหมด (Admin)</h2>
+
+<label>
+  🔍 ค้นหาห้อง:
+  <input [(ngModel)]="searchRoom" (ngModelChange)="applyFilter()" placeholder="เช่น A101">
+</label>
+
+<table class="parcel-table">
+  <thead>
+    <tr>
+      <th>ห้อง</th><th>รายละเอียด</th><th>ผู้รับ</th>
+      <th>รับแล้ว</th><th>วันที่รับ</th><th>จัดการ</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let p of filteredParcels">
+      <td>{{ p.room_number }}</td>
+      <td>{{ p.description }}</td>
+      <td>{{ p.recipient_name || '-' }}</td>
+      <td>
+        <input type="checkbox" [checked]="p.picked_up"
+               (change)="togglePickedUp(p)">
+      </td>
+      <td>{{ p.received_at | date:'short' }}</td>
+      <td>
+        <button (click)="deleteParcel(p.id)">🗑️</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<p *ngIf="filteredParcels.length===0">ไม่มีข้อมูลพัสดุ</p>

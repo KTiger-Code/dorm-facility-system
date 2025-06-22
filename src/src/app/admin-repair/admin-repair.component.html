@@ -1,0 +1,29 @@
+<h2>จัดการคำขอซ่อม (Admin)</h2>
+
+<table class="repair-table">
+  <thead>
+    <tr>
+      <th>ห้อง</th>
+      <th>หัวข้อ</th>
+      <th>รายละเอียด</th>
+      <th>สถานะ</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let r of repairs">
+      <td>{{ r.room_number }}</td>
+      <td>{{ r.title }}</td>
+      <td>{{ r.description }}</td>
+      <td>
+        <select
+          [(ngModel)]="r.status"
+          (ngModelChange)="updateStatus(r, $event)"
+        >
+          <option value="pending">รอดำเนินการ</option>
+          <option value="in_progress">กำลังดำเนินการ</option>
+          <option value="completed">เสร็จสิ้น</option>
+        </select>
+      </td>
+    </tr>
+  </tbody>
+</table>

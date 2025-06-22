@@ -1,0 +1,245 @@
+// controllers/invoiceController.js
+const db = require('../db');
+
+// — ดึงใบแจ้งหนี้ของผู้เช่า (Resident)
+exports.getMyInvoices = async (req, res) => {
+  const userId     = req.user.id;
+  const roomNumber = req.user.room_number;
+
+  try {
+    // 1) ดึง invoices หลัก
+    const [invoices] = await db.query(
+      `SELECT 
+         id,
+         month_year,
+         water_fee,
+         electricity_fee,
+         common_fee,
+         room_rent,
+         paid,
+         paid_at,
+         created_at
+       FROM invoices
+       WHERE user_id = ?
+       ORDER BY created_at DESC`,
+      [userId]
+    );
+
+    // 2) ดึง extras จาก invoice_extras
+    const invoiceIds = invoices.map(i => i.id);
+    let extras = [];
+    if (invoiceIds.length) {
+      [extras] = await db.query(
+        `SELECT invoice_id, label, amount
+         FROM invoice_extras
+         WHERE invoice_id IN (?)`,
+        [invoiceIds]
+      );
+    }
+
+    // 3) จัดกลุ่ม extras ตาม invoice_id
+    const extrasMap = {};
+    extras.forEach(e => {
+      extrasMap[e.invoice_id] = extrasMap[e.invoice_id] || [];
+      extrasMap[e.invoice_id].push({
+        label: e.label,
+        amount: parseFloat(e.amount)
+      });
+    });
+
+    // 4) ผนึกกลับไปพร้อมเลขห้อง
+    const result = invoices.map(inv => ({
+      ...inv,
+      room_number:   roomNumber,
+      extra_charges: extrasMap[inv.id] || []
+    }));
+
+    res.json(result);
+  } catch (err) {
+    console.error('❌ getMyInvoices error:', err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// — ดึงใบแจ้งหนี้ทั้งหมด (Admin)
+exports.getAllInvoices = async (req, res) => {
+  try {
+    // 1) ดึง invoices + room_number
+    const [invoices] = await db.query(
+      `SELECT 
+         inv.id,
+         inv.user_id,
+         u.room_number,
+         inv.month_year,
+         inv.water_fee,
+         inv.electricity_fee,
+         inv.common_fee,
+         inv.room_rent,
+         inv.paid,
+         inv.paid_at,
+         inv.created_at
+       FROM invoices AS inv
+       JOIN users    AS u   ON inv.user_id = u.id
+       ORDER BY inv.created_at DESC`
+    );
+
+    // 2) ดึง extras
+    const invoiceIds = invoices.map(i => i.id);
+    let extras = [];
+    if (invoiceIds.length) {
+      [extras] = await db.query(
+        `SELECT invoice_id, label, amount
+         FROM invoice_extras
+         WHERE invoice_id IN (?)`,
+        [invoiceIds]
+      );
+    }
+
+    // 3) จัดกลุ่ม extras
+    const extrasMap = {};
+    extras.forEach(e => {
+      extrasMap[e.invoice_id] = extrasMap[e.invoice_id] || [];
+      extrasMap[e.invoice_id].push({
+        label: e.label,
+        amount: parseFloat(e.amount)
+      });
+    });
+
+    // 4) ผนึกกลับ
+    const result = invoices.map(inv => ({
+      ...inv,
+      extra_charges: extrasMap[inv.id] || []
+    }));
+
+    res.json(result);
+  } catch (err) {
+    console.error('❌ getAllInvoices error:', err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// — สร้างใบแจ้งหนี้ใหม่ (Admin)
+exports.createInvoice = async (req, res) => {
+  const {
+    user_id,
+    month_year,
+    water_fee = 0,
+    electricity_fee = 0,
+    common_fee = 0,
+    room_rent = 0,
+    extra_charges = []
+  } = req.body;
+
+  try {
+    // 1) insert invoice
+    const [invResult] = await db.query(
+      `INSERT INTO invoices
+         (user_id, month_year, water_fee, electricity_fee, common_fee, room_rent)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [user_id, month_year, water_fee, electricity_fee, common_fee, room_rent]
+    );
+    const invoiceId = invResult.insertId;
+
+    // 2) insert extras
+    if (extra_charges.length) {
+      const rows = extra_charges.map(e => [invoiceId, e.label, e.amount]);
+      await db.query(
+        `INSERT INTO invoice_extras
+           (invoice_id, label, amount)
+         VALUES ?`,
+        [rows]
+      );
+    }
+
+    res.status(201).json({ message: 'Invoice created' });
+  } catch (err) {
+    console.error('❌ createInvoice error:', err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// — แก้ไขใบแจ้งหนี้ (Admin)
+exports.updateInvoice = async (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  const {
+    month_year,
+    water_fee,
+    electricity_fee,
+    common_fee,
+    room_rent,
+    extra_charges = []
+  } = req.body;
+
+  try {
+    // 1) update invoice หลัก
+    const [upd] = await db.query(
+      `UPDATE invoices
+       SET month_year      = ?,
+           water_fee       = ?,
+           electricity_fee = ?,
+           common_fee      = ?,
+           room_rent       = ?
+       WHERE id = ?`,
+      [month_year, water_fee, electricity_fee, common_fee, room_rent, id]
+    );
+    if (upd.affectedRows === 0) {
+      return res.status(404).json({ error: 'Invoice not found' });
+    }
+
+    // 2) ลบ extras เก่า
+    await db.query(`DELETE FROM invoice_extras WHERE invoice_id = ?`, [id]);
+
+    // 3) ใส่ extras ใหม่
+    if (extra_charges.length) {
+      const rows = extra_charges.map(e => [id, e.label, e.amount]);
+      await db.query(
+        `INSERT INTO invoice_extras (invoice_id, label, amount) VALUES ?`,
+        [rows]
+      );
+    }
+
+    res.json({ message: 'Invoice updated' });
+  } catch (err) {
+    console.error('❌ updateInvoice error:', err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// — ติ๊กชำระเงิน (Admin)
+exports.toggleInvoicePaid = async (req, res) => {
+  const id   = parseInt(req.params.id, 10);
+  const paid = req.body.paid ? 1 : 0;
+  const paidAt = paid ? new Date() : null;
+
+  try {
+    const [upd] = await db.query(
+      `UPDATE invoices
+       SET paid    = ?, paid_at = ?
+       WHERE id = ?`,
+      [paid, paidAt, id]
+    );
+    if (upd.affectedRows === 0) {
+      return res.status(404).json({ error: 'Invoice not found' });
+    }
+    res.json({ message: 'Paid status updated' });
+  } catch (err) {
+    console.error('❌ toggleInvoicePaid error:', err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// — ลบใบแจ้งหนี้ (Admin)
+exports.deleteInvoice = async (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  try {
+    const [del] = await db.query(`DELETE FROM invoices WHERE id = ?`, [id]);
+    if (del.affectedRows === 0) {
+      return res.status(404).json({ error: 'Invoice not found' });
+    }
+    // ตาราง invoice_extras ตั้ง FK ให้ลบ cascade เรียบร้อยแล้ว
+    res.json({ message: 'Invoice deleted' });
+  } catch (err) {
+    console.error('❌ deleteInvoice error:', err);
+    res.status(500).json({ error: err.message });
+  }
+};

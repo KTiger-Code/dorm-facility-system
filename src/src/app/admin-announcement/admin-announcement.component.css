@@ -1,0 +1,19 @@
+input, textarea {
+  width: 100%;
+  padding: 8px;
+  margin-top: 4px;
+  font-size: 14px;
+}
+
+button {
+  padding: 8px 16px;
+  font-size: 16px;
+  background-color: #1DB446;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #128837;
+}

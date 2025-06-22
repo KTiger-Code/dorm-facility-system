@@ -1,0 +1,17 @@
+<h2>📢 ประกาศข่าวสาร</h2>
+
+<label>
+  หัวข้อ:
+  <input [(ngModel)]="title" placeholder="กรอกหัวข้อประกาศ" />
+</label>
+
+<br /><br />
+
+<label>
+  เนื้อหา:
+  <textarea [(ngModel)]="content" rows="5" placeholder="กรอกเนื้อหาประกาศ"></textarea>
+</label>
+
+<br /><br />
+
+<button (click)="postAnnouncement()">📤 ประกาศ</button>

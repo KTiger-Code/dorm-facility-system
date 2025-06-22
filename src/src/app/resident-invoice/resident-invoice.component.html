@@ -1,0 +1,70 @@
+<h2 style="text-align:center; margin-bottom:16px;">ใบแจ้งหนี้</h2>
+
+<div *ngFor="let inv of invoices" class="invoice-container" style="margin-bottom:32px;">
+  <!-- — ส่วนหัวข้อมูลห้อง/เดือนปี — -->
+  <table class="header">
+    <tr>
+      <td><strong>ห้อง:</strong> {{ inv.room_number }}</td>
+      <td style="text-align:right;"><strong>เดือน/ปี:</strong> {{ inv.month_year }}</td>
+    </tr>
+  </table>
+
+  <!-- — ตารางรายการ — -->
+  <table class="items">
+    <thead>
+      <tr>
+        <th>ลำดับ<br/>Item</th>
+        <th>รายการ<br/>Description</th>
+        <th>จำนวนเงิน<br/>Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- 1-4 รายการคงที่ -->
+      <tr>
+        <td>1</td>
+        <td>ค่าไฟ</td>
+        <td class="amount">{{ inv.electricity_fee | number:'1.2-2' }} ฿</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>ค่าน้ำ</td>
+        <td class="amount">{{ inv.water_fee       | number:'1.2-2' }} ฿</td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td>ค่าส่วนกลาง</td>
+        <td class="amount">{{ inv.common_fee      | number:'1.2-2' }} ฿</td>
+      </tr>
+      <tr>
+        <td>4</td>
+        <td>ค่าเช่าห้อง</td>
+        <td class="amount">{{ inv.room_rent       | number:'1.2-2' }} ฿</td>
+      </tr>
+
+      <!-- ถ้ามี extra_charges แสดงยอดรวมแรก -->
+      <tr *ngIf="inv.extra_charges.length">
+        <td>5</td>
+        <td>อื่นๆ</td>
+        <td class="amount">{{ extrasSum(inv) | number:'1.2-2' }} ฿</td>
+      </tr>
+      <!-- แล้วไล่ปัดรายการย่อย -->
+      <tr *ngFor="let ex of inv.extra_charges">
+        <td></td>
+        <td>&nbsp;&nbsp;- {{ ex.label }}</td>
+        <td class="amount">{{ ex.amount | number:'1.2-2' }} ฿</td>
+      </tr>
+
+      <!-- แถวรวมยอดสุดท้าย -->
+      <tr>
+        <td colspan="2" class="total-label">รวม</td>
+        <td class="amount total-value">
+          <strong>{{ total(inv) | number:'1.2-2' }} ฿</strong>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div style="text-align:right; margin-top:8px;">
+    <button (click)="downloadPdf(inv)">ดาวน์โหลด PDF</button>
+  </div>
+</div>
