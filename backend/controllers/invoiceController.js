@@ -138,15 +138,19 @@ exports.createInvoice = async (req, res) => {
     water_prev_meter = 0,
     water_curr_meter = 0,
     water_unit_price = 0,
-    water_fee = 0,
     electricity_prev_meter = 0,
     electricity_curr_meter = 0,
     electricity_unit_price = 0,
-    electricity_fee = 0,
     common_fee = 0,
     room_rent = 0,
     extra_charges = []
   } = req.body;
+
+  // คำนวณค่าน้ำและค่าไฟจากตัวเลขมิเตอร์และราคาต่อหน่วย
+  const water_used = water_curr_meter - water_prev_meter;
+  const electricity_used = electricity_curr_meter - electricity_prev_meter;
+  const water_fee = water_used * water_unit_price;
+  const electricity_fee = electricity_used * electricity_unit_price;
 
   try {
     // 1) insert invoice
@@ -190,15 +194,18 @@ exports.updateInvoice = async (req, res) => {
     water_prev_meter = 0,
     water_curr_meter = 0,
     water_unit_price = 0,
-    water_fee = 0,
     electricity_prev_meter = 0,
     electricity_curr_meter = 0,
     electricity_unit_price = 0,
-    electricity_fee = 0,
     common_fee = 0,
     room_rent = 0,
     extra_charges = []
   } = req.body;
+
+  const water_used = water_curr_meter - water_prev_meter;
+  const electricity_used = electricity_curr_meter - electricity_prev_meter;
+  const water_fee = water_used * water_unit_price;
+  const electricity_fee = electricity_used * electricity_unit_price;
 
   try {
     // 1) update invoice หลัก
