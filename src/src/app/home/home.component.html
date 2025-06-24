@@ -1,4 +1,5 @@
 <h1>🏠 ระบบอำนวยความสะดวกหอพัก</h1>
+<a *ngIf="isAdmin" routerLink="/staff" style="position:absolute;top:10px;right:10px">หน้าสำหรับเจ้าหน้าที่</a>
 
 <nav>
   <ul>
@@ -11,13 +12,6 @@
     <li><a routerLink="/qr-checkin">✅ QR Check-in</a></li>
     <li><a routerLink="/qr-scan">🔍 QR Scan</a></li>
 
-    <!-- เฉพาะ Admin เท่านั้น -->
-    <li *ngIf="isAdmin"><a routerLink="/admin-parcels">📦 จัดการพัสดุ (Admin)</a></li>
-    <li *ngIf="isAdmin"><a routerLink="/admin/announcement">📢 จัดการข่าวสาร (Admin)</a></li>
-    <li *ngIf="isAdmin"><a routerLink="/admin-users">👥 จัดการผู้ใช้ (Admin)</a></li>
-    <li *ngIf="isAdmin"><a routerLink="/admin/invoice">📄 จัดการใบแจ้งหนี้ (Admin)</a></li>
-    <li *ngIf="isAdmin"><a routerLink="/admin/repairs">🛠️ จัดการคำขอซ่อม (Admin)</a></li>
-        <li *ngIf="isAdmin"><a routerLink="/admin/facility-booking">🏢 จัดการการจองส่วนกลาง (Admin)</a></li>
 
   </ul>
 </nav>
