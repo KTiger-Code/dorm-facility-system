@@ -16,6 +16,7 @@ import { AdminUsersComponent }         from './admin-users/admin-users.component
 import { AdminGuard }                  from './admin.guard';
 import { AdminFacilityComponent }      from './admin-facility/admin-facility.component';
 import { AdminRepairComponent } from './admin-repair/admin-repair.component';
+import { AdminHomeComponent } from './admin-home/admin-home.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -33,6 +34,11 @@ export const routes: Routes = [
   { path: 'qr-scan',    component: QrScanComponent },
 
   // Admin pages
+  {
+    path: 'staff',
+    component: AdminHomeComponent,
+    canActivate: [AdminGuard]
+  },
   {
     path: 'admin/invoice',
     component: AdminInvoiceComponent,
