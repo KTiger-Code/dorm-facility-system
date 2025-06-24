@@ -3,12 +3,14 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #4c6ef5, #d0bfff);
+  background: url('/building.svg') center/cover no-repeat fixed,
+              linear-gradient(135deg, rgba(76, 110, 245, 0.6), rgba(208, 191, 255, 0.6));
+  background-blend-mode: overlay;
   padding: 1rem;
 }
 
 .login-card {
-  background: #fff;
+  background: rgba(255, 255, 255, 0.9);
   padding: 2rem;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
