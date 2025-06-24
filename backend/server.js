@@ -18,7 +18,6 @@ app.use('/api/repair-request', require('./routes/repair'));
 app.use('/api/parcels', require('./routes/parcel'));
 app.use('/api/facility-booking', require('./routes/facility')); // ✅ << ใช้ path นี้
 app.use('/api/announcements', require('./routes/announcement'));
-app.use('/api/qr-checkin', require('./routes/qr-checkin'));
 app.use('/api/line', require('./routes/line'));
 app.use('/api/line', require('./routes/lineNotify'));
 app.use('/api/users', require('./routes/user'));
