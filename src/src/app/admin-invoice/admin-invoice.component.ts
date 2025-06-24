@@ -44,12 +44,20 @@ export class AdminInvoiceComponent implements OnInit {
       id:              [null],
       room_number:     ['', Validators.required],  // พิมพ์เลขห้อง
       month_year:      ['', Validators.required],
+      water_prev_meter:       [0],
+      water_curr_meter:       [0],
+      water_unit_price:       [0],
       water_fee:       [0, [Validators.min(0)]],
+      electricity_prev_meter: [0],
+      electricity_curr_meter: [0],
+      electricity_unit_price: [0],
       electricity_fee: [0, [Validators.min(0)]],
       common_fee:      [0, [Validators.min(0)]],
       room_rent:       [0, [Validators.min(0)]],
       extra_charges:   this.fb.array([])
     });
+
+    this.form.valueChanges.subscribe(() => this.calcFees());
 
     this.loadUsers();
     this.loadAll();
@@ -108,6 +116,18 @@ export class AdminInvoiceComponent implements OnInit {
     return base + extra;
   }
 
+  calcFees() {
+    const v = this.form.value;
+    const waterUsed = (+v.water_curr_meter || 0) - (+v.water_prev_meter || 0);
+    const waterFee = waterUsed * (+v.water_unit_price || 0);
+    const elecUsed = (+v.electricity_curr_meter || 0) - (+v.electricity_prev_meter || 0);
+    const elecFee = elecUsed * (+v.electricity_unit_price || 0);
+    this.form.patchValue({
+      water_fee: waterFee,
+      electricity_fee: elecFee
+    }, { emitEvent: false });
+  }
+
   save() {
     if (this.form.invalid) {
       return alert('กรุณากรอกข้อมูลในฟอร์มให้ครบและถูกต้อง');
@@ -122,7 +142,13 @@ export class AdminInvoiceComponent implements OnInit {
     const payload = {
       user_id:         user.id,
       month_year:      v.month_year,
+      water_prev_meter:       v.water_prev_meter,
+      water_curr_meter:       v.water_curr_meter,
+      water_unit_price:       v.water_unit_price,
       water_fee:       v.water_fee,
+      electricity_prev_meter: v.electricity_prev_meter,
+      electricity_curr_meter: v.electricity_curr_meter,
+      electricity_unit_price: v.electricity_unit_price,
       electricity_fee: v.electricity_fee,
       common_fee:      v.common_fee,
       room_rent:       v.room_rent,
@@ -133,14 +159,24 @@ export class AdminInvoiceComponent implements OnInit {
       this.svc.updateInvoice(v.id, payload)
         .subscribe(() => {
           this.loadAll();
-          this.form.reset({ id:null, room_number:'', month_year:'', water_fee:0, electricity_fee:0, common_fee:0, room_rent:0, extra_charges:[] });
+          this.form.reset({
+            id:null, room_number:'', month_year:'',
+            water_prev_meter:0, water_curr_meter:0, water_unit_price:0, water_fee:0,
+            electricity_prev_meter:0, electricity_curr_meter:0, electricity_unit_price:0, electricity_fee:0,
+            common_fee:0, room_rent:0, extra_charges:[]
+          });
           this.extras.clear();
         });
     } else {
       this.svc.createInvoice(payload)
         .subscribe(() => {
           this.loadAll();
-          this.form.reset({ id:null, room_number:'', month_year:'', water_fee:0, electricity_fee:0, common_fee:0, room_rent:0, extra_charges:[] });
+          this.form.reset({
+            id:null, room_number:'', month_year:'',
+            water_prev_meter:0, water_curr_meter:0, water_unit_price:0, water_fee:0,
+            electricity_prev_meter:0, electricity_curr_meter:0, electricity_unit_price:0, electricity_fee:0,
+            common_fee:0, room_rent:0, extra_charges:[]
+          });
           this.extras.clear();
         });
     }
@@ -151,7 +187,13 @@ export class AdminInvoiceComponent implements OnInit {
       id:              inv.id,
       room_number:     inv.room_number,
       month_year:      inv.month_year,
+      water_prev_meter:       inv.water_prev_meter,
+      water_curr_meter:       inv.water_curr_meter,
+      water_unit_price:       inv.water_unit_price,
       water_fee:       inv.water_fee,
+      electricity_prev_meter: inv.electricity_prev_meter,
+      electricity_curr_meter: inv.electricity_curr_meter,
+      electricity_unit_price: inv.electricity_unit_price,
       electricity_fee: inv.electricity_fee,
       common_fee:      inv.common_fee,
       room_rent:       inv.room_rent

@@ -39,6 +39,14 @@ export class ResidentInvoiceComponent implements OnInit {
       .reduce((sum: number, x: any) => sum + (+x.amount || 0), 0);
   }
 
+  waterUsed(inv: any): number {
+    return (+inv.water_curr_meter || 0) - (+inv.water_prev_meter || 0);
+  }
+
+  electricityUsed(inv: any): number {
+    return (+inv.electricity_curr_meter || 0) - (+inv.electricity_prev_meter || 0);
+  }
+
   /** ปริ้นท์หน้าเป็น PDF */
   downloadPdf(inv: any) {
     // ส่วนนี้คุณอาจจะเปลี่ยนเป็น jsPDF/html2canvas ตามต้องการ
