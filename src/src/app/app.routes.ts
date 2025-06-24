@@ -8,8 +8,6 @@ import { RepairStatusComponent }       from './repair-status/repair-status.compo
 import { AnnouncementComponent }       from './announcements/announcement.component';
 import { FacilityBookingComponent }    from './facility-booking/facility-booking.component';
 import { ParcelNotificationComponent } from './parcel-notification/parcel-notification.component';
-import { QrCheckinComponent }          from './qr-checkin/qr-checkin.component';
-import { QrScanComponent }             from './qr-scan/qr-scan.component';
 import { AdminParcelsComponent }       from './admin-parcels/admin-parcels.component';
 import { AdminAnnouncementComponent }  from './admin-announcement/admin-announcement.component';
 import { AdminUsersComponent }         from './admin-users/admin-users.component';
@@ -30,8 +28,6 @@ export const routes: Routes = [
   { path: 'repair-status', component: RepairStatusComponent },
   { path: 'announcements', component: AnnouncementComponent },
   { path: 'parcel',     component: ParcelNotificationComponent },
-  { path: 'qr-checkin', component: QrCheckinComponent },
-  { path: 'qr-scan',    component: QrScanComponent },
 
   // Admin pages
   {
