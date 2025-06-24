@@ -1,0 +1,106 @@
+DROP TABLE IF EXISTS invoice_extras;
+DROP TABLE IF EXISTS invoices;
+DROP TABLE IF EXISTS repair_requests;
+DROP TABLE IF EXISTS parcels;
+DROP TABLE IF EXISTS facility_bookings;
+DROP TABLE IF EXISTS qr_checkins;
+DROP TABLE IF EXISTS announcements;
+DROP TABLE IF EXISTS users;
+
+CREATE TABLE users (
+  id INT NOT NULL AUTO_INCREMENT,
+  username VARCHAR(50) NOT NULL,
+  password VARCHAR(255) NOT NULL,
+  fullname VARCHAR(255) NOT NULL,
+  room_number VARCHAR(10) NOT NULL,
+  role ENUM('resident','admin') NOT NULL DEFAULT 'resident',
+  line_user_id VARCHAR(255) DEFAULT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE announcements (
+  id INT NOT NULL AUTO_INCREMENT,
+  title VARCHAR(255) NOT NULL,
+  content TEXT NOT NULL,
+  posted_by INT NOT NULL,
+  posted_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  FOREIGN KEY (posted_by) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE qr_checkins (
+  id INT NOT NULL AUTO_INCREMENT,
+  user_id INT NOT NULL,
+  room_number VARCHAR(10) NOT NULL,
+  checkin_time DATETIME NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE facility_bookings (
+  id INT NOT NULL AUTO_INCREMENT,
+  user_id INT NOT NULL,
+  facility_name VARCHAR(100) NOT NULL,
+  booking_date DATE NOT NULL,
+  time_slot_start TIME NOT NULL,
+  time_slot_end TIME NOT NULL,
+  number_of_people INT NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE parcels (
+  id INT NOT NULL AUTO_INCREMENT,
+  room_number VARCHAR(10) NOT NULL,
+  description VARCHAR(255) NOT NULL,
+  received_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  picked_up TINYINT(1) NOT NULL DEFAULT 0,
+  picked_up_at DATETIME DEFAULT NULL,
+  PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE repair_requests (
+  id INT NOT NULL AUTO_INCREMENT,
+  user_id INT NOT NULL,
+  room_number VARCHAR(10) NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  description TEXT NOT NULL,
+  status ENUM('pending','in_progress','completed') NOT NULL DEFAULT 'pending',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE invoices (
+  id INT NOT NULL AUTO_INCREMENT,
+  user_id INT NOT NULL,
+  water_fee DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  electricity_fee DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  common_fee DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  room_rent DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  month_year CHAR(7) NOT NULL,
+  paid TINYINT(1) NOT NULL DEFAULT 0,
+  paid_at DATETIME DEFAULT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  water_prev_meter DECIMAL(10,2) DEFAULT 0.00,
+  water_curr_meter DECIMAL(10,2) DEFAULT 0.00,
+  water_unit_price DECIMAL(10,2) DEFAULT 0.00,
+  electricity_prev_meter DECIMAL(10,2) DEFAULT 0.00,
+  electricity_curr_meter DECIMAL(10,2) DEFAULT 0.00,
+  electricity_unit_price DECIMAL(10,2) DEFAULT 0.00,
+  PRIMARY KEY (id),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE invoice_extras (
+  id INT NOT NULL AUTO_INCREMENT,
+  invoice_id INT NOT NULL,
+  label VARCHAR(255) NOT NULL,
+  amount DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  PRIMARY KEY (id),
+  FOREIGN KEY (invoice_id) REFERENCES invoices(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
