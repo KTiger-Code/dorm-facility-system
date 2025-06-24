@@ -146,11 +146,19 @@ exports.createInvoice = async (req, res) => {
     extra_charges = []
   } = req.body;
 
+  // ensure numeric values
+  const wp = parseFloat(water_prev_meter) || 0;
+  const wc = parseFloat(water_curr_meter) || 0;
+  const wprice = parseFloat(water_unit_price) || 0;
+  const ep = parseFloat(electricity_prev_meter) || 0;
+  const ec = parseFloat(electricity_curr_meter) || 0;
+  const eprice = parseFloat(electricity_unit_price) || 0;
+
   // คำนวณค่าน้ำและค่าไฟจากตัวเลขมิเตอร์และราคาต่อหน่วย
-  const water_used = water_curr_meter - water_prev_meter;
-  const electricity_used = electricity_curr_meter - electricity_prev_meter;
-  const water_fee = water_used * water_unit_price;
-  const electricity_fee = electricity_used * electricity_unit_price;
+  const water_used = wc - wp;
+  const electricity_used = ec - ep;
+  const water_fee = water_used * wprice;
+  const electricity_fee = electricity_used * eprice;
 
   try {
     // 1) insert invoice
@@ -162,8 +170,8 @@ exports.createInvoice = async (req, res) => {
           common_fee, room_rent)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [user_id, month_year,
-       water_prev_meter, water_curr_meter, water_unit_price, water_fee,
-       electricity_prev_meter, electricity_curr_meter, electricity_unit_price, electricity_fee,
+       wp, wc, wprice, water_fee,
+       ep, ec, eprice, electricity_fee,
        common_fee, room_rent]
     );
     const invoiceId = invResult.insertId;
@@ -202,10 +210,17 @@ exports.updateInvoice = async (req, res) => {
     extra_charges = []
   } = req.body;
 
-  const water_used = water_curr_meter - water_prev_meter;
-  const electricity_used = electricity_curr_meter - electricity_prev_meter;
-  const water_fee = water_used * water_unit_price;
-  const electricity_fee = electricity_used * electricity_unit_price;
+  const wp = parseFloat(water_prev_meter) || 0;
+  const wc = parseFloat(water_curr_meter) || 0;
+  const wprice = parseFloat(water_unit_price) || 0;
+  const ep = parseFloat(electricity_prev_meter) || 0;
+  const ec = parseFloat(electricity_curr_meter) || 0;
+  const eprice = parseFloat(electricity_unit_price) || 0;
+
+  const water_used = wc - wp;
+  const electricity_used = ec - ep;
+  const water_fee = water_used * wprice;
+  const electricity_fee = electricity_used * eprice;
 
   try {
     // 1) update invoice หลัก
@@ -224,8 +239,8 @@ exports.updateInvoice = async (req, res) => {
            room_rent       = ?
        WHERE id = ?`,
       [month_year,
-       water_prev_meter, water_curr_meter, water_unit_price, water_fee,
-       electricity_prev_meter, electricity_curr_meter, electricity_unit_price,
+       wp, wc, wprice, water_fee,
+       ep, ec, eprice,
        electricity_fee, common_fee, room_rent, id]
     );
     if (upd.affectedRows === 0) {
