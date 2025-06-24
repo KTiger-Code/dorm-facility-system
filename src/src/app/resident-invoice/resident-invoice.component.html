@@ -22,12 +22,22 @@
       <!-- 1-4 รายการคงที่ -->
       <tr>
         <td>1</td>
-        <td>ค่าไฟ</td>
+        <td>
+          ค่าไฟ
+          <div class="sub">{{ inv.electricity_prev_meter }} → {{ inv.electricity_curr_meter }}
+            ({{ electricityUsed(inv) }} หน่วย × {{ inv.electricity_unit_price }} ฿)
+          </div>
+        </td>
         <td class="amount">{{ inv.electricity_fee | number:'1.2-2' }} ฿</td>
       </tr>
       <tr>
         <td>2</td>
-        <td>ค่าน้ำ</td>
+        <td>
+          ค่าน้ำ
+          <div class="sub">{{ inv.water_prev_meter }} → {{ inv.water_curr_meter }}
+            ({{ waterUsed(inv) }} หน่วย × {{ inv.water_unit_price }} ฿)
+          </div>
+        </td>
         <td class="amount">{{ inv.water_fee       | number:'1.2-2' }} ฿</td>
       </tr>
       <tr>

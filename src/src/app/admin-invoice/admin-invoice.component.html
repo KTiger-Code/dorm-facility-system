@@ -13,8 +13,20 @@
   </div>
 
   <div class="row">
-    <label>ค่าน้ำ:      <input type="number" formControlName="water_fee" /></label>
-    <label>ค่าไฟ:       <input type="number" formControlName="electricity_fee" /></label>
+    <div class="sub">
+      <label>เลขน้ำเดือนก่อน: <input type="number" formControlName="water_prev_meter" /></label>
+      <label>เลขน้ำปัจจุบัน: <input type="number" formControlName="water_curr_meter" /></label>
+      <label>ราคาต่อหน่วย: <input type="number" formControlName="water_unit_price" /></label>
+      <label>ค่าน้ำรวม: <input type="number" formControlName="water_fee" readonly /></label>
+    </div>
+    <div class="sub">
+      <label>เลขไฟเดือนก่อน: <input type="number" formControlName="electricity_prev_meter" /></label>
+      <label>เลขไฟปัจจุบัน: <input type="number" formControlName="electricity_curr_meter" /></label>
+      <label>ราคาต่อหน่วย: <input type="number" formControlName="electricity_unit_price" /></label>
+      <label>ค่าไฟรวม: <input type="number" formControlName="electricity_fee" readonly /></label>
+    </div>
+  </div>
+  <div class="row">
     <label>ค่าส่วนกลาง: <input type="number" formControlName="common_fee" /></label>
     <label>ค่าเช่าห้อง:  <input type="number" formControlName="room_rent" /></label>
   </div>
@@ -59,8 +71,14 @@
     <tr *ngFor="let inv of filteredInvoices()">
       <td>{{ inv.room_number }}</td>
       <td>{{ inv.month_year }}</td>
-      <td>{{ inv.water_fee       | number:'1.2-2' }} ฿</td>
-      <td>{{ inv.electricity_fee | number:'1.2-2' }} ฿</td>
+      <td>
+        {{ inv.water_fee | number:'1.2-2' }} ฿
+        <div class="sub">{{ inv.water_prev_meter }}→{{ inv.water_curr_meter }} ({{ inv.water_curr_meter - inv.water_prev_meter }} x {{ inv.water_unit_price }})</div>
+      </td>
+      <td>
+        {{ inv.electricity_fee | number:'1.2-2' }} ฿
+        <div class="sub">{{ inv.electricity_prev_meter }}→{{ inv.electricity_curr_meter }} ({{ inv.electricity_curr_meter - inv.electricity_prev_meter }} x {{ inv.electricity_unit_price }})</div>
+      </td>
       <td>{{ inv.common_fee      | number:'1.2-2' }} ฿</td>
       <td>{{ inv.room_rent       | number:'1.2-2' }} ฿</td>
       <td>

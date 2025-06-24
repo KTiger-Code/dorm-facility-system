@@ -12,7 +12,13 @@ exports.getMyInvoices = async (req, res) => {
       `SELECT 
          id,
          month_year,
+         water_prev_meter,
+         water_curr_meter,
+         water_unit_price,
          water_fee,
+         electricity_prev_meter,
+         electricity_curr_meter,
+         electricity_unit_price,
          electricity_fee,
          common_fee,
          room_rent,
@@ -71,7 +77,13 @@ exports.getAllInvoices = async (req, res) => {
          inv.user_id,
          u.room_number,
          inv.month_year,
+         inv.water_prev_meter,
+         inv.water_curr_meter,
+         inv.water_unit_price,
          inv.water_fee,
+         inv.electricity_prev_meter,
+         inv.electricity_curr_meter,
+         inv.electricity_unit_price,
          inv.electricity_fee,
          inv.common_fee,
          inv.room_rent,
@@ -123,7 +135,13 @@ exports.createInvoice = async (req, res) => {
   const {
     user_id,
     month_year,
+    water_prev_meter = 0,
+    water_curr_meter = 0,
+    water_unit_price = 0,
     water_fee = 0,
+    electricity_prev_meter = 0,
+    electricity_curr_meter = 0,
+    electricity_unit_price = 0,
     electricity_fee = 0,
     common_fee = 0,
     room_rent = 0,
@@ -134,9 +152,15 @@ exports.createInvoice = async (req, res) => {
     // 1) insert invoice
     const [invResult] = await db.query(
       `INSERT INTO invoices
-         (user_id, month_year, water_fee, electricity_fee, common_fee, room_rent)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [user_id, month_year, water_fee, electricity_fee, common_fee, room_rent]
+         (user_id, month_year,
+          water_prev_meter, water_curr_meter, water_unit_price, water_fee,
+          electricity_prev_meter, electricity_curr_meter, electricity_unit_price, electricity_fee,
+          common_fee, room_rent)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [user_id, month_year,
+       water_prev_meter, water_curr_meter, water_unit_price, water_fee,
+       electricity_prev_meter, electricity_curr_meter, electricity_unit_price, electricity_fee,
+       common_fee, room_rent]
     );
     const invoiceId = invResult.insertId;
 
@@ -163,10 +187,16 @@ exports.updateInvoice = async (req, res) => {
   const id = parseInt(req.params.id, 10);
   const {
     month_year,
-    water_fee,
-    electricity_fee,
-    common_fee,
-    room_rent,
+    water_prev_meter = 0,
+    water_curr_meter = 0,
+    water_unit_price = 0,
+    water_fee = 0,
+    electricity_prev_meter = 0,
+    electricity_curr_meter = 0,
+    electricity_unit_price = 0,
+    electricity_fee = 0,
+    common_fee = 0,
+    room_rent = 0,
     extra_charges = []
   } = req.body;
 
@@ -175,12 +205,21 @@ exports.updateInvoice = async (req, res) => {
     const [upd] = await db.query(
       `UPDATE invoices
        SET month_year      = ?,
+           water_prev_meter       = ?,
+           water_curr_meter       = ?,
+           water_unit_price       = ?,
            water_fee       = ?,
+           electricity_prev_meter = ?,
+           electricity_curr_meter = ?,
+           electricity_unit_price = ?,
            electricity_fee = ?,
            common_fee      = ?,
            room_rent       = ?
        WHERE id = ?`,
-      [month_year, water_fee, electricity_fee, common_fee, room_rent, id]
+      [month_year,
+       water_prev_meter, water_curr_meter, water_unit_price, water_fee,
+       electricity_prev_meter, electricity_curr_meter, electricity_unit_price,
+       electricity_fee, common_fee, room_rent, id]
     );
     if (upd.affectedRows === 0) {
       return res.status(404).json({ error: 'Invoice not found' });
