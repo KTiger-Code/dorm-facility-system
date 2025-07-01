@@ -64,6 +64,8 @@
       <th>อื่นๆ</th>
       <th>รวม</th>
       <th>ชำระแล้ว</th>
+      <th>สถานะ</th>
+      <th>สลิป</th>
       <th>จัดการ</th>
     </tr>
   </thead>
@@ -94,6 +96,12 @@
         <input type="checkbox"
                [checked]="inv.paid"
                (change)="togglePaid(inv)" />
+      </td>
+      <td>
+        {{ inv.payment_status === 'paid' ? 'จ่ายเงินสำเร็จ' : inv.payment_status === 'waiting_review' ? 'รอตรวจสอบการชำระเงิน' : 'รอจ่ายเงิน' }}
+      </td>
+      <td>
+        <img *ngIf="inv.payment_proof" [src]="inv.payment_proof" style="max-width:80px" />
       </td>
       <td>
         <button (click)="edit(inv)">แก้ไข</button>
