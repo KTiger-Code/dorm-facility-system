@@ -28,6 +28,12 @@ export class InvoiceService {
   toggleInvoicePaid(id: number, paid: boolean): Observable<any> {
     return this.http.patch(`${this.api}/${id}/paid`, { paid }, this.auth());
   }
+  uploadProof(id: number, file: File): Observable<any> {
+    const form = new FormData();
+    form.append('file', file);
+    const opts = { headers: this.auth().headers };
+    return this.http.post(`${this.api}/${id}/proof`, form, opts);
+  }
   deleteInvoice(id: number): Observable<any> {
     return this.http.delete(`${this.api}/${id}`, this.auth());
   }

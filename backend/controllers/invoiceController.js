@@ -9,7 +9,7 @@ exports.getMyInvoices = async (req, res) => {
   try {
     // 1) ดึง invoices หลัก
     const [invoices] = await db.query(
-      `SELECT 
+      `SELECT
          id,
          month_year,
          water_prev_meter,
@@ -24,6 +24,8 @@ exports.getMyInvoices = async (req, res) => {
          room_rent,
          paid,
          paid_at,
+         payment_status,
+         payment_proof,
          created_at
        FROM invoices
        WHERE user_id = ?
@@ -89,6 +91,8 @@ exports.getAllInvoices = async (req, res) => {
          inv.room_rent,
          inv.paid,
          inv.paid_at,
+         inv.payment_status,
+         inv.payment_proof,
          inv.created_at
        FROM invoices AS inv
        JOIN users    AS u   ON inv.user_id = u.id
@@ -271,20 +275,52 @@ exports.toggleInvoicePaid = async (req, res) => {
   const id   = parseInt(req.params.id, 10);
   const paid = req.body.paid ? 1 : 0;
   const paidAt = paid ? new Date() : null;
+  const status = paid ? 'paid' : 'waiting_payment';
 
   try {
     const [upd] = await db.query(
       `UPDATE invoices
-       SET paid    = ?, paid_at = ?
+       SET paid = ?, paid_at = ?, payment_status = ?
        WHERE id = ?`,
-      [paid, paidAt, id]
+      [paid, paidAt, status, id]
     );
     if (upd.affectedRows === 0) {
       return res.status(404).json({ error: 'Invoice not found' });
     }
+    if (!paid) {
+      await db.query(
+        `UPDATE invoices SET payment_proof = NULL WHERE id = ?`,
+        [id]
+      );
+    }
     res.json({ message: 'Paid status updated' });
   } catch (err) {
     console.error('❌ toggleInvoicePaid error:', err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// — อัปโหลดหลักฐานการชำระเงิน
+exports.uploadPaymentProof = async (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  if (!req.file) {
+    return res.status(400).json({ error: 'No file uploaded' });
+  }
+  const filePath = `/uploads/slip/${req.file.filename}`;
+
+  try {
+    const [upd] = await db.query(
+      `UPDATE invoices
+       SET payment_proof = ?, payment_status = 'waiting_review'
+       WHERE id = ?`,
+      [filePath, id]
+    );
+    if (upd.affectedRows === 0) {
+      return res.status(404).json({ error: 'Invoice not found' });
+    }
+    res.json({ message: 'Proof uploaded', file: filePath });
+  } catch (err) {
+    console.error('❌ uploadPaymentProof error:', err);
     res.status(500).json({ error: err.message });
   }
 };

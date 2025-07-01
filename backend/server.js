@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const path = require('path');
 dotenv.config();
 
 const app = express();
@@ -10,6 +11,7 @@ app.use(cors({
   origin: 'http://localhost:4200' // หรือ app.use(cors()); ถ้าจะเปิดทั้งหมด
 }));
 app.use(express.json());
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ✅ เชื่อมต่อกับ routes (เรียงต่อกันได้เลย)
 app.use('/api/auth', require('./routes/auth'));

@@ -13,6 +13,7 @@ import { InvoiceService }  from '../invoice.service';
 export class ResidentInvoiceComponent implements OnInit {
   /** รายการใบแจ้งหนี้ทั้งหมดของผู้ใช้ */
   invoices: any[] = [];
+  uploading: { [id: number]: boolean } = {};
 
   constructor(private svc: InvoiceService) {}
 
@@ -51,5 +52,23 @@ export class ResidentInvoiceComponent implements OnInit {
   downloadPdf(inv: any) {
     // ส่วนนี้คุณอาจจะเปลี่ยนเป็น jsPDF/html2canvas ตามต้องการ
     window.print();
+  }
+
+  uploadProof(inv: any, event: any) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    this.uploading[inv.id] = true;
+    this.svc.uploadProof(inv.id, file)
+      .subscribe({
+        next: res => {
+          inv.payment_status = 'waiting_review';
+          inv.payment_proof = res.file;
+          this.uploading[inv.id] = false;
+        },
+        error: err => {
+          console.error('upload failed', err);
+          this.uploading[inv.id] = false;
+        }
+      });
   }
 }
