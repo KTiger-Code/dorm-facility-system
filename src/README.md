@@ -57,3 +57,7 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+## PromptPay QR
+
+Place your PromptPay QR code image at `public/QR-ME/QR.jpg`. The invoice page references this path when displaying the payment QR.
