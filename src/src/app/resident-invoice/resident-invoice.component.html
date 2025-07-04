@@ -84,7 +84,11 @@
       : inv.payment_status === 'waiting_review' ? 'รอตรวจสอบการชำระเงิน'
       : 'รอจ่ายเงิน' }}</p>
 
-    <img *ngIf="inv.payment_proof" [src]="inv.payment_proof" alt="slip" style="max-width:200px; display:block; margin-bottom:8px;" />
+    <img *ngIf="inv.payment_proof"
+         [src]="inv.payment_proof"
+         alt="slip"
+         style="max-width:200px; display:block; margin-bottom:8px;"
+         (error)="handleImgError($event)" />
 
     <div *ngIf="inv.payment_status === 'waiting_payment'">
       <img src="QR-ME/QR.jpg" alt="QR" style="max-width:200px;" />
