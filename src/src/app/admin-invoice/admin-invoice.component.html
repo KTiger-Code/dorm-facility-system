@@ -101,7 +101,10 @@
         {{ inv.payment_status === 'paid' ? 'จ่ายเงินสำเร็จ' : inv.payment_status === 'waiting_review' ? 'รอตรวจสอบการชำระเงิน' : 'รอจ่ายเงิน' }}
       </td>
       <td>
-        <img *ngIf="inv.payment_proof" [src]="inv.payment_proof" style="max-width:80px" />
+        <img *ngIf="inv.payment_proof"
+             [src]="inv.payment_proof"
+             style="max-width:80px"
+             (error)="handleImgError($event)" />
       </td>
       <td>
         <button (click)="edit(inv)">แก้ไข</button>

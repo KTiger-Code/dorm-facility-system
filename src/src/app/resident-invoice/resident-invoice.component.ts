@@ -71,4 +71,8 @@ export class ResidentInvoiceComponent implements OnInit {
         }
       });
   }
+
+  handleImgError(event: Event) {
+    (event.target as HTMLImageElement).src = 'building.svg';
+  }
 }

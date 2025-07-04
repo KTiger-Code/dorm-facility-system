@@ -213,4 +213,8 @@ export class AdminInvoiceComponent implements OnInit {
     if (!confirm('ลบใบแจ้งหนี้นี้?')) return;
     this.svc.deleteInvoice(id).subscribe(() => this.loadAll());
   }
+
+  handleImgError(event: Event) {
+    (event.target as HTMLImageElement).src = 'building.svg';
+  }
 }
