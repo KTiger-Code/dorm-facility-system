@@ -60,4 +60,4 @@ For more information on using the Angular CLI, including detailed command refere
 
 ## PromptPay QR
 
-Place your PromptPay QR code image at `public/QR-ME/QR.jpg`. The invoice page references this path when displaying the payment QR.
+Place your PromptPay QR code image at `public/QR-ME/QR.jpg`. The Resident Invoice page loads the image from `QR-ME/QR.jpg`, so ensure the file exists and restart the Angular server after adding it.

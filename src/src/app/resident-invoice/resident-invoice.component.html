@@ -87,7 +87,7 @@
     <img *ngIf="inv.payment_proof" [src]="inv.payment_proof" alt="slip" style="max-width:200px; display:block; margin-bottom:8px;" />
 
     <div *ngIf="inv.payment_status === 'waiting_payment'">
-      <img src="/QR-ME/QR.jpg" alt="QR" style="max-width:200px;" />
+      <img src="QR-ME/QR.jpg" alt="QR" style="max-width:200px;" />
       <div>
         <input type="file" (change)="uploadProof(inv, $event)" />
       </div>
