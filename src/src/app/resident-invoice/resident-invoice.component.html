@@ -85,7 +85,7 @@
       : 'รอจ่ายเงิน' }}</p>
 
     <img *ngIf="inv.payment_proof"
-         [src]="inv.payment_proof"
+         [src]="proofUrl(inv.payment_proof)"
          alt="slip"
          style="max-width:200px; display:block; margin-bottom:8px;"
          (error)="handleImgError($event)" />
