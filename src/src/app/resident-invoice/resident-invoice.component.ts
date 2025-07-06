@@ -72,6 +72,11 @@ export class ResidentInvoiceComponent implements OnInit {
       });
   }
 
+  proofUrl(url: string): string {
+    if (!url) return '';
+    return url.replace(/(?:\/uploads\/slip\/)+/, '/uploads/slip/');
+  }
+
   handleImgError(event: Event) {
     (event.target as HTMLImageElement).src = 'building.svg';
   }
