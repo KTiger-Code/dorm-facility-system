@@ -14,6 +14,7 @@ export class ResidentInvoiceComponent implements OnInit {
   /** รายการใบแจ้งหนี้ทั้งหมดของผู้ใช้ */
   invoices: any[] = [];
   uploading: { [id: number]: boolean } = {};
+  selectedImage: string | null = null;
 
   constructor(private svc: InvoiceService) {}
 
@@ -74,5 +75,9 @@ export class ResidentInvoiceComponent implements OnInit {
 
   handleImgError(event: Event) {
     (event.target as HTMLImageElement).src = 'building.svg';
+  }
+
+  openImage(src: string) {
+    this.selectedImage = src;
   }
 }
