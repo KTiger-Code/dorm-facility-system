@@ -32,6 +32,7 @@ export class AdminInvoiceComponent implements OnInit {
   invoices: any[] = [];
   users: any[] = [];
   searchRoom = '';  // สำหรับกรองตาราง
+  selectedImage: string | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -216,5 +217,9 @@ export class AdminInvoiceComponent implements OnInit {
 
   handleImgError(event: Event) {
     (event.target as HTMLImageElement).src = 'building.svg';
+  }
+
+  openImage(src: string) {
+    this.selectedImage = src;
   }
 }
