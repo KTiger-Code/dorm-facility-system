@@ -103,7 +103,8 @@
       <td>
         <img *ngIf="inv.payment_proof"
              [src]="inv.payment_proof"
-             style="max-width:80px"
+             style="max-width:80px; cursor:pointer;"
+             (click)="openImage(inv.payment_proof)"
              (error)="handleImgError($event)" />
       </td>
       <td>
@@ -113,3 +114,6 @@
     </tr>
   </tbody>
 </table>
+<div class="img-overlay" *ngIf="selectedImage" (click)="selectedImage=null">
+  <img [src]="selectedImage" alt="slip" />
+</div>

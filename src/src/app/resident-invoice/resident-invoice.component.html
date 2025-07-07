@@ -87,7 +87,8 @@
     <img *ngIf="inv.payment_proof"
          [src]="inv.payment_proof"
          alt="slip"
-         style="max-width:200px; display:block; margin-bottom:8px;"
+         style="max-width:200px; display:block; margin-bottom:8px; cursor:pointer;"
+         (click)="openImage(inv.payment_proof)"
          (error)="handleImgError($event)" />
 
     <div *ngIf="inv.payment_status === 'waiting_payment'">
@@ -98,4 +99,7 @@
       <div *ngIf="uploading[inv.id]">กำลังอัปโหลด...</div>
     </div>
   </div>
+</div>
+<div class="img-overlay" *ngIf="selectedImage" (click)="selectedImage=null">
+  <img [src]="selectedImage" alt="slip" />
 </div>
