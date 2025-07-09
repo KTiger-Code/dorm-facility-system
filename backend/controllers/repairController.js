@@ -135,5 +135,14 @@ exports.updateRepairRequest = async (req, res) => {
   }
 };
 
-// (ถ้าต้องการ) DELETE /api/repair-request/:id
-// exports.deleteRepairRequest = async (req, res) => { … }
+// DELETE /api/repair-request/:id
+exports.deleteRepairRequest = async (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  try {
+    await db.query('DELETE FROM repair_requests WHERE id = ?', [id]);
+    res.json({ message: 'ลบคำขอซ่อมแล้ว' });
+  } catch (err) {
+    console.error('❌ deleteRepairRequest error:', err);
+    res.status(500).json({ error: err.message });
+  }
+};

@@ -14,7 +14,7 @@ router.get('/all',          verify, ctr.getAllRepairRequests);
 router.patch('/:id/status', verify, ctr.updateRepairStatus);
 // อัพเดตข้อมูลอื่นๆ (title, description) ถ้าต้องการ
 router.patch('/:id',        verify, ctr.updateRepairRequest);
-// ถ้าต้องการ ลบคำขอซ่อม
-// router.delete('/:id',     verify, ctr.deleteRepairRequest);
+// ลบคำขอซ่อม
+router.delete('/:id',     verify, ctr.deleteRepairRequest);
 
 module.exports = router;

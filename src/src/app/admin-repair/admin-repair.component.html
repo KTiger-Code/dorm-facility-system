@@ -1,5 +1,15 @@
 <h2>จัดการคำขอซ่อม (Admin)</h2>
 
+<label>
+  สถานะ:
+  <select [(ngModel)]="filterStatus">
+    <option value="all">ทั้งหมด</option>
+    <option value="pending">รอดำเนินการ</option>
+    <option value="in_progress">กำลังดำเนินการ</option>
+    <option value="completed">เสร็จสิ้น</option>
+  </select>
+</label>
+
 <table class="repair-table">
   <thead>
     <tr>
@@ -7,10 +17,11 @@
       <th>หัวข้อ</th>
       <th>รายละเอียด</th>
       <th>สถานะ</th>
+      <th>จัดการ</th>
     </tr>
   </thead>
   <tbody>
-    <tr *ngFor="let r of repairs">
+    <tr *ngFor="let r of filteredRepairs()">
       <td>{{ r.room_number }}</td>
       <td>{{ r.title }}</td>
       <td>{{ r.description }}</td>
@@ -23,6 +34,9 @@
           <option value="in_progress">กำลังดำเนินการ</option>
           <option value="completed">เสร็จสิ้น</option>
         </select>
+      </td>
+      <td>
+        <button (click)="deleteRepair(r.id)">🗑️</button>
       </td>
     </tr>
   </tbody>

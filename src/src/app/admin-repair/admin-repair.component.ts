@@ -24,6 +24,7 @@ export class AdminRepairComponent implements OnInit {
     created_at: string;
     updated_at: string | null;
   }[] = [];
+  filterStatus: 'all' | 'pending' | 'in_progress' | 'completed' = 'all';
 
   constructor(private http: HttpClient) {}
 
@@ -48,6 +49,18 @@ export class AdminRepairComponent implements OnInit {
         },
         error: err => console.error('โหลดคำขอซ่อม (Admin) ไม่สำเร็จ:', err)
       });
+  }
+
+  filteredRepairs() {
+    return this.repairs.filter(r =>
+      this.filterStatus === 'all' || r.status === this.filterStatus
+    );
+  }
+
+  deleteRepair(id: number) {
+    if (!confirm('ลบคำขอนี้?')) return;
+    this.http.delete(`/api/repair-request/${id}`, this.authHeaders())
+      .subscribe(() => this.loadAll());
   }
 
   updateStatus(req: any, newStatus: 'pending' | 'in_progress' | 'completed') {
