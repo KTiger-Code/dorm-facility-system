@@ -14,6 +14,7 @@ export class AdminParcelsComponent implements OnInit {
   allParcels: any[]      = [];
   filteredParcels: any[] = [];
   searchRoom: string     = '';
+  statusFilter: string   = 'all';
   newParcel = { room_number: '', description: '' };
   users: any[]          = [];
 
@@ -47,9 +48,16 @@ export class AdminParcelsComponent implements OnInit {
 
   applyFilter() {
     const kw = this.searchRoom.trim().toLowerCase();
-    this.filteredParcels = this.allParcels.filter(p =>
-      p.room_number.toLowerCase().includes(kw)
-    );
+    this.filteredParcels = this.allParcels.filter(p => {
+      const roomMatch = p.room_number.toLowerCase().includes(kw);
+      let statusMatch = true;
+      if (this.statusFilter === 'received') {
+        statusMatch = p.picked_up;
+      } else if (this.statusFilter === 'notReceived') {
+        statusMatch = !p.picked_up;
+      }
+      return roomMatch && statusMatch;
+    });
   }
 
   deleteParcel(id: number) {
