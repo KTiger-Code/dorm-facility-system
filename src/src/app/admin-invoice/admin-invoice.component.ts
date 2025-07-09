@@ -32,6 +32,7 @@ export class AdminInvoiceComponent implements OnInit {
   invoices: any[] = [];
   users: any[] = [];
   searchRoom = '';  // สำหรับกรองตาราง
+  filterStatus = 'all'; // กรองสถานะการชำระเงิน
   selectedImage: string | null = null;
 
   constructor(
@@ -96,15 +97,26 @@ export class AdminInvoiceComponent implements OnInit {
       })),
       error: err => console.error('โหลด invoices ไม่สำเร็จ:', err)
     });
+
+
+  // ตรวจสอบว่าห้องที่กรอกมีในระบบ
+  validateRoom() {
+    const room = this.form.value.room_number;
+    if (room && !this.users.find(u => u.room_number === room)) {
+      alert('ไม่พบห้องในระบบ');
+      this.form.patchValue({ room_number: '' });
+    }
   }
+
 
   // คืนรายการหลังกรอง searchRoom
   filteredInvoices() {
     const q = this.searchRoom.trim().toLowerCase();
-    if (!q) return this.invoices;
-    return this.invoices.filter(inv =>
-      inv.room_number.toLowerCase().includes(q)
-    );
+    return this.invoices.filter(inv => {
+      const matchRoom = inv.room_number.toLowerCase().includes(q);
+      const matchStatus = this.filterStatus === 'all' || inv.payment_status === this.filterStatus;
+      return matchRoom && matchStatus;
+    });
   }
 
   total(inv: any): number {
