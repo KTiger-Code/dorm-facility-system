@@ -2,7 +2,10 @@
 
 <form (ngSubmit)="addParcel()" class="add-form">
   <label>ห้องพัก:</label>
-  <input type="text" [(ngModel)]="newParcel.room_number" name="room_number" required><br>
+  <input type="text" [(ngModel)]="newParcel.room_number" name="room_number" list="roomList" required (blur)="validateRoom()"><br>
+  <datalist id="roomList">
+    <option *ngFor="let u of users" [value]="u.room_number"></option>
+  </datalist>
   <label>รายละเอียดพัสดุ:</label>
   <input type="text" [(ngModel)]="newParcel.description" name="description" required><br>
   <button type="submit">เพิ่มพัสดุ</button>
