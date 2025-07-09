@@ -4,11 +4,14 @@
   <div class="row">
     <label>
       ห้อง:
-      <input type="text" formControlName="room_number" placeholder="พิมพ์เลขห้อง" />
+      <input type="text" formControlName="room_number" placeholder="พิมพ์เลขห้อง" list="roomList" (blur)="validateRoom()" />
     </label>
+    <datalist id="roomList">
+      <option *ngFor="let u of users" [value]="u.room_number"></option>
+    </datalist>
     <label>
       เดือน/ปี:
-      <input formControlName="month_year" placeholder="YYYY-MM" />
+      <input type="month" formControlName="month_year" />
     </label>
   </div>
 
@@ -50,6 +53,15 @@
 <label>
   ค้นหาเฉพาะห้อง:
   <input type="text" [(ngModel)]="searchRoom" placeholder="พิมพ์เลขห้องเพื่อกรอง" />
+</label>
+<label>
+  สถานะการจ่ายเงิน:
+  <select [(ngModel)]="filterStatus">
+    <option value="all">ทั้งหมด</option>
+    <option value="paid">จ่ายเงินสำเร็จ</option>
+    <option value="waiting_review">รอตรวจสอบ</option>
+    <option value="waiting_payment">รอจ่ายเงิน</option>
+  </select>
 </label>
 
 <table>
