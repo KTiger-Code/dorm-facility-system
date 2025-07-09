@@ -15,6 +15,14 @@
   🔍 ค้นหาห้อง:
   <input [(ngModel)]="searchRoom" (ngModelChange)="applyFilter()" placeholder="เช่น A101">
 </label>
+<label>
+  สถานะ:
+  <select [(ngModel)]="statusFilter" (change)="applyFilter()">
+    <option value="all">ทั้งหมด</option>
+    <option value="notReceived">ยังไม่รับ</option>
+    <option value="received">รับแล้ว</option>
+  </select>
+</label>
 
 <table class="parcel-table">
   <thead>
