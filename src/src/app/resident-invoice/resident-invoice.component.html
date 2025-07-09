@@ -1,6 +1,6 @@
 <h2 style="text-align:center; margin-bottom:16px;">ใบแจ้งหนี้</h2>
 
-<div *ngFor="let inv of invoices" class="invoice-container" style="margin-bottom:32px;">
+<div *ngFor="let inv of invoices" class="invoice-container">
   <!-- — ส่วนหัวข้อมูลห้อง/เดือนปี — -->
   <table class="header">
     <tr>
@@ -87,7 +87,7 @@
     <img *ngIf="inv.payment_proof"
          [src]="inv.payment_proof"
          alt="slip"
-         style="max-width:200px; display:block; margin-bottom:8px; cursor:pointer;"
+         class="slip-img"
          (click)="openImage(inv.payment_proof)"
          (error)="handleImgError($event)" />
 
