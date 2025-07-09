@@ -15,10 +15,12 @@ export class AdminParcelsComponent implements OnInit {
   filteredParcels: any[] = [];
   searchRoom: string     = '';
   newParcel = { room_number: '', description: '' };
+  users: any[]          = [];
 
   constructor(private http: HttpClient) {}
 
   ngOnInit() {
+    this.loadUsers();
     this.fetchAllParcels();
   }
 
@@ -32,6 +34,14 @@ export class AdminParcelsComponent implements OnInit {
       .subscribe(data => {
         this.allParcels = data;
         this.applyFilter();
+      });
+  }
+
+  loadUsers() {
+    this.http.get<any[]>('/api/users', this.getAuth())
+      .subscribe({
+        next: data => this.users = data,
+        error: err  => console.error('โหลดผู้ใช้ไม่สำเร็จ:', err)
       });
   }
 
@@ -54,7 +64,18 @@ export class AdminParcelsComponent implements OnInit {
       .subscribe(() => this.fetchAllParcels());
   }
 
+  validateRoom() {
+    const room = this.newParcel.room_number;
+    if (room && !this.users.find(u => u.room_number === room)) {
+      alert('ไม่พบห้องในระบบ');
+      this.newParcel.room_number = '';
+    }
+  }
+
   addParcel() {
+    if (!this.users.find(u => u.room_number === this.newParcel.room_number)) {
+      return alert('ไม่พบห้องในระบบ');
+    }
     this.http.post('/api/parcels', this.newParcel, this.getAuth())
       .subscribe({
         next: () => {
