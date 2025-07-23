@@ -1,58 +1,205 @@
-.login-wrapper {
-  height: 100vh;
+.login-page-container {
+  min-height: 100vh;
+  background: #ededed;
   display: flex;
+  flex-direction: column;
+}
+
+.header-bar {
+  width: 100%;
+  background: #ededed;
+  border-bottom: 3px solid #222;
+  padding: 32px 0 8px 0;
+  display: flex;
+  align-items: flex-start;
+}
+
+.logo-section {
+  display: flex;
+  align-items: flex-start;
+  margin-left: 24px; /* ลด margin ซ้ายให้ชิดขอบมากขึ้น */
+  margin-top: 8px;   /* เพิ่ม margin บนเล็กน้อย */
+}
+
+.logo-icon {
+  height: 56px !important;
+  width: auto !important;
+  margin-right: 18px;
+  margin-top: 0;
+}
+
+.logo-title {
+  font-weight: bold;
+  font-size: 1.7rem;
+  letter-spacing: 1px;
+  line-height: 1.1;
+  color: #111;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  justify-content: stretch;
+  align-items: stretch;
+  height: calc(100vh - 100px);
+  margin-top: 0;
+}
+
+.login-image-section {
+  flex: 1 1 50%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  height: 100%;
+  min-width: 0;
+  padding-top: 32px; /* ขยับรูปลงมาไม่ให้ทับเส้น */
+  padding-left: 0; /* ชิดซ้ายสุด */
+}
+
+.login-building-img {
+  width: 100%;
+  height: calc(100vh - 100px - 32px);
+  object-fit: cover;
+  object-position: left center;
+  border-radius: 0;
+  box-shadow: none;
+  margin-left: 0; /* ชิดซ้ายสุด */
+}
+
+.login-form-section {
+  flex: 1 1 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 294px; /* ลดลง 30% จาก 420px */
+  max-width: 420px; /* ลดลง 30% จาก 600px */
+  padding: 32px 32px 32px 32px;
+  background: transparent;
+  height: 100%;
+}
+
+.login-form-section {
+  /* จัดให้อยู่ตรงกลางแนวตั้งและแนวนอนของฝั่งขวา */
   justify-content: center;
   align-items: center;
-  background: url('/building.svg') center/cover no-repeat fixed,
-              linear-gradient(135deg, rgba(76, 110, 245, 0.6), rgba(208, 191, 255, 0.6));
-  background-blend-mode: overlay;
-  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
-.login-card {
-  background: rgba(255, 255, 255, 0.9);
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+.login-user-icon {
+  margin-bottom: 32px;
+  display: flex;
+  justify-content: center;
+}
+
+.login-user-icon img {
+  width: 220px !important;
+  height: 120px !important;
+  max-width: 100%;
+  margin-bottom: 0;
+}
+
+/* --- Login Form --- */
+.login-form {
   width: 100%;
-  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px; /* เพิ่มช่องว่างระหว่าง input */
 }
 
-.login-card h2 {
-  text-align: center;
-  margin-bottom: 0.5rem;
+.input-group {
+  display: flex;
+  align-items: center;
+  border: 3px solid #222;
+  border-radius: 8px;
+  background: #fff;
+  margin-bottom: 0;
+  height: 52px;
+  overflow: hidden;
+  font-size: 1.1rem;
 }
 
-.tagline {
-  text-align: center;
-  color: #666;
-  margin-bottom: 1.5rem;
+.input-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 100%;
+  border-right: 2px solid #222;
+  background: #fff;
 }
 
-input {
-  display: block;
-  margin-bottom: 1rem;
-  width: 100%;
-  padding: 0.5rem;
-  border-radius: 6px;
-  border: 1px solid #ccc;
+.input-icon img {
+  width: 32px;
+  height: 32px;
 }
 
-button {
-  width: 100%;
-  padding: 0.5rem;
-  background-color: #4c6ef5;
-  color: #fff;
+.input-group input {
   border: none;
-  border-radius: 6px;
-  cursor: pointer;
+  outline: none;
+  font-size: 1.1rem;
+  padding: 0 16px;
+  height: 100%;
+  width: 100%;
+  background: #fff;
+  color: #222;
+  font-weight: 500;
+  letter-spacing: 1px;
 }
 
-button:hover {
-  background-color: #3b5bdb;
+.input-group input::placeholder {
+  color: #888;
+  font-weight: 400;
+  letter-spacing: 2px;
+}
+
+.login-btn {
+  margin-top: 24px;
+  width: 100%;
+  height: 64px;
+  background: #dedede;
+  color: #111;
+  font-size: 1.25rem;
+  font-weight: bold;
+  border: 2px solid #888;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.login-btn:hover {
+  background: #cfcfcf;
+  color: #000;
 }
 
 .message {
+  margin-top: 18px;
+  color: #d32f2f;
+  font-size: 1.1rem;
   text-align: center;
-  margin-top: 1rem;
+}
+
+@media (max-width: 900px) {
+  .main-content {
+    flex-direction: column;
+    align-items: stretch;
+    margin-top: 0;
+  }
+  .login-image-section {
+    justify-content: center;
+    margin-bottom: 24px;
+  }
+  .login-building-img {
+    width: 90vw;
+    max-width: 95vw;
+    height: 260px;
+  }
+  .login-form-section {
+    min-width: unset;
+    max-width: 98vw;
+    padding: 16px;
+  }
 }

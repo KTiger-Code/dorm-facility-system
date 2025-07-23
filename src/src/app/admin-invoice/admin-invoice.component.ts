@@ -97,7 +97,7 @@ export class AdminInvoiceComponent implements OnInit {
       })),
       error: err => console.error('โหลด invoices ไม่สำเร็จ:', err)
     });
-
+  }
 
   // ตรวจสอบว่าห้องที่กรอกมีในระบบ
   validateRoom() {
@@ -107,7 +107,6 @@ export class AdminInvoiceComponent implements OnInit {
       this.form.patchValue({ room_number: '' });
     }
   }
-
 
   // คืนรายการหลังกรอง searchRoom
   filteredInvoices() {

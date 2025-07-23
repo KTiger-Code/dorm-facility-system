@@ -1,12 +1,38 @@
-<div class="login-wrapper">
-  <div class="login-card">
-    <h2>🏢 ระบบอำนวยความสะดวกหอพัก</h2>
-    <p class="tagline">บริหารห้องเช่าง่ายๆ ในที่เดียว</p>
-    <form (ngSubmit)="login()">
-      <input type="text" [(ngModel)]="username" name="username" placeholder="Username" required />
-      <input type="password" [(ngModel)]="password" name="password" placeholder="Password" required />
-      <button type="submit">เข้าสู่ระบบ</button>
-    </form>
-    <p class="message">{{ message }}</p>
+<div class="login-page-container">
+  <div class="header-bar">
+    <div class="logo-section" style="align-items: center;">
+      <img src="/Photo/Logo-icon.svg" alt="logo" class="logo-icon" style="height:56px;width:auto;" />
+      <div class="logo-text" style="display: flex; align-items: center; justify-content: center; height: 100%;">
+        <div class="logo-title" style="text-align: center;">FACILITY AND SERVICE SYSTEM</div>
+      </div>
+    </div>
+  </div>
+  <div class="main-content">
+    <div class="login-image-section">
+      <!-- ใช้ path รูปภาพใหม่ที่อยู่ใน public/Photo/Login-buiding.svg -->
+      <img src="/Photo/Login-buiding.svg" alt="building" class="login-building-img" />
+    </div>
+    <div class="login-form-section">
+      <div class="login-user-icon">
+        <!-- เปลี่ยนเป็นรูป SVG จาก public/Photo/login-form-section.svg -->
+        <img src="/Photo/login-form-section.svg" alt="user icon" style="width:160px;height:90px;" />
+      </div>
+      <form (ngSubmit)="login()" class="login-form">
+        <div class="input-group">
+          <span class="input-icon">
+            <img src="/Photo/Login-user-icon.svg" alt="user icon" style="width:24px;height:24px;" />
+          </span>
+          <input type="text" [(ngModel)]="username" name="username" placeholder="USERNAME" required />
+        </div>
+        <div class="input-group">
+          <span class="input-icon">
+            <img src="/Photo/Login-password-icon.svg" alt="password icon" style="width:24px;height:24px;" />
+          </span>
+          <input type="password" [(ngModel)]="password" name="password" placeholder="PASSWORD" required />
+        </div>
+        <button type="submit" class="login-btn">LOGIN</button>
+      </form>
+      <p class="message">{{ message }}</p>
+    </div>
   </div>
 </div>

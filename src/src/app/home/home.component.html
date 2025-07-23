@@ -1,20 +1,106 @@
-<h1>🏠 ระบบอำนวยความสะดวกหอพัก</h1>
-<a *ngIf="isAdmin" routerLink="/staff" style="position:absolute;top:10px;right:10px">หน้าสำหรับเจ้าหน้าที่</a>
 
-<nav>
-  <ul>
-    <li><a routerLink="/invoice">📄 ใบแจ้งหนี้</a></li>
-    <li><a routerLink="/repair">🛠️ แจ้งซ่อม</a></li>
-    <li><a routerLink="/repair-status">🔍 ตรวจสอบสถานะการซ่อม</a></li>
-    <li><a routerLink="/announcements">📢 ข่าวสาร</a></li>
-    <li><a routerLink="/facility-booking">📅 จองบริการส่วนกลาง</a></li>
-    <li><a routerLink="/parcel">📦 แจ้งพัสดุ</a></li>
-
-
+<header class="home-header">
+  <div class="logo-section">
+    <img src="/Photo/Logo-icon.svg" class="logo-icon-img" alt="logo">
+    <span class="logo-title">FACILITY AND SERVICE SYSTEM</span>
+  </div>
+  <div class="header-actions-vertical">
+    <div class="admin-block">
+      <img src="/Photo/For-admin-icon.svg" class="admin-icon-img" alt="for admin">
+      <span class="admin-label">สำหรับเจ้าหน้าที่<br>FOR ADMIN</span>
+      <a *ngIf="isAdmin" routerLink="/staff" class="admin-link"></a>
+    </div>
+    <button class="line-connect" (click)="connectLine()">
+      <img src="/Photo/Line-icon.svg" class="line-icon-img" alt="line icon">
+      <span class="line-label">เชื่อมต่อบัญชี LINE<br>CONECT LINE ACCOUNT</span>
+    </button>
+  </div>
+</header>
+<div class="home-divider"></div>
+<nav class="home-nav">
+  <ul class="menu-list">
+    <li class="menu-item">
+      <a routerLink="/invoice" class="menu-btn menu-btn-horizontal">
+        <span class="menu-icon-horizontal-wrap">
+          <img src="/Photo/invoice-icon.svg" class="menu-icon-horizontal" alt="invoice">
+        </span>
+        <span class="menu-label-horizontal-wrap">
+          <span class="menu-labels-block">
+            <span class="menu-label-th">ใบแจ้งหนี้</span>
+            <span class="menu-label-en">INVOICE</span>
+          </span>
+        </span>
+      </a>
+    </li>
+    <li class="menu-item">
+      <a routerLink="/repair" class="menu-btn menu-btn-horizontal">
+        <span class="menu-icon-horizontal-wrap">
+          <img src="/Photo/service-request-icon.svg" class="menu-icon-horizontal" alt="service request">
+        </span>
+        <span class="menu-label-horizontal-wrap">
+          <span class="menu-labels-block">
+            <span class="menu-label-th">แจ้งซ่อม</span>
+            <span class="menu-label-en">SERVICE REQUEST</span>
+          </span>
+        </span>
+      </a>
+    </li>
+    <li class="menu-item">
+      <a routerLink="/repair-status" class="menu-btn menu-btn-horizontal">
+        <span class="menu-icon-horizontal-wrap">
+          <img src="/Photo/service-status-icon.svg" class="menu-icon-horizontal" alt="service status">
+        </span>
+        <span class="menu-label-horizontal-wrap">
+          <span class="menu-labels-block">
+            <span class="menu-label-th">สถานะซ่อม</span>
+            <span class="menu-label-en">SERVICE STATUS</span>
+          </span>
+        </span>
+      </a>
+    </li>
+    <li class="menu-item">
+      <a routerLink="/announcements" class="menu-btn menu-btn-horizontal">
+        <span class="menu-icon-horizontal-wrap">
+          <img src="/Photo/announcement-icon.svg" class="menu-icon-horizontal" alt="announcement">
+        </span>
+        <span class="menu-label-horizontal-wrap">
+          <span class="menu-labels-block">
+            <span class="menu-label-th">ประกาศข่าวสาร</span>
+            <span class="menu-label-en">ANNOUNCEMENT</span>
+          </span>
+        </span>
+      </a>
+    </li>
+    <li class="menu-item">
+      <a routerLink="/facility-booking" class="menu-btn menu-btn-horizontal">
+        <span class="menu-icon-horizontal-wrap">
+          <img src="/Photo/facility-booking-icon.svg" class="menu-icon-horizontal" alt="facility booking">
+        </span>
+        <span class="menu-label-horizontal-wrap">
+          <span class="menu-labels-block">
+            <span class="menu-label-th">จองบริการส่วนกลาง</span>
+            <span class="menu-label-en">FACILITY BOOKING</span>
+          </span>
+        </span>
+      </a>
+    </li>
+    <li class="menu-item">
+      <a routerLink="/parcel" class="menu-btn menu-btn-horizontal">
+        <span class="menu-icon-horizontal-wrap">
+          <img src="/Photo/parcel-icon.svg" class="menu-icon-horizontal" alt="parcel">
+        </span>
+        <span class="menu-label-horizontal-wrap">
+          <span class="menu-labels-block">
+            <span class="menu-label-th">พัสดุของฉัน</span>
+            <span class="menu-label-en">PARCEL</span>
+          </span>
+        </span>
+      </a>
+    </li>
   </ul>
 </nav>
-
-<!-- ปุ่มเชื่อม LINE -->
-<button (click)="connectLine()" style="margin-top:20px;">
-  🔗 เชื่อมบัญชี LINE
-</button>
+<main class="home-main">
+  <div class="ad-area">
+    <img src="/Photo/advert.svg" alt="advert" class="advert-img">
+  </div>
+</main>
