@@ -1,27 +1,58 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule }    from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
 import { InvoiceService }  from '../invoice.service';
 
 @Component({
   selector: 'app-resident-invoice',
   standalone: true,
-  imports: [CommonModule, HttpClientModule],
+  imports: [CommonModule, HttpClientModule, FormsModule],
   templateUrl: './resident-invoice.component.html',
   styleUrls: ['./resident-invoice.component.css']
 })
 export class ResidentInvoiceComponent implements OnInit {
   /** รายการใบแจ้งหนี้ทั้งหมดของผู้ใช้ */
   invoices: any[] = [];
+  filteredInvoices: any[] = [];
   uploading: { [id: number]: boolean } = {};
   selectedImage: string | null = null;
 
-  constructor(private svc: InvoiceService) {}
+  selectedMonth: string = '';
+  selectedYear: string = '';
+  
+  months = [
+    { value: '01', label: 'มกราคม' },
+    { value: '02', label: 'กุมภาพันธ์' },
+    { value: '03', label: 'มีนาคม' },
+    { value: '04', label: 'เมษายน' },
+    { value: '05', label: 'พฤษภาคม' },
+    { value: '06', label: 'มิถุนายน' },
+    { value: '07', label: 'กรกฎาคม' },
+    { value: '08', label: 'สิงหาคม' },
+    { value: '09', label: 'กันยายน' },
+    { value: '10', label: 'ตุลาคม' },
+    { value: '11', label: 'พฤศจิกายน' },
+    { value: '12', label: 'ธันวาคม' }
+  ];
+
+  years: number[] = [];
+
+  constructor(private svc: InvoiceService) {
+    // สร้างรายการปีย้อนหลัง 5 ปี และ ล่วงหน้า 2 ปี
+    const currentYear = new Date().getFullYear();
+    for (let year = currentYear - 5; year <= currentYear + 2; year++) {
+      this.years.push(year);
+    }
+  }
 
   ngOnInit() {
     this.svc.getMyInvoices().subscribe({
-      next: data   => this.invoices = data,
-      error: err   => console.error('โหลดใบแจ้งหนี้ไม่สำเร็จ', err)
+      next: data => {
+        this.invoices = data;
+        this.filteredInvoices = [...this.invoices];
+      },
+      error: err => console.error('โหลดใบแจ้งหนี้ไม่สำเร็จ', err)
     });
   }
 
@@ -53,6 +84,24 @@ export class ResidentInvoiceComponent implements OnInit {
   downloadPdf(inv: any) {
     // ส่วนนี้คุณอาจจะเปลี่ยนเป็น jsPDF/html2canvas ตามต้องการ
     window.print();
+  }
+
+  /** กรองใบแจ้งหนี้ตามเดือนและปีที่เลือก */
+  filterInvoices() {
+    if (!this.selectedMonth && !this.selectedYear) {
+      this.filteredInvoices = [...this.invoices];
+      return;
+    }
+
+    this.filteredInvoices = this.invoices.filter(inv => {
+      if (!inv.month_year) return false;
+      
+      const [month, year] = inv.month_year.split('/');
+      const matchMonth = !this.selectedMonth || month === this.selectedMonth;
+      const matchYear = !this.selectedYear || year === this.selectedYear;
+      
+      return matchMonth && matchYear;
+    });
   }
 
   uploadProof(inv: any, event: any) {

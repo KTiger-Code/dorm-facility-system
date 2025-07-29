@@ -7,6 +7,7 @@ import {
   FormArray,
   Validators,
 } from '@angular/forms';
+import { MonthYear, MONTHS } from '../shared/month-year.model';
 import {
   HttpClientModule,
   HttpClient,
@@ -35,17 +36,30 @@ export class AdminInvoiceComponent implements OnInit {
   filterStatus = 'all'; // กรองสถานะการชำระเงิน
   selectedImage: string | null = null;
 
+  months = MONTHS;
+  years: number[] = [];
+
+  // เก็บข้อมูลมิเตอร์ล่าสุดของแต่ละห้อง
+  lastMeterReadings: { [room: string]: { water: number; electricity: number } } = {};
+
   constructor(
     private fb: FormBuilder,
     private svc: InvoiceService,
     private http: HttpClient
-  ) {}
+  ) {
+    // สร้างรายการปีย้อนหลัง 5 ปี และล่วงหน้า 2 ปี
+    const currentYear = new Date().getFullYear();
+    for (let year = currentYear - 5; year <= currentYear + 2; year++) {
+      this.years.push(year);
+    }
+  }
 
   ngOnInit() {
     this.form = this.fb.group({
       id:              [null],
-      room_number:     ['', Validators.required],  // พิมพ์เลขห้อง
-      month_year:      ['', Validators.required],
+      room_number:     ['', Validators.required],
+      month:          ['', Validators.required],
+      year:           ['', Validators.required],
       water_prev_meter:       [0],
       water_curr_meter:       [0],
       water_unit_price:       [0],
@@ -89,12 +103,16 @@ export class AdminInvoiceComponent implements OnInit {
 
   loadAll() {
     this.svc.getAllInvoices().subscribe({
-      next: data => this.invoices = data.map(inv => ({
-        ...inv,
-        extra_charges: Array.isArray(inv.extra_charges)
-          ? inv.extra_charges
-          : []
-      })),
+      next: data => {
+        this.invoices = data.map(inv => ({
+          ...inv,
+          extra_charges: Array.isArray(inv.extra_charges)
+            ? inv.extra_charges
+            : []
+        }));
+        // อัพเดตข้อมูลมิเตอร์ล่าสุดของแต่ละห้อง
+        this.updateLastMeterReadings();
+      },
       error: err => console.error('โหลด invoices ไม่สำเร็จ:', err)
     });
   }
@@ -105,6 +123,48 @@ export class AdminInvoiceComponent implements OnInit {
     if (room && !this.users.find(u => u.room_number === room)) {
       alert('ไม่พบห้องในระบบ');
       this.form.patchValue({ room_number: '' });
+    } else {
+      // เมื่อเลือกห้องแล้ว ให้เซ็ตค่ามิเตอร์เดือนก่อน
+      this.setPreviousMonthReadings(room);
+    }
+  }
+
+  // อัพเดตข้อมูลมิเตอร์ล่าสุดของแต่ละห้อง
+  private updateLastMeterReadings() {
+    this.lastMeterReadings = {};
+    
+    // เรียงข้อมูลตามเดือน/ปี
+    const sortedInvoices = [...this.invoices].sort((a, b) => {
+      const [monthA, yearA] = (a.month_year || '').split('/');
+      const [monthB, yearB] = (b.month_year || '').split('/');
+      if (yearA !== yearB) return Number(yearA) - Number(yearB);
+      return Number(monthA) - Number(monthB);
+    });
+
+    // เก็บค่ามิเตอร์ล่าสุดของแต่ละห้อง
+    sortedInvoices.forEach(inv => {
+      if (inv.room_number) {
+        this.lastMeterReadings[inv.room_number] = {
+          water: Number(inv.water_curr_meter) || 0,
+          electricity: Number(inv.electricity_curr_meter) || 0
+        };
+      }
+    });
+  }
+
+  // เซ็ตค่ามิเตอร์จากเดือนก่อน
+  private setPreviousMonthReadings(room: string) {
+    if (this.lastMeterReadings[room]) {
+      this.form.patchValue({
+        water_prev_meter: this.lastMeterReadings[room].water,
+        electricity_prev_meter: this.lastMeterReadings[room].electricity
+      });
+    } else {
+      // ถ้าไม่มีข้อมูลเดือนก่อน ให้เซ็ตเป็น 0
+      this.form.patchValue({
+        water_prev_meter: 0,
+        electricity_prev_meter: 0
+      });
     }
   }
 
@@ -134,6 +194,7 @@ export class AdminInvoiceComponent implements OnInit {
     const waterFee = waterUsed * (+v.water_unit_price || 0);
     const elecUsed = (+v.electricity_curr_meter || 0) - (+v.electricity_prev_meter || 0);
     const elecFee = elecUsed * (+v.electricity_unit_price || 0);
+    
     this.form.patchValue({
       water_fee: waterFee,
       electricity_fee: elecFee
@@ -151,9 +212,12 @@ export class AdminInvoiceComponent implements OnInit {
       return alert(`ไม่พบห้อง "${v.room_number}" ในระบบ`);
     }
 
+    // สร้าง month_year ในรูปแบบ MM/YYYY
+    const month_year = `${v.month}/${v.year}`;
+
     const payload = {
       user_id:         user.id,
-      month_year:      v.month_year,
+      month_year:      month_year,
       water_prev_meter:       v.water_prev_meter,
       water_curr_meter:       v.water_curr_meter,
       water_unit_price:       v.water_unit_price,

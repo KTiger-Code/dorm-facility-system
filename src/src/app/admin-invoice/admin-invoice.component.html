@@ -10,20 +10,34 @@
       <option *ngFor="let u of users" [value]="u.room_number"></option>
     </datalist>
     <label>
-      เดือน/ปี:
-      <input type="month" formControlName="month_year" placeholder="MM-YYYY" />
+      เดือน:
+      <select formControlName="month">
+        <option value="">- เลือกเดือน -</option>
+        <option *ngFor="let month of months" [value]="month.value">
+          {{ month.label }}
+        </option>
+      </select>
+    </label>
+    <label>
+      ปี:
+      <select formControlName="year">
+        <option value="">- เลือกปี -</option>
+        <option *ngFor="let year of years" [value]="year">
+          {{ year }}
+        </option>
+      </select>
     </label>
   </div>
 
   <div class="row">
     <div class="sub">
-      <label>เลขน้ำเดือนก่อน: <input type="number" formControlName="water_prev_meter" /></label>
+      <label>เลขน้ำเดือนก่อน: <input type="number" formControlName="water_prev_meter" readonly /></label>
       <label>เลขน้ำปัจจุบัน: <input type="number" formControlName="water_curr_meter" /></label>
       <label>ราคาต่อหน่วย: <input type="number" formControlName="water_unit_price" /></label>
       <label>ค่าน้ำรวม: <input type="number" formControlName="water_fee" readonly /></label>
     </div>
     <div class="sub">
-      <label>เลขไฟเดือนก่อน: <input type="number" formControlName="electricity_prev_meter" /></label>
+      <label>เลขไฟเดือนก่อน: <input type="number" formControlName="electricity_prev_meter" readonly /></label>
       <label>เลขไฟปัจจุบัน: <input type="number" formControlName="electricity_curr_meter" /></label>
       <label>ราคาต่อหน่วย: <input type="number" formControlName="electricity_unit_price" /></label>
       <label>ค่าไฟรวม: <input type="number" formControlName="electricity_fee" readonly /></label>

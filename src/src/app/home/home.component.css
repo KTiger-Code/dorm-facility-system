@@ -47,7 +47,7 @@
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
-  margin-left: 8px;
+  flex: 1;
 }
 .menu-label-th {
   font-size: 0.80rem;
@@ -67,32 +67,31 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   background: #fff;
   border-radius: 20px;
   box-shadow: 0 4px 18px #0002;
-  min-width: 180px;
-  max-width: 260px;
-  min-height: 90px;
-  padding: 12px 18px 12px 18px;
+  min-width: 200px;
+  max-width: 280px;
+  min-height: 70px;
+  padding: 12px 20px;
   text-align: left;
   text-decoration: none;
   transition: box-shadow 0.2s, transform 0.2s;
   border: none;
   cursor: pointer;
-  gap: 14px;
+  gap: 16px;
 }
 .menu-btn-horizontal:hover {
   box-shadow: 0 8px 32px #0003;
   transform: translateY(-4px) scale(1.04);
 }
 .menu-icon-horizontal {
-  width: 38px;
-  height: 38px;
+  width: 32px;
+  height: 32px;
   object-fit: contain;
   filter: grayscale(100%) contrast(1.2);
   flex-shrink: 0;
-  margin-right: 0;
 }
 .menu-label-horizontal {
   font-size: 1.08rem;
@@ -105,8 +104,8 @@
   text-align: left;
 }
 .line-icon-img {
-  width: 32px;
-  height: 32px;
+  width: 26px;
+  height: 26px;
   margin-right: 8px;
   display: inline-block;
   vertical-align: middle;
@@ -173,12 +172,17 @@
   align-items: center;
   background: #fff;
   border-radius: 20px;
-  padding: 8px 24px;
-  box-shadow: 0 2px 8px #0001;
-  font-size: 1rem;
+  padding: 6px 20px;
+  box-shadow: 0 4px 18px #0002;
+  font-size: 0.95rem;
   position: relative;
-  min-width: 180px;
+  min-width: 144px;
   margin-bottom: 0;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.admin-block:hover {
+  box-shadow: 0 8px 32px #0003;
+  transform: translateY(-4px) scale(1.04);
 }
 .admin-icon {
   font-size: 1.5rem;
@@ -198,16 +202,17 @@
   align-items: center;
   background: #fff;
   border-radius: 20px;
-  padding: 8px 24px;
-  box-shadow: 0 2px 8px #0001;
+  padding: 6px 20px;
+  box-shadow: 0 4px 18px #0002;
   border: none;
   cursor: pointer;
-  font-size: 1rem;
-  min-width: 180px;
-  transition: background 0.2s;
+  font-size: 0.95rem;
+  min-width: 144px;
+  transition: box-shadow 0.2s, transform 0.2s;
 }
 .line-connect:hover {
-  background: #e0f7fa;
+  box-shadow: 0 8px 32px #0003;
+  transform: translateY(-4px) scale(1.04);
 }
 .line-icon {
   font-size: 1.5rem;

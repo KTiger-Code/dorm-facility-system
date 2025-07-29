@@ -97,6 +97,68 @@ button {
   margin: 0 auto 32px;
 }
 
+.month-selector {
+  background: #fff;
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 4px 18px #0002;
+  margin-bottom: 24px;
+}
+
+.month-selector-title {
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-bottom: 12px;
+  color: #333;
+}
+
+.month-selector select {
+  padding: 8px 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  margin-right: 12px;
+  min-width: 120px;
+  cursor: pointer;
+  background: #f8f8f8;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.month-selector select:hover {
+  border-color: #aaa;
+}
+
+.month-selector select:focus {
+  outline: none;
+  border-color: #666;
+  box-shadow: 0 0 0 2px rgba(0,0,0,0.1);
+}
+
+.month-selector button {
+  padding: 8px 20px;
+  background: #205081;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.month-selector button:hover {
+  background: #2a69aa;
+  transform: translateY(-1px);
+}
+
+.no-invoice-message {
+  text-align: center;
+  padding: 32px;
+  background: #f8f8f8;
+  border-radius: 12px;
+  color: #666;
+  font-size: 1.1rem;
+}
+
 .slip-img {
   max-width: 100px;
   display: block;

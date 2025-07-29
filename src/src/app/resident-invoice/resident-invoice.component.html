@@ -1,6 +1,27 @@
 <h2 style="text-align:center; margin-bottom:16px;">ใบแจ้งหนี้</h2>
 
-<div *ngFor="let inv of invoices" class="invoice-container">
+<div class="month-selector">
+  <div class="month-selector-title">เลือกเดือนที่ต้องการดูใบแจ้งหนี้</div>
+  <select [(ngModel)]="selectedMonth">
+    <option value="">- เลือกเดือน -</option>
+    <option *ngFor="let month of months" [value]="month.value">
+      {{ month.label }}
+    </option>
+  </select>
+  <select [(ngModel)]="selectedYear">
+    <option value="">- เลือกปี -</option>
+    <option *ngFor="let year of years" [value]="year">
+      {{ year }}
+    </option>
+  </select>
+  <button (click)="filterInvoices()">แสดงข้อมูล</button>
+</div>
+
+<div *ngIf="filteredInvoices.length === 0" class="no-invoice-message">
+  ไม่พบใบแจ้งหนี้ในเดือนที่เลือก
+</div>
+
+<div *ngFor="let inv of filteredInvoices" class="invoice-container">
   <!-- — ส่วนหัวข้อมูลห้อง/เดือนปี — -->
   <table class="header">
     <tr>
