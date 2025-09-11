@@ -1,8 +1,116 @@
-<h2>รายการพัสดุของคุณ</h2>
+<!-- Header Component -->
+<app-header [showHeaderActions]="true"></app-header>
 
-<ul>
-  <li *ngFor="let p of parcels">
-    📦 {{ p.description }}<br>
-    🕒 รับเมื่อ: {{ p.received_at | date:'d MMMM yyyy เวลา HH:mm น.' }}
-  </li>
-</ul>
+<!-- Page Title Section -->
+<div class="page-title-section">
+  <div class="page-title-content">
+    <h1 class="page-title">
+      <i class="page-icon">📦</i>
+      แจ้งเตือนพัสดุ
+    </h1>
+    <p class="page-description">ติดตามและตรวจสอบสถานะพัสดุที่ส่งมาให้คุณ</p>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="container">
+  <!-- Search and Statistics Section -->
+  <div class="search-wrapper">
+    <div class="search-header">
+      <h2 class="search-title">
+        <i class="search-icon">📋</i>
+        รายการพัสดุ
+      </h2>
+    </div>
+    
+    <div class="search-section">
+      <div class="search-form">
+        <div class="search-group">
+          <input type="text" class="search-input" placeholder="ค้นหาพัสดุ..." [(ngModel)]="searchQuery" (ngModelChange)="filterParcels()" />
+          <button class="search-btn">
+            <i class="search-btn-icon">🔍</i>
+          </button>
+        </div>
+      </div>
+      
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">📦</div>
+          <div class="stat-content">
+            <div class="stat-number">{{getTotalParcels()}}</div>
+            <div class="stat-label">พัสดุทั้งหมด</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🔔</div>
+          <div class="stat-content">
+            <div class="stat-number">{{getNewParcels()}}</div>
+            <div class="stat-label">พัสดุใหม่</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">✅</div>
+          <div class="stat-content">
+            <div class="stat-number">{{getPickedUpParcels()}}</div>
+            <div class="stat-label">รับแล้ว</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Parcels Display Section -->
+  <div class="table-wrapper">
+    <div class="parcels-grid" *ngIf="filteredParcels.length > 0; else noParcels">
+      <div class="parcel-card" *ngFor="let parcel of filteredParcels" [class]="getParcelStatusClass(parcel)">
+        <div class="parcel-header">
+          <div class="parcel-icon">📦</div>
+          <div class="parcel-info">
+            <h3 class="parcel-title">{{parcel.description}}</h3>
+            <span class="parcel-status" [class]="getStatusBadgeClass(parcel)">
+              {{getParcelStatus(parcel)}}
+            </span>
+          </div>
+        </div>
+        
+        <div class="parcel-details">
+          <div class="detail-item">
+            <i class="detail-icon">�</i>
+            <span class="detail-label">วันที่ได้รับ:</span>
+            <span class="detail-value">{{formatDate(parcel.received_at)}}</span>
+          </div>
+          <div class="detail-item">
+            <i class="detail-icon">⏰</i>
+            <span class="detail-label">เวลา:</span>
+            <span class="detail-value">{{formatTime(parcel.received_at)}}</span>
+          </div>
+          <div class="detail-item" *ngIf="parcel.sender">
+            <i class="detail-icon">👤</i>
+            <span class="detail-label">ผู้ส่ง:</span>
+            <span class="detail-value">{{parcel.sender}}</span>
+          </div>
+          <div class="detail-item" *ngIf="parcel.tracking_number">
+            <i class="detail-icon">🔢</i>
+            <span class="detail-label">เลขติดตาม:</span>
+            <span class="detail-value">{{parcel.tracking_number}}</span>
+          </div>
+        </div>
+        
+        <div class="parcel-actions" *ngIf="!parcel.picked_up">
+          <button class="btn btn-primary btn-sm" (click)="markAsPickedUp(parcel.id)">
+            <i class="btn-icon">✅</i>
+            รับพัสดุแล้ว
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #noParcels>
+      <div class="empty-state">
+        <div class="empty-icon">📦</div>
+        <h3 class="empty-title">ไม่มีพัสดุในขณะนี้</h3>
+        <p class="empty-description">เมื่อมีพัสดุส่งมาให้คุณ จะแสดงในหน้านี้</p>
+      </div>
+    </ng-template>
+  </div>
+</div>

@@ -15,6 +15,7 @@ import {
 } from '@angular/common/http';
 import { InvoiceService } from '../invoice.service';
 import { FormsModule } from '@angular/forms';
+import { HeaderComponent } from '../shared/header/header.component';
 
 @Component({
   selector: 'app-admin-invoice',
@@ -23,7 +24,8 @@ import { FormsModule } from '@angular/forms';
     CommonModule,
     HttpClientModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    HeaderComponent
   ],
   templateUrl: './admin-invoice.component.html',
   styleUrls: ['./admin-invoice.component.css']
@@ -176,6 +178,18 @@ export class AdminInvoiceComponent implements OnInit {
       const matchStatus = this.filterStatus === 'all' || inv.payment_status === this.filterStatus;
       return matchRoom && matchStatus;
     });
+  }
+
+  getPaidCount(): number {
+    return this.invoices.filter(inv => inv.payment_status === 'paid').length;
+  }
+
+  getUnpaidCount(): number {
+    return this.invoices.filter(inv => inv.payment_status === 'waiting_payment').length;
+  }
+
+  getReviewCount(): number {
+    return this.invoices.filter(inv => inv.payment_status === 'waiting_review').length;
   }
 
   total(inv: any): number {

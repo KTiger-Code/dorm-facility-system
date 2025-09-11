@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule }      from '@angular/common';
 import { FormsModule }       from '@angular/forms';
 import { HttpClientModule, HttpClient, HttpHeaders } from '@angular/common/http';
+import { HeaderComponent }   from '../shared/header/header.component';
 
 @Component({
   selector: 'app-admin-repair',
@@ -9,7 +10,8 @@ import { HttpClientModule, HttpClient, HttpHeaders } from '@angular/common/http'
   imports: [
     CommonModule,
     FormsModule,
-    HttpClientModule
+    HttpClientModule,
+    HeaderComponent
   ],
   templateUrl: './admin-repair.component.html',
   styleUrls: ['./admin-repair.component.css']
@@ -55,6 +57,18 @@ export class AdminRepairComponent implements OnInit {
     return this.repairs.filter(r =>
       this.filterStatus === 'all' || r.status === this.filterStatus
     );
+  }
+
+  getPendingCount(): number {
+    return this.repairs.filter(r => r.status === 'pending').length;
+  }
+
+  getInProgressCount(): number {
+    return this.repairs.filter(r => r.status === 'in_progress').length;
+  }
+
+  getCompletedCount(): number {
+    return this.repairs.filter(r => r.status === 'completed').length;
   }
 
   deleteRepair(id: number) {

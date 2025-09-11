@@ -4,7 +4,7 @@ import { HomeComponent }               from './home/home.component';
 import { ResidentInvoiceComponent }    from './resident-invoice/resident-invoice.component';
 import { AdminInvoiceComponent }       from './admin-invoice/admin-invoice.component';
 import { RepairRequestComponent }      from './repair-request/repair-request.component';
-import { RepairStatusComponent }       from './repair-status/repair-status.component';
+
 import { AnnouncementComponent }       from './announcements/announcement.component';
 import { FacilityBookingComponent }    from './facility-booking/facility-booking.component';
 import { ParcelNotificationComponent } from './parcel-notification/parcel-notification.component';
@@ -25,7 +25,7 @@ export const routes: Routes = [
   { path: 'invoice',    component: ResidentInvoiceComponent },
   { path: 'facility-booking', component: FacilityBookingComponent },
   { path: 'repair',     component: RepairRequestComponent },
-  { path: 'repair-status', component: RepairStatusComponent },
+
   { path: 'announcements', component: AnnouncementComponent },
   { path: 'parcel',     component: ParcelNotificationComponent },
 

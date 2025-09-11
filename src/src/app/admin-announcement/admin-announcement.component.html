@@ -1,17 +1,153 @@
-<h2>📢 ประกาศข่าวสาร</h2>
+<!-- Header Component -->
+<app-header [showHeaderActions]="false"></app-header>
 
-<label>
-  หัวข้อ:
-  <input [(ngModel)]="title" placeholder="กรอกหัวข้อประกาศ" />
-</label>
+<!-- Page Title Section -->
+<div class="page-title-section">
+  <div class="page-title-content">
+    <h1 class="page-title">
+      <i class="page-icon">📢</i>
+      จัดการประกาศข่าวสาร
+    </h1>
+    <p class="page-description">สร้างและจัดการประกาศข่าวสารสำหรับผู้อยู่อาศัยในหอพัก</p>
+  </div>
+</div>
 
-<br /><br />
+<!-- Main Content -->
+<div class="container">
+  <!-- Form Section -->
+  <div class="form-wrapper">
+    <div class="form-header">
+      <h2 class="form-title">
+        <i class="form-icon">📝</i>
+        สร้างประกาศใหม่
+      </h2>
+    </div>
+    
+    <form class="announcement-form">
+      <div class="form-section">
+        <div class="form-grid">
+          <div class="form-group full-width">
+            <label class="form-label">หัวข้อประกาศ</label>
+            <input type="text" [(ngModel)]="title" name="title"
+                   class="form-input" placeholder="กรอกหัวข้อประกาศ เช่น แจ้งปิดระบบน้ำชั่วคราว" 
+                   maxlength="100" />
+            <small class="input-hint">ความยาวสูงสุด 100 ตัวอักษร ({{title.length}}/100)</small>
+          </div>
+          <div class="form-group full-width">
+            <label class="form-label">เนื้อหาประกาศ</label>
+            <textarea [(ngModel)]="content" name="content" rows="6"
+                      class="form-textarea" placeholder="กรอกรายละเอียดของประกาศ..."
+                      maxlength="500"></textarea>
+            <small class="input-hint">ความยาวสูงสุด 500 ตัวอักษร ({{content.length}}/500)</small>
+          </div>
+        </div>
+      </div>
 
-<label>
-  เนื้อหา:
-  <textarea [(ngModel)]="content" rows="5" placeholder="กรอกเนื้อหาประกาศ"></textarea>
-</label>
+      <!-- Preview Section -->
+      <div class="preview-section" *ngIf="title.trim() || content.trim()">
+        <div class="preview-header">
+          <h3 class="preview-title">
+            <i class="preview-icon">👁️</i>
+            ตัวอย่างการแสดงผล
+          </h3>
+        </div>
+        <div class="preview-content">
+          <div class="announcement-preview">
+            <div class="announcement-header">
+              <div class="announcement-title">{{ title || 'หัวข้อประกาศ' }}</div>
+              <div class="announcement-date">{{ getCurrentDate() }}</div>
+            </div>
+            <div class="announcement-content">{{ content || 'เนื้อหาประกาศ' }}</div>
+          </div>
+        </div>
+      </div>
 
-<br /><br />
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button type="button" (click)="postAnnouncement()" class="btn btn-primary"
+                [disabled]="!title.trim() || !content.trim()">
+          <i class="btn-icon">📤</i>
+          ประกาศข่าวสาร
+        </button>
+        <button type="button" (click)="clearForm()" class="btn btn-secondary">
+          <i class="btn-icon">�️</i>
+          ล้างข้อมูล
+        </button>
+      </div>
+    </form>
+  </div>
 
-<button (click)="postAnnouncement()">📤 ประกาศ</button>
+  <!-- Existing Announcements Section -->
+  <div class="announcements-wrapper">
+    <div class="announcements-header">
+      <h2 class="announcements-title">
+        <i class="announcements-icon">📋</i>
+        ประกาศที่มีอยู่
+      </h2>
+      <button (click)="loadAnnouncements()" class="btn btn-outline">
+        <i class="btn-icon">🔄</i>
+        รีเฟรช
+      </button>
+    </div>
+    
+    <div class="search-section">
+      <div class="search-form">
+        <div class="search-group">
+          <input type="text" class="search-input" placeholder="ค้นหาประกาศ..." 
+                 [(ngModel)]="searchQuery" (ngModelChange)="filterAnnouncements()" />
+          <button class="search-btn">
+            <i class="search-btn-icon">🔍</i>
+          </button>
+        </div>
+      </div>
+      
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">�</div>
+          <div class="stat-content">
+            <div class="stat-number">{{getTotalAnnouncements()}}</div>
+            <div class="stat-label">ประกาศทั้งหมด</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🆕</div>
+          <div class="stat-content">
+            <div class="stat-number">{{getRecentAnnouncements()}}</div>
+            <div class="stat-label">ประกาศใหม่ (7 วัน)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Announcements List -->
+    <div class="announcements-list" *ngIf="filteredAnnouncements.length > 0; else noAnnouncements">
+      <div class="announcement-card" *ngFor="let announcement of filteredAnnouncements">
+        <div class="card-header">
+          <h3 class="card-title">{{announcement.title}}</h3>
+          <div class="card-date">{{formatDate(announcement.created_at)}}</div>
+        </div>
+        <div class="card-content">
+          <p class="card-text">{{announcement.content}}</p>
+        </div>
+        <div class="card-actions">
+          <button (click)="editAnnouncement(announcement)" class="btn btn-sm btn-secondary">
+            <i class="btn-icon">✏️</i>
+            แก้ไข
+          </button>
+          <button (click)="deleteAnnouncement(announcement.id)" class="btn btn-sm btn-danger">
+            <i class="btn-icon">🗑️</i>
+            ลบ
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #noAnnouncements>
+      <div class="empty-state">
+        <div class="empty-icon">📢</div>
+        <h3 class="empty-title">ยังไม่มีประกาศ</h3>
+        <p class="empty-description">เริ่มสร้างประกาศแรกของคุณเพื่อแจ้งข้อมูลข่าวสารให้ผู้อยู่อาศัย</p>
+      </div>
+    </ng-template>
+  </div>
+</div>

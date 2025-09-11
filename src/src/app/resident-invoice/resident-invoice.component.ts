@@ -3,11 +3,12 @@ import { CommonModule }    from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { InvoiceService }  from '../invoice.service';
+import { HeaderComponent } from '../shared/header/header.component';
 
 @Component({
   selector: 'app-resident-invoice',
   standalone: true,
-  imports: [CommonModule, HttpClientModule, FormsModule],
+  imports: [CommonModule, HttpClientModule, FormsModule, HeaderComponent],
   templateUrl: './resident-invoice.component.html',
   styleUrls: ['./resident-invoice.component.css']
 })
@@ -128,5 +129,49 @@ export class ResidentInvoiceComponent implements OnInit {
 
   openImage(src: string) {
     this.selectedImage = src;
+  }
+
+  // Statistics methods
+  getTotalAmount(): number {
+    return this.filteredInvoices.reduce((sum, inv) => sum + this.total(inv), 0);
+  }
+
+  getPaidInvoices(): number {
+    return this.filteredInvoices.filter(inv => inv.payment_status === 'paid').length;
+  }
+
+  getReviewInvoices(): number {
+    return this.filteredInvoices.filter(inv => inv.payment_status === 'waiting_review').length;
+  }
+
+  getPendingInvoices(): number {
+    return this.filteredInvoices.filter(inv => inv.payment_status === 'waiting_payment').length;
+  }
+
+  // Status methods
+  getStatusText(status: string): string {
+    switch (status) {
+      case 'paid':
+        return 'ชำระแล้ว';
+      case 'waiting_review':
+        return 'รอตรวจสอบ';
+      case 'waiting_payment':
+        return 'รอชำระ';
+      default:
+        return 'ไม่ทราบสถานะ';
+    }
+  }
+
+  getStatusClass(status: string): string {
+    switch (status) {
+      case 'paid':
+        return 'status-paid';
+      case 'waiting_review':
+        return 'status-review';
+      case 'waiting_payment':
+        return 'status-pending';
+      default:
+        return 'status-unknown';
+    }
   }
 }

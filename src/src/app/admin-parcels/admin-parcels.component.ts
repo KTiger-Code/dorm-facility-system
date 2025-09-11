@@ -2,11 +2,12 @@ import { Component, OnInit }  from '@angular/core';
 import { CommonModule }       from '@angular/common';
 import { FormsModule }        from '@angular/forms';
 import { HttpClient }         from '@angular/common/http';
+import { HeaderComponent }    from '../shared/header/header.component';
 
 @Component({
   selector: 'app-admin-parcels',
   standalone: true,
-  imports: [ CommonModule, FormsModule ],
+  imports: [ CommonModule, FormsModule, HeaderComponent ],
   templateUrl: './admin-parcels.component.html',
   styleUrls: ['./admin-parcels.component.css']
 })
@@ -58,6 +59,14 @@ export class AdminParcelsComponent implements OnInit {
       }
       return roomMatch && statusMatch;
     });
+  }
+
+  getReceivedCount(): number {
+    return this.allParcels.filter(p => p.picked_up).length;
+  }
+
+  getNotReceivedCount(): number {
+    return this.allParcels.filter(p => !p.picked_up).length;
   }
 
   deleteParcel(id: number) {

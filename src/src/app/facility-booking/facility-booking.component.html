@@ -1,32 +1,160 @@
-<h2>การจองบริการส่วนกลาง</h2>
+<!-- Header Component -->
+<app-header [showHeaderActions]="true"></app-header>
 
-<form (ngSubmit)="bookFacility()">
-  <label>กิจกรรม:</label>
-  <input type="text" [(ngModel)]="newBooking.facility_name" name="facility_name" required /><br>
+<!-- Page Title Section -->
+<div class="page-title-section">
+  <div class="page-title-content">
+    <h1 class="page-title">
+      <i class="page-icon">🏢</i>
+      จองบริการส่วนกลาง
+    </h1>
+    <p class="page-description">จองใช้สิ่งอำนวยความสะดวกและห้องกิจกรรมในหอพัก</p>
+  </div>
+</div>
 
-  <label>วันที่:</label>
-  <input type="date" [(ngModel)]="newBooking.booking_date" name="booking_date" required /><br>
+<!-- Main Content -->
+<div class="container">
+  <!-- Form Section -->
+  <div class="form-wrapper">
+    <div class="form-header">
+      <h2 class="form-title">
+        <i class="form-icon">📅</i>
+        จองสิ่งอำนวยความสะดวก
+      </h2>
+    </div>
+    
+    <form (ngSubmit)="bookFacility()" class="booking-form">
+      <div class="form-section">
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">ชื่อกิจกรรม/สถานที่</label>
+            <input type="text" [(ngModel)]="newBooking.facility_name" name="facility_name" 
+                   class="form-input" placeholder="เช่น ห้องประชุม, สนามกีฬา" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">วันที่จอง</label>
+            <input type="date" [(ngModel)]="newBooking.booking_date" name="booking_date" 
+                   class="form-input" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">เวลาเริ่ม</label>
+            <input type="time" [(ngModel)]="newBooking.time_slot_start" name="time_slot_start" 
+                   class="form-input" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">เวลาสิ้นสุด</label>
+            <input type="time" [(ngModel)]="newBooking.time_slot_end" name="time_slot_end" 
+                   class="form-input" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">จำนวนผู้เข้าร่วม</label>
+            <input type="number" [(ngModel)]="newBooking.number_of_people" name="number_of_people" 
+                   class="form-input" min="1" placeholder="จำนวนคน" required />
+          </div>
+        </div>
+      </div>
 
-  <label>เวลาเริ่ม:</label>
-  <input type="time" [(ngModel)]="newBooking.time_slot_start" name="time_slot_start" required /><br>
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">
+          <i class="btn-icon">📅</i>
+          จองเลย
+        </button>
+      </div>
+    </form>
+  </div>
 
-  <label>เวลาสิ้นสุด:</label>
-  <input type="time" [(ngModel)]="newBooking.time_slot_end" name="time_slot_end" required /><br>
+  <!-- Search and Statistics Section -->
+  <div class="search-wrapper">
+    <div class="search-header">
+      <h2 class="search-title">
+        <i class="search-icon">📋</i>
+        ประวัติการจอง
+      </h2>
+    </div>
+    
+    <div class="search-section">
+      <div class="search-form">
+        <div class="search-group">
+          <input type="text" class="search-input" placeholder="ค้นหาการจอง..." />
+          <button class="search-btn">
+            <i class="search-btn-icon">🔍</i>
+          </button>
+        </div>
+      </div>
+      
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">📅</div>
+          <div class="stat-content">
+            <div class="stat-number">{{getTotalBookings()}}</div>
+            <div class="stat-label">การจองทั้งหมด</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">⏰</div>
+          <div class="stat-content">
+            <div class="stat-number">{{getUpcomingBookings()}}</div>
+            <div class="stat-label">การจองที่กำลังจะมาถึง</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">✅</div>
+          <div class="stat-content">
+            <div class="stat-number">{{getCompletedBookings()}}</div>
+            <div class="stat-label">การจองที่เสร็จแล้ว</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-  <label>จำนวนคน:</label>
-  <input type="number" [(ngModel)]="newBooking.number_of_people" name="number_of_people" min="1" required /><br>
+  <!-- Bookings Display Section -->
+  <div class="table-wrapper">
+    <div class="bookings-grid" *ngIf="bookings.length > 0; else noBookings">
+      <div class="booking-card" *ngFor="let booking of bookings">
+        <div class="booking-header">
+          <h3 class="booking-title">{{booking.facility_name}}</h3>
+          <span class="booking-status" [class]="getBookingStatusClass(booking)">
+            {{getBookingStatus(booking)}}
+          </span>
+        </div>
+        
+        <div class="booking-details">
+          <div class="booking-info">
+            <div class="info-item">
+              <i class="info-icon">📅</i>
+              <span class="info-label">วันที่:</span>
+              <span class="info-value">{{formatDate(booking.booking_date)}}</span>
+            </div>
+            <div class="info-item">
+              <i class="info-icon">⏰</i>
+              <span class="info-label">เวลา:</span>
+              <span class="info-value">{{booking.time_slot_start}} - {{booking.time_slot_end}}</span>
+            </div>
+            <div class="info-item">
+              <i class="info-icon">👥</i>
+              <span class="info-label">จำนวนคน:</span>
+              <span class="info-value">{{booking.number_of_people}} คน</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="booking-actions" *ngIf="canCancelBooking(booking)">
+          <button class="btn btn-secondary btn-sm" (click)="cancelBooking(booking.booking_id)">
+            <i class="btn-icon">❌</i>
+            ยกเลิกการจอง
+          </button>
+        </div>
+      </div>
+    </div>
 
-  <button type="submit">จอง</button>
-</form>
-
-<hr>
-
-<h3>รายการที่จองแล้ว</h3>
-<ul>
-  <li *ngFor="let b of bookings">
-    <strong>{{ b.facility_name }}</strong> —
-    {{ formatDate(b.booking_date) }}
-    เวลา {{ b.time_slot_start }} – {{ b.time_slot_end }} น.
-    ({{ b.number_of_people }} คน)
-  </li>
-</ul>
+    <ng-template #noBookings>
+      <div class="empty-state">
+        <div class="empty-icon">📅</div>
+        <h3 class="empty-title">ยังไม่มีการจอง</h3>
+        <p class="empty-description">เริ่มจองสิ่งอำนวยความสะดวกสำหรับกิจกรรมของคุณ</p>
+      </div>
+    </ng-template>
+  </div>
+</div>

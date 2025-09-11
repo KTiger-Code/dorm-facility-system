@@ -1,22 +1,70 @@
-<h2>ข่าวสารจากหอพัก</h2>
+<!-- Header Component -->
+<app-header [showHeaderActions]="true"></app-header>
 
-<ul class="announcements">
-  <li *ngFor="let a of announcements" class="announcement-item">
-    <div class="meta">
-      <span class="timestamp">
-        {{ a.posted_at 
-           | date:'d MMM yyyy, HH:mm':'':'th-TH' }}
-      </span>
-      &nbsp;|&nbsp;
-      <span class="author">
-        โดย {{ a.posted_by_name }}
-      </span>
+<!-- Page Title Section -->
+<div class="page-title-section">
+  <div class="page-title-content">
+    <h1 class="page-title">
+      <i class="page-icon">📢</i>
+      ข่าวสารและประกาศ
+    </h1>
+    <p class="page-description">อัปเดตข่าวสารและประกาศสำคัญจากหอพัก</p>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="container">
+  <!-- Announcements Section -->
+  <div class="announcements-section">
+    <div class="section-header">
+      <h2 class="section-title">
+        <i class="section-icon">📋</i>
+        ข่าวสารล่าสุด
+      </h2>
+      <div class="announcement-stats">
+        <span class="stats-item">
+          <i class="stats-icon">📄</i>
+          ทั้งหมด: {{ announcements.length }} รายการ
+        </span>
+      </div>
     </div>
-    <h3 class="title">{{ a.title }}</h3>
-    <p class="content">{{ a.content }}</p>
-  </li>
-</ul>
 
-<ng-container *ngIf="announcements.length === 0">
-  <p>ยังไม่มีข่าวสารใหม่</p>
-</ng-container>
+    <!-- Announcements List -->
+    <div class="announcements-container">
+      <div *ngFor="let a of announcements" class="announcement-card">
+        <div class="card-header">
+          <div class="announcement-meta">
+            <span class="timestamp">
+              <i class="meta-icon">🕒</i>
+              {{ a.posted_at | date:'d MMMM yyyy, HH:mm':'':'th-TH' }}
+            </span>
+            <span class="author">
+              <i class="meta-icon">👤</i>
+              โดย {{ a.posted_by_name }}
+            </span>
+          </div>
+        </div>
+        
+        <div class="card-body">
+          <h3 class="announcement-title">{{ a.title }}</h3>
+          <div class="announcement-content">
+            <p>{{ a.content }}</p>
+          </div>
+        </div>
+        
+        <div class="card-footer">
+          <div class="announcement-actions">
+            <span class="announcement-id">ID: {{ a.id }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="announcements.length === 0" class="empty-state">
+        <div class="empty-icon">📢</div>
+        <h3 class="empty-title">ยังไม่มีข่าวสารใหม่</h3>
+        <p class="empty-description">ข่าวสารและประกาศจากหอพักจะแสดงที่นี่</p>
+      </div>
+    </div>
+  </div>
+</div>

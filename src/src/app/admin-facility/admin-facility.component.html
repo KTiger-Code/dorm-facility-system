@@ -1,43 +1,152 @@
-<h2>จัดการการจอง (Admin)</h2>
+<app-header [showHeaderActions]="false"></app-header>
 
-<label>🔍 ค้นหาห้อง:
-  <input [(ngModel)]="filterRoom" placeholder="A101">
-</label>
+<!-- Page Title Section -->
+<div class="page-title-section">
+  <div class="page-title-content">
+    <h1 class="page-title">
+      <i class="page-icon">🏢</i>
+      จัดการการจองส่วนกลาง
+    </h1>
+    <p class="page-description">ดูและจัดการการจองห้องและสิ่งอำนวยความสะดวกต่างๆ</p>
+  </div>
+</div>
 
-<table>
-  <thead>
-    <tr>
-      <th>ห้อง</th>
-      <th>กิจกรรม</th>
-      <th>วันที่</th>
-      <th>เวลา</th>
-      <th>จำนวนคน</th>
-      <th>จัดการ</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let b of filtered">
-      <td>{{ b.room_number }}</td>
-      <td>
-        <input [(ngModel)]="b.facility_name">
-      </td>
-      <td>
-        <input type="date" [(ngModel)]="b.booking_date">
-      </td>
-      <td>
-        <input type="time" [(ngModel)]="b.time_slot_start"> –
-        <input type="time" [(ngModel)]="b.time_slot_end">
-      </td>
-      <td>
-        <input type="number" min="1" [(ngModel)]="b.number_of_people">
-      </td>
-      <td>
-        <button (click)="save()">บันทึก</button>
-        <button (click)="delete(b.id)">ลบ</button>
-      </td>
-    </tr>
-    <tr *ngIf="filtered.length===0">
-      <td colspan="6">ยังไม่มีการจอง</td>
-    </tr>
-  </tbody>
-</table>
+<div class="container">
+  <!-- Search Section -->
+  <div class="search-wrapper">
+    <div class="search-header">
+      <h2 class="search-title">
+        <i class="search-icon">🔍</i>
+        ค้นหาการจอง
+      </h2>
+    </div>
+    
+    <div class="search-content">
+      <div class="search-form">
+        <div class="search-group">
+          <input 
+            [(ngModel)]="filterRoom" 
+            placeholder="ค้นหาหมายเลขห้อง เช่น A101, B202..." 
+            class="search-input"
+          >
+          <button class="search-btn">
+            <i class="search-btn-icon">🔍</i>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Statistics -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <i class="stat-icon">📋</i>
+          <div class="stat-content">
+            <div class="stat-number">{{ bookings.length }}</div>
+            <div class="stat-label">การจองทั้งหมด</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <i class="stat-icon">🔍</i>
+          <div class="stat-content">
+            <div class="stat-number">{{ filtered.length }}</div>
+            <div class="stat-label">ผลการค้นหา</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bookings Wrapper -->
+  <div class="bookings-wrapper">
+    <div class="bookings-header">
+      <h2 class="bookings-title">
+        <i class="bookings-icon">📅</i>
+        รายการการจอง
+      </h2>
+    </div>
+    
+    <div class="table-container" *ngIf="filtered.length > 0">
+      <div class="table-wrapper">
+        <table class="booking-table">
+          <thead>
+            <tr>
+              <th class="col-room">หมายเลขห้อง</th>
+              <th class="col-activity">ชื่อกิจกรรม</th>
+              <th class="col-date">วันที่จอง</th>
+              <th class="col-time">ช่วงเวลา</th>
+              <th class="col-people">จำนวนคน</th>
+              <th class="col-actions">การจัดการ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let b of filtered; let i = index" class="booking-row">
+              <td class="room-cell">
+                <div class="room-badge">{{ b.room_number }}</div>
+              </td>
+              <td class="activity-cell">
+                <input 
+                  [(ngModel)]="b.facility_name" 
+                  class="form-input activity-input"
+                  placeholder="ระบุชื่อกิจกรรม"
+                >
+              </td>
+              <td class="date-cell">
+                <input 
+                  type="date" 
+                  [(ngModel)]="b.booking_date" 
+                  class="form-input date-input"
+                >
+              </td>
+              <td class="time-cell">
+                <div class="time-range">
+                  <input 
+                    type="time" 
+                    [(ngModel)]="b.time_slot_start" 
+                    class="form-input time-input"
+                  >
+                  <span class="time-separator">ถึง</span>
+                  <input 
+                    type="time" 
+                    [(ngModel)]="b.time_slot_end" 
+                    class="form-input time-input"
+                  >
+                </div>
+              </td>
+              <td class="people-cell">
+                <div class="people-input-wrapper">
+                  <input 
+                    type="number" 
+                    min="1" 
+                    max="50"
+                    [(ngModel)]="b.number_of_people" 
+                    class="form-input people-input"
+                  >
+                  <span class="people-unit">คน</span>
+                </div>
+              </td>
+              <td class="actions-cell">
+                <div class="action-buttons">
+                  <button (click)="save()" class="btn btn-primary btn-sm" title="บันทึกการแก้ไข">
+                    <i class="btn-icon">💾</i>
+                    <span class="btn-text">บันทึก</span>
+                  </button>
+                  <button (click)="delete(b.id)" class="btn btn-danger btn-sm" title="ลบการจอง">
+                    <i class="btn-icon">🗑️</i>
+                    <span class="btn-text">ลบ</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="filtered.length === 0">
+      <i class="empty-icon">📅</i>
+      <h3 class="empty-title">ไม่พบข้อมูลการจอง</h3>
+      <p class="empty-description" *ngIf="filterRoom">ไม่พบการจองสำหรับห้อง "{{ filterRoom }}"</p>
+      <p class="empty-description" *ngIf="!filterRoom">ยังไม่มีการจองในระบบ</p>
+    </div>
+  </div>
+</div>

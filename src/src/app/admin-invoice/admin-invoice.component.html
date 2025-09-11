@@ -1,145 +1,306 @@
-<h2>จัดการใบแจ้งหนี้ (Admin)</h2>
+<!-- Header Component -->
+<app-header [showHeaderActions]="false"></app-header>
 
-<form [formGroup]="form" (ngSubmit)="save()">
-  <div class="row">
-    <label>
-      ห้อง:
-      <input type="text" formControlName="room_number" placeholder="พิมพ์เลขห้อง" list="roomList" (blur)="validateRoom()" />
-    </label>
-    <datalist id="roomList">
-      <option *ngFor="let u of users" [value]="u.room_number"></option>
-    </datalist>
-    <label>
-      เดือน:
-      <select formControlName="month">
-        <option value="">- เลือกเดือน -</option>
-        <option *ngFor="let month of months" [value]="month.value">
-          {{ month.label }}
-        </option>
-      </select>
-    </label>
-    <label>
-      ปี:
-      <select formControlName="year">
-        <option value="">- เลือกปี -</option>
-        <option *ngFor="let year of years" [value]="year">
-          {{ year }}
-        </option>
-      </select>
-    </label>
+<!-- Page Title Section -->
+<div class="page-title-section">
+  <div class="page-title-content">
+    <h1 class="page-title">
+      <i class="page-icon">💰</i>
+      จัดการใบแจ้งหนี้
+    </h1>
+    <p class="page-description">สร้างและจัดการใบแจ้งหนี้รายเดือนสำหรับผู้เช่า</p>
   </div>
+</div>
 
-  <div class="row">
-    <div class="sub">
-      <label>เลขน้ำเดือนก่อน: <input type="number" formControlName="water_prev_meter" readonly /></label>
-      <label>เลขน้ำปัจจุบัน: <input type="number" formControlName="water_curr_meter" /></label>
-      <label>ราคาต่อหน่วย: <input type="number" formControlName="water_unit_price" /></label>
-      <label>ค่าน้ำรวม: <input type="number" formControlName="water_fee" readonly /></label>
+<!-- Main Content -->
+<div class="container">
+  <!-- Form Section -->
+  <div class="form-wrapper">
+    <div class="form-header">
+      <h2 class="form-title">
+        <i class="form-icon">📄</i>
+        {{ form.value.id ? 'แก้ไขใบแจ้งหนี้' : 'สร้างใบแจ้งหนี้ใหม่' }}
+      </h2>
     </div>
-    <div class="sub">
-      <label>เลขไฟเดือนก่อน: <input type="number" formControlName="electricity_prev_meter" readonly /></label>
-      <label>เลขไฟปัจจุบัน: <input type="number" formControlName="electricity_curr_meter" /></label>
-      <label>ราคาต่อหน่วย: <input type="number" formControlName="electricity_unit_price" /></label>
-      <label>ค่าไฟรวม: <input type="number" formControlName="electricity_fee" readonly /></label>
+    
+    <form [formGroup]="form" (ngSubmit)="save()" class="invoice-form">
+      <!-- Basic Information -->
+      <div class="form-section">
+        <h3 class="section-title">ข้อมูลพื้นฐาน</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">ห้อง</label>
+            <input formControlName="room_number" class="form-input"
+                   (blur)="validateRoom()" placeholder="เช่น A001" list="roomList" />
+            <datalist id="roomList">
+              <option *ngFor="let u of users" [value]="u.room_number"></option>
+            </datalist>
+          </div>
+          <div class="form-group">
+            <label class="form-label">เดือน</label>
+            <select formControlName="month" class="form-select">
+              <option value="">-- เลือกเดือน --</option>
+              <option *ngFor="let month of months" [value]="month.value">
+                {{ month.label }}
+              </option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">ปี</label>
+            <select formControlName="year" class="form-select">
+              <option value="">-- เลือกปี --</option>
+              <option *ngFor="let year of years" [value]="year">{{ year }}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Water Section -->
+      <div class="form-section">
+        <h3 class="section-title">💧 ค่าน้ำประปา</h3>
+        <div class="form-grid utility-grid">
+          <div class="form-group">
+            <label class="form-label">มิเตอร์เดือนก่อน</label>
+            <input formControlName="water_prev_meter" type="number" readonly class="form-input readonly" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">มิเตอร์เดือนนี้</label>
+            <input formControlName="water_curr_meter" type="number" class="form-input" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">ราคาต่อหน่วย (บาท)</label>
+            <input formControlName="water_unit_price" type="number" step="0.01" class="form-input" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">ค่าน้ำรวม (บาท)</label>
+            <input formControlName="water_fee" type="number" readonly class="form-input readonly calculated" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Electricity Section -->
+      <div class="form-section">
+        <h3 class="section-title">⚡ ค่าไฟฟ้า</h3>
+        <div class="form-grid utility-grid">
+          <div class="form-group">
+            <label class="form-label">มิเตอร์เดือนก่อน</label>
+            <input formControlName="electricity_prev_meter" type="number" readonly class="form-input readonly" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">มิเตอร์เดือนนี้</label>
+            <input formControlName="electricity_curr_meter" type="number" class="form-input" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">ราคาต่อหน่วย (บาท)</label>
+            <input formControlName="electricity_unit_price" type="number" step="0.01" class="form-input" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">ค่าไฟรวม (บาท)</label>
+            <input formControlName="electricity_fee" type="number" readonly class="form-input readonly calculated" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Other Fees Section -->
+      <div class="form-section">
+        <h3 class="section-title">🏠 ค่าใช้จ่ายอื่นๆ</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">ค่าส่วนกลาง (บาท)</label>
+            <input formControlName="common_fee" type="number" class="form-input" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">ค่าเช่าห้อง (บาท)</label>
+            <input formControlName="room_rent" type="number" class="form-input" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Extra Charges Section -->
+      <div class="form-section">
+        <h3 class="section-title">📋 ค่าใช้จ่ายเพิ่มเติม</h3>
+        <div formArrayName="extra_charges" class="extra-charges">
+          <div *ngFor="let grp of extras.controls; let i = index" 
+               [formGroupName]="i" class="extra-charge-item">
+            <div class="form-group">
+              <label class="form-label">รายการ</label>
+              <input formControlName="label" placeholder="ระบุรายการ" class="form-input" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">จำนวนเงิน (บาท)</label>
+              <input formControlName="amount" type="number" placeholder="0" class="form-input" />
+            </div>
+            <div class="form-group">
+              <button type="button" (click)="removeExtra(i)" class="btn btn-danger btn-sm">
+                <i class="btn-icon">🗑️</i>
+                ลบ
+              </button>
+            </div>
+          </div>
+        </div>
+        <button type="button" (click)="addExtra()" class="btn btn-secondary">
+          <i class="btn-icon">➕</i>
+          เพิ่มรายการ
+        </button>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">
+          <i class="btn-icon">💾</i>
+          {{ form.value.id ? 'อัปเดตใบแจ้งหนี้' : 'สร้างใบแจ้งหนี้ใหม่' }}
+        </button>
+      </div>
+    </form>
+  </div>
+  <!-- Search and Filter Section -->
+  <div class="search-section">
+    <div class="search-header">
+      <h2 class="search-title">
+        <i class="search-icon">📊</i>
+        รายการใบแจ้งหนี้
+      </h2>
+      <div class="search-stats">
+        <span class="stats-item">
+          <i class="stats-icon">📄</i>
+          ทั้งหมด: {{ invoices.length }}
+        </span>
+        <span class="stats-item">
+          <i class="stats-icon">✅</i>
+          จ่ายแล้ว: {{ getPaidCount() }}
+        </span>
+        <span class="stats-item">
+          <i class="stats-icon">🔍</i>
+          รอตรวจสอบ: {{ getReviewCount() }}
+        </span>
+        <span class="stats-item">
+          <i class="stats-icon">⏳</i>
+          รอจ่าย: {{ getUnpaidCount() }}
+        </span>
+      </div>
+    </div>
+    
+    <div class="search-controls">
+      <div class="form-group">
+        <label class="form-label">ค้นหาห้อง</label>
+        <input type="text" [(ngModel)]="searchRoom" placeholder="พิมพ์เลขห้องเพื่อกรอง" class="form-input" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">สถานะการจ่ายเงิน</label>
+        <select [(ngModel)]="filterStatus" class="form-select">
+          <option value="all">ทั้งหมด</option>
+          <option value="paid">จ่ายเงินสำเร็จ</option>
+          <option value="waiting_review">รอตรวจสอบ</option>
+          <option value="waiting_payment">รอจ่ายเงิน</option>
+        </select>
+      </div>
     </div>
   </div>
-  <div class="row">
-    <label>ค่าส่วนกลาง: <input type="number" formControlName="common_fee" /></label>
-    <label>ค่าเช่าห้อง:  <input type="number" formControlName="room_rent" /></label>
-  </div>
 
-  <div formArrayName="extra_charges" class="extras">
-    <div *ngFor="let grp of extras.controls; let i = index" [formGroupName]="i">
-      <input formControlName="label" placeholder="คำอธิบายเพิ่มเติม" />
-      <input type="number" formControlName="amount" placeholder="จำนวนเงิน" />
-      <button type="button" (click)="removeExtra(i)">ลบ</button>
+  <!-- Table Section -->
+  <div class="table-wrapper">
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>ห้อง</th>
+            <th>เดือน/ปี</th>
+            <th>ค่าน้ำ</th>
+            <th>ค่าไฟ</th>
+            <th>ค่าส่วนกลาง</th>
+            <th>ค่าเช่าห้อง</th>
+            <th>อื่นๆ</th>
+            <th>รวม</th>
+            <th>ชำระแล้ว</th>
+            <th>สถานะ</th>
+            <th>สลิป</th>
+            <th>จัดการ</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let inv of filteredInvoices()">
+            <td>
+              <div class="room-cell">
+                <span class="room-badge">{{ inv.room_number }}</span>
+              </div>
+            </td>
+            <td class="month-cell">{{ inv.month_year }}</td>
+            <td class="amount-cell">
+              <div class="amount-main">{{ inv.water_fee | number:'1.2-2' }} ฿</div>
+              <div class="amount-detail">{{ inv.water_prev_meter }}→{{ inv.water_curr_meter }} ({{ inv.water_curr_meter - inv.water_prev_meter }} x {{ inv.water_unit_price }})</div>
+            </td>
+            <td class="amount-cell">
+              <div class="amount-main">{{ inv.electricity_fee | number:'1.2-2' }} ฿</div>
+              <div class="amount-detail">{{ inv.electricity_prev_meter }}→{{ inv.electricity_curr_meter }} ({{ inv.electricity_curr_meter - inv.electricity_prev_meter }} x {{ inv.electricity_unit_price }})</div>
+            </td>
+            <td class="amount-cell">{{ inv.common_fee | number:'1.2-2' }} ฿</td>
+            <td class="amount-cell">{{ inv.room_rent | number:'1.2-2' }} ฿</td>
+            <td class="extra-cell">
+              <ng-container *ngIf="inv.extra_charges.length; else noExtras">
+                <div *ngFor="let ex of inv.extra_charges" class="extra-item">
+                  {{ ex.label }}: {{ ex.amount | number:'1.2-2' }} ฿
+                </div>
+              </ng-container>
+              <ng-template #noExtras>
+                <span class="no-data">–</span>
+              </ng-template>
+            </td>
+            <td class="total-cell">
+              <span class="total-amount">{{ total(inv) | number:'1.2-2' }} ฿</span>
+            </td>
+            <td class="checkbox-cell">
+              <label class="checkbox-container">
+                <input type="checkbox"
+                       [checked]="inv.paid"
+                       (change)="togglePaid(inv)" />
+                <span class="checkmark"></span>
+              </label>
+            </td>
+            <td class="status-cell">
+              <span class="status-badge" 
+                    [ngClass]="{
+                      'status-paid': inv.payment_status === 'paid',
+                      'status-review': inv.payment_status === 'waiting_review',
+                      'status-waiting': inv.payment_status === 'waiting_payment'
+                    }">
+                {{ inv.payment_status === 'paid' ? 'จ่ายเงินสำเร็จ' : 
+                   inv.payment_status === 'waiting_review' ? 'รอตรวจสอบ' : 'รอจ่ายเงิน' }}
+              </span>
+            </td>
+            <td class="image-cell">
+              <img *ngIf="inv.payment_proof"
+                   [src]="inv.payment_proof"
+                   class="payment-proof"
+                   (click)="openImage(inv.payment_proof)"
+                   (error)="handleImgError($event)" />
+              <span *ngIf="!inv.payment_proof" class="no-data">ไม่มีสลิป</span>
+            </td>
+            <td class="action-cell">
+              <div class="action-buttons">
+                <button (click)="edit(inv)" class="btn btn-sm btn-secondary" title="แก้ไข">
+                  <i class="btn-icon">✏️</i>
+                </button>
+                <button (click)="delete(inv.id)" class="btn btn-sm btn-danger" title="ลบ">
+                  <i class="btn-icon">🗑️</i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="filteredInvoices().length === 0" class="no-data-row">
+            <td colspan="12" class="no-data-cell">
+              <div class="no-data-message">
+                <i class="no-data-icon">📄</i>
+                <p>ไม่พบข้อมูลใบแจ้งหนี้</p>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
-    <button type="button" (click)="addExtra()">+ เพิ่มค่าใช้จ่ายอื่นๆ</button>
   </div>
+</div>
 
-  <button type="submit">
-    {{ form.value.id ? 'อัปเดตใบแจ้งหนี้' : 'สร้างใบแจ้งหนี้ใหม่' }}
-  </button>
-</form>
-
-<hr>
-
-<label>
-  ค้นหาเฉพาะห้อง:
-  <input type="text" [(ngModel)]="searchRoom" placeholder="พิมพ์เลขห้องเพื่อกรอง" />
-</label>
-<label>
-  สถานะการจ่ายเงิน:
-  <select [(ngModel)]="filterStatus">
-    <option value="all">ทั้งหมด</option>
-    <option value="paid">จ่ายเงินสำเร็จ</option>
-    <option value="waiting_review">รอตรวจสอบ</option>
-    <option value="waiting_payment">รอจ่ายเงิน</option>
-  </select>
-</label>
-
-<table>
-  <thead>
-    <tr>
-      <th>ห้อง</th>
-      <th>เดือน/ปี</th>
-      <th>ค่าน้ำ</th>
-      <th>ค่าไฟ</th>
-      <th>ค่าส่วนกลาง</th>
-      <th>ค่าเช่าห้อง</th>
-      <th>อื่นๆ</th>
-      <th>รวม</th>
-      <th>ชำระแล้ว</th>
-      <th>สถานะ</th>
-      <th>สลิป</th>
-      <th>จัดการ</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let inv of filteredInvoices()">
-      <td>{{ inv.room_number }}</td>
-      <td>{{ inv.month_year }}</td>
-      <td>
-        {{ inv.water_fee | number:'1.2-2' }} ฿
-        <div class="sub">{{ inv.water_prev_meter }}→{{ inv.water_curr_meter }} ({{ inv.water_curr_meter - inv.water_prev_meter }} x {{ inv.water_unit_price }})</div>
-      </td>
-      <td>
-        {{ inv.electricity_fee | number:'1.2-2' }} ฿
-        <div class="sub">{{ inv.electricity_prev_meter }}→{{ inv.electricity_curr_meter }} ({{ inv.electricity_curr_meter - inv.electricity_prev_meter }} x {{ inv.electricity_unit_price }})</div>
-      </td>
-      <td>{{ inv.common_fee      | number:'1.2-2' }} ฿</td>
-      <td>{{ inv.room_rent       | number:'1.2-2' }} ฿</td>
-      <td>
-        <ng-container *ngIf="inv.extra_charges.length; else noExtras">
-          <span *ngFor="let ex of inv.extra_charges; let last = last">
-            {{ ex.label }}: {{ ex.amount | number:'1.2-2' }} ฿<span *ngIf="!last">, </span>
-          </span>
-        </ng-container>
-        <ng-template #noExtras>–</ng-template>
-      </td>
-      <td>{{ total(inv) | number:'1.2-2' }} ฿</td>
-      <td>
-        <input type="checkbox"
-               [checked]="inv.paid"
-               (change)="togglePaid(inv)" />
-      </td>
-      <td>
-        {{ inv.payment_status === 'paid' ? 'จ่ายเงินสำเร็จ' : inv.payment_status === 'waiting_review' ? 'รอตรวจสอบการชำระเงิน' : 'รอจ่ายเงิน' }}
-      </td>
-      <td>
-        <img *ngIf="inv.payment_proof"
-             [src]="inv.payment_proof"
-             style="max-width:80px; cursor:pointer;"
-             (click)="openImage(inv.payment_proof)"
-             (error)="handleImgError($event)" />
-      </td>
-      <td>
-        <button (click)="edit(inv)">แก้ไข</button>
-        <button (click)="delete(inv.id)">ลบ</button>
-      </td>
-    </tr>
-  </tbody>
-</table>
+<!-- Image Overlay -->
 <div class="img-overlay" *ngIf="selectedImage" (click)="selectedImage=null">
-  <img [src]="selectedImage" alt="slip" />
+  <img [src]="selectedImage" alt="Payment Slip" class="overlay-image" />
 </div>

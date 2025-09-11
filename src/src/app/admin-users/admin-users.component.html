@@ -1,65 +1,163 @@
-<h2>👥 จัดการผู้ใช้งาน</h2>
+<!-- Header Component -->
+<app-header [showHeaderActions]="false"></app-header>
 
-<!-- ค้นหา -->
-<label>
-  🔍 ค้นหาชื่อหรือห้องพัก:
-  <input [(ngModel)]="searchKeyword" placeholder="A101 หรือ ชื่อผู้ใช้">
-</label>
-
-<hr>
-
-<!-- ฟอร์มสร้าง/แก้ไข -->
-<h3 *ngIf="!isEdit">➕ สร้างผู้ใช้ใหม่</h3>
-<h3 *ngIf=" isEdit">✏️ แก้ไขผู้ใช้</h3>
-
-<form (ngSubmit)="submitForm()">
-  <div>
-    <label>Username:</label>
-    <input [(ngModel)]="formModel.username" name="username" required>
+<!-- Page Title Section -->
+<div class="page-title-section">
+  <div class="page-title-content">
+    <h1 class="page-title">
+      <i class="page-icon">👥</i>
+      จัดการผู้ใช้งาน
+    </h1>
+    <p class="page-description">เพิ่ม แก้ไข และจัดการข้อมูลผู้ใช้งานในระบบ</p>
   </div>
-  <div>
-    <label>Password:</label>
-    <input type="password" [(ngModel)]="formModel.password" name="password" [required]="!isEdit">
-    <small *ngIf="isEdit">(เว้นว่างถ้าไม่ต้องการเปลี่ยน)</small>
-  </div>
-  <div>
-    <label>ชื่อ-นามสกุล:</label>
-    <input [(ngModel)]="formModel.fullname" name="fullname" required>
-  </div>
-  <div>
-    <label>ห้องพัก:</label>
-    <input [(ngModel)]="formModel.room_number" name="room_number" required>
-  </div>
-  <div>
-    <label>สิทธิ์:</label>
-    <select [(ngModel)]="formModel.role" name="role">
-      <option value="resident">Resident</option>
-      <option value="admin">Admin</option>
-    </select>
-  </div>
-  <button type="submit">{{ isEdit ? 'บันทึกการแก้ไข' : 'สร้างผู้ใช้' }}</button>
-  <button type="button" (click)="startCreate()" *ngIf="isEdit">ยกเลิก</button>
-</form>
+</div>
 
-<hr>
+<!-- Main Content -->
+<div class="container">
+  <!-- Form Section -->
+  <div class="form-wrapper">
+    <div class="form-header">
+      <h2 class="form-title">
+        <i class="form-icon">{{ isEdit ? '✏️' : '➕' }}</i>
+        {{ isEdit ? 'แก้ไขผู้ใช้งาน' : 'เพิ่มผู้ใช้งานใหม่' }}
+      </h2>
+    </div>
+    
+    <form (ngSubmit)="submitForm()" class="user-form">
+      <div class="form-section">
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">ชื่อผู้ใช้ (Username)</label>
+            <input [(ngModel)]="formModel.username" name="username" 
+                   class="form-input" placeholder="username" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">รหัสผ่าน (Password)</label>
+            <input type="password" [(ngModel)]="formModel.password" name="password" 
+                   class="form-input" placeholder="password" [required]="!isEdit" />
+            <small *ngIf="isEdit" class="form-note">เว้นว่างถ้าไม่ต้องการเปลี่ยนรหัสผ่าน</small>
+          </div>
+          <div class="form-group">
+            <label class="form-label">ชื่อ-นามสกุล</label>
+            <input [(ngModel)]="formModel.fullname" name="fullname" 
+                   class="form-input" placeholder="ชื่อ นามสกุล" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">ห้องพัก</label>
+            <input [(ngModel)]="formModel.room_number" name="room_number" 
+                   class="form-input" placeholder="เช่น A101" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">สิทธิ์การใช้งาน</label>
+            <select [(ngModel)]="formModel.role" name="role" class="form-select">
+              <option value="resident">ผู้เช่า (Resident)</option>
+              <option value="admin">ผู้ดูแล (Admin)</option>
+            </select>
+          </div>
+        </div>
+      </div>
 
-<!-- ตารางรายการ -->
-<table>
-  <thead>
-    <tr>
-      <th>ชื่อผู้ใช้</th><th>ชื่อ-นามสกุล</th><th>ห้อง</th><th>สิทธิ์</th><th>จัดการ</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let u of filteredUsers">
-      <td>{{ u.username }}</td>
-      <td>{{ u.fullname }}</td>
-      <td>{{ u.room_number }}</td>
-      <td>{{ u.role }}</td>
-      <td>
-        <button (click)="startEdit(u)">แก้ไข</button>
-        <button (click)="deleteUser(u.id!)">ลบ</button>
-      </td>
-    </tr>
-  </tbody>
-</table>
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button type="button" (click)="startCreate()" *ngIf="isEdit" class="btn btn-secondary">
+          <i class="btn-icon">✖️</i>
+          ยกเลิก
+        </button>
+        <button type="submit" class="btn btn-primary">
+          <i class="btn-icon">{{ isEdit ? '💾' : '➕' }}</i>
+          {{ isEdit ? 'บันทึกการแก้ไข' : 'สร้างผู้ใช้งาน' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Search and Filter Section -->
+  <div class="search-section">
+    <div class="search-header">
+      <h2 class="search-title">
+        <i class="search-icon">📊</i>
+        รายการผู้ใช้งาน
+      </h2>
+      <div class="search-stats">
+        <span class="stats-item">
+          <i class="stats-icon">👥</i>
+          ทั้งหมด: {{ users.length }}
+        </span>
+        <span class="stats-item">
+          <i class="stats-icon">👤</i>
+          ผู้เช่า: {{ getResidentCount() }}
+        </span>
+        <span class="stats-item">
+          <i class="stats-icon">👑</i>
+          ผู้ดูแล: {{ getAdminCount() }}
+        </span>
+      </div>
+    </div>
+    
+    <div class="search-controls">
+      <div class="form-group">
+        <label class="form-label">ค้นหาชื่อหรือห้องพัก</label>
+        <input [(ngModel)]="searchKeyword" placeholder="พิมพ์ชื่อผู้ใช้หรือหมายเลขห้อง" class="form-input" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Table Section -->
+  <div class="table-wrapper">
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>ชื่อผู้ใช้</th>
+            <th>ชื่อ-นามสกุล</th>
+            <th>ห้องพัก</th>
+            <th>สิทธิ์</th>
+            <th>จัดการ</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let u of filteredUsers">
+            <td class="username-cell">
+              <div class="username-text">{{ u.username }}</div>
+            </td>
+            <td class="fullname-cell">
+              <div class="fullname-text">{{ u.fullname }}</div>
+            </td>
+            <td>
+              <div class="room-cell">
+                <span class="room-badge">{{ u.room_number }}</span>
+              </div>
+            </td>
+            <td class="role-cell">
+              <span class="role-badge" 
+                    [ngClass]="{
+                      'role-admin': u.role === 'admin',
+                      'role-resident': u.role === 'resident'
+                    }">
+                {{ u.role === 'admin' ? 'ผู้ดูแล' : 'ผู้เช่า' }}
+              </span>
+            </td>
+            <td class="action-cell">
+              <div class="action-buttons">
+                <button (click)="startEdit(u)" class="btn btn-sm btn-secondary" title="แก้ไข">
+                  <i class="btn-icon">✏️</i>
+                </button>
+                <button (click)="deleteUser(u.id!)" class="btn btn-sm btn-danger" title="ลบ">
+                  <i class="btn-icon">🗑️</i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="filteredUsers.length === 0" class="no-data-row">
+            <td colspan="5" class="no-data-cell">
+              <div class="no-data-message">
+                <i class="no-data-icon">👥</i>
+                <p>ไม่พบข้อมูลผู้ใช้งาน</p>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

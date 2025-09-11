@@ -1,18 +1,160 @@
-<h2>แจ้งซ่อมเฟอร์นิเจอร์</h2>
+<!-- Header Component -->
+<app-header [showHeaderActions]="true"></app-header>
 
-<form (ngSubmit)="submitRepair()">
-  <input type="text" [(ngModel)]="title"       name="title"       placeholder="หัวข้อปัญหา" required>
-  <input type="text" [(ngModel)]="description" name="description" placeholder="รายละเอียดปัญหา" required>
-  <button type="submit">ส่งแจ้งซ่อม</button>
-</form>
+<!-- Page Title Section -->
+<div class="page-title-section">
+  <div class="page-title-content">
+    <h1 class="page-title">
+      <i class="page-icon">🔧</i>
+      แจ้งซ่อมบำรุง
+    </h1>
+    <p class="page-description">แจ้งซ่อมเฟอร์นิเจอร์ อุปกรณ์ และติดตามสถานะการซ่อมแซม</p>
+  </div>
+</div>
 
-<hr>
+<!-- Main Content -->
+<div class="container">
+  <!-- Form Section -->
+  <div class="form-wrapper">
+    <div class="form-header">
+      <h2 class="form-title">
+        <i class="form-icon">📝</i>
+        แจ้งซ่อมใหม่
+      </h2>
+    </div>
+    
+    <form (ngSubmit)="submitRepair()" class="repair-form">
+      <div class="form-section">
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">หัวข้อปัญหา</label>
+            <input type="text" [(ngModel)]="title" name="title" 
+                   class="form-input" placeholder="เช่น หลอดไฟเสีย, ก๊อกน้ำรั่ว" required />
+          </div>
+          <div class="form-group full-width">
+            <label class="form-label">รายละเอียดปัญหา</label>
+            <textarea [(ngModel)]="description" name="description" 
+                      class="form-textarea" rows="4" 
+                      placeholder="โปรดอธิบายปัญหาอย่างละเอียด เช่น ตำแหน่งที่เสีย อาการ" required></textarea>
+          </div>
+        </div>
+      </div>
 
-<h3>รายการแจ้งซ่อมของคุณ</h3>
-<ul>
-  <li *ngFor="let r of repairs">
-    <strong>ห้อง:</strong> {{ r.room_number }} |
-    <strong>ปัญหา:</strong> {{ r.title }} |
-    <strong>สถานะ:</strong> {{ r.status }}
-  </li>
-</ul>
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">
+          <i class="btn-icon">📤</i>
+          ส่งแจ้งซ่อม
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Search and Statistics Section -->
+  <div class="search-wrapper">
+    <div class="search-header">
+      <h2 class="search-title">
+        <i class="search-icon">📋</i>
+        รายการแจ้งซ่อม
+      </h2>
+    </div>
+    
+    <div class="search-section">
+      <div class="search-form">
+        <div class="search-group">
+          <input type="text" class="search-input" placeholder="ค้นหารายการซ่อม..." 
+                 [(ngModel)]="searchQuery" (ngModelChange)="filterRepairs()" />
+          <button class="search-btn">
+            <i class="search-btn-icon">🔍</i>
+          </button>
+        </div>
+      </div>
+      
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">🔧</div>
+          <div class="stat-content">
+            <div class="stat-number">{{getTotalRepairs()}}</div>
+            <div class="stat-label">รายการทั้งหมด</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">⏳</div>
+          <div class="stat-content">
+            <div class="stat-number">{{getPendingRepairs()}}</div>
+            <div class="stat-label">รอดำเนินการ</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">⚙️</div>
+          <div class="stat-content">
+            <div class="stat-number">{{getInProgressRepairs()}}</div>
+            <div class="stat-label">กำลังดำเนินการ</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">✅</div>
+          <div class="stat-content">
+            <div class="stat-number">{{getCompletedRepairs()}}</div>
+            <div class="stat-label">เสร็จสิ้นแล้ว</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Repairs Display Section -->
+  <div class="table-wrapper">
+    <div class="repairs-grid" *ngIf="filteredRepairs.length > 0; else noRepairs">
+      <div class="repair-card" *ngFor="let repair of filteredRepairs" [class]="getRepairCardClass(repair)">
+        <div class="repair-header">
+          <div class="repair-icon">🔧</div>
+          <div class="repair-info">
+            <h3 class="repair-title">{{repair.title}}</h3>
+            <span class="repair-status" [class]="getStatusClass(repair.status)">
+              {{getStatusText(repair.status)}}
+            </span>
+          </div>
+        </div>
+        
+        <div class="repair-details">
+          <div class="detail-item" *ngIf="repair.room_number">
+            <i class="detail-icon">🏠</i>
+            <span class="detail-label">ห้อง:</span>
+            <span class="detail-value">{{repair.room_number}}</span>
+          </div>
+          <div class="detail-item">
+            <i class="detail-icon">📝</i>
+            <span class="detail-label">รายละเอียด:</span>
+            <span class="detail-value">{{repair.description}}</span>
+          </div>
+          <div class="detail-item">
+            <i class="detail-icon">📅</i>
+            <span class="detail-label">วันที่แจ้ง:</span>
+            <span class="detail-value">{{formatDate(repair.created_at)}}</span>
+          </div>
+          <div class="detail-item" *ngIf="repair.updated_at && repair.updated_at !== repair.created_at">
+            <i class="detail-icon">🔄</i>
+            <span class="detail-label">อัปเดตล่าสุด:</span>
+            <span class="detail-value">{{formatDate(repair.updated_at)}}</span>
+          </div>
+        </div>
+        
+        <div class="repair-actions" *ngIf="repair.status === 'pending'">
+          <button class="btn btn-secondary btn-sm" (click)="cancelRepair(repair.id)">
+            <i class="btn-icon">❌</i>
+            ยกเลิกการแจ้งซ่อม
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #noRepairs>
+      <div class="empty-state">
+        <div class="empty-icon">🔧</div>
+        <h3 class="empty-title">ยังไม่มีการแจ้งซ่อม</h3>
+        <p class="empty-description">เมื่อคุณแจ้งซ่อมบำรุง รายการจะแสดงในหน้านี้</p>
+      </div>
+    </ng-template>
+  </div>
+</div>

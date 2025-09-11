@@ -2,11 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule }       from '@angular/common';
 import { HttpClientModule }   from '@angular/common/http';
 import { AnnouncementService } from './announcement.service';
+import { HeaderComponent }    from '../shared/header/header.component';
 
 @Component({
   selector: 'app-announcement',
   standalone: true,
-  imports: [CommonModule, HttpClientModule],
+  imports: [CommonModule, HttpClientModule, HeaderComponent],
   templateUrl: './announcement.component.html',
   styleUrls: ['./announcement.component.css']
 })

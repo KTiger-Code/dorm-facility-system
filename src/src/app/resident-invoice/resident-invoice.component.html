@@ -1,126 +1,231 @@
-<h2 style="text-align:center; margin-bottom:16px;">ใบแจ้งหนี้</h2>
+<!-- Header Component -->
+<app-header [showHeaderActions]="true"></app-header>
 
-<div class="month-selector">
-  <div class="month-selector-title">เลือกเดือนที่ต้องการดูใบแจ้งหนี้</div>
-  <select [(ngModel)]="selectedMonth">
-    <option value="">- เลือกเดือน -</option>
-    <option *ngFor="let month of months" [value]="month.value">
-      {{ month.label }}
-    </option>
-  </select>
-  <select [(ngModel)]="selectedYear">
-    <option value="">- เลือกปี -</option>
-    <option *ngFor="let year of years" [value]="year">
-      {{ year }}
-    </option>
-  </select>
-  <button (click)="filterInvoices()">แสดงข้อมูล</button>
+<!-- Page Title Section -->
+<div class="page-title-section">
+  <div class="page-title-content">
+    <h1 class="page-title">
+      <i class="page-icon">💰</i>
+      ใบแจ้งหนี้ค่าใช้จ่าย
+    </h1>
+    <p class="page-description">ตรวจสอบและชำระค่าใช้จ่ายประจำเดือนของคุณ</p>
+  </div>
 </div>
 
-<div *ngIf="filteredInvoices.length === 0" class="no-invoice-message">
-  ไม่พบใบแจ้งหนี้ในเดือนที่เลือก
-</div>
-
-<div *ngFor="let inv of filteredInvoices" class="invoice-container">
-  <!-- — ส่วนหัวข้อมูลห้อง/เดือนปี — -->
-  <table class="header">
-    <tr>
-      <td><strong>ห้อง:</strong> {{ inv.room_number }}</td>
-      <td style="text-align:right;"><strong>เดือน/ปี:</strong> {{ inv.month_year }}</td>
-    </tr>
-  </table>
-
-  <!-- — ตารางรายการ — -->
-  <table class="items">
-    <thead>
-      <tr>
-        <th>ลำดับ<br/>Item</th>
-        <th>รายการ<br/>Description</th>
-        <th>จำนวนเงิน<br/>Amount</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- 1-4 รายการคงที่ -->
-      <tr>
-        <td>1</td>
-        <td>
-          ค่าไฟ
-          <div class="sub">{{ inv.electricity_prev_meter }} → {{ inv.electricity_curr_meter }}
-            ({{ electricityUsed(inv) }} หน่วย × {{ inv.electricity_unit_price }} ฿)
-          </div>
-        </td>
-        <td class="amount">{{ inv.electricity_fee | number:'1.2-2' }} ฿</td>
-      </tr>
-      <tr>
-        <td>2</td>
-        <td>
-          ค่าน้ำ
-          <div class="sub">{{ inv.water_prev_meter }} → {{ inv.water_curr_meter }}
-            ({{ waterUsed(inv) }} หน่วย × {{ inv.water_unit_price }} ฿)
-          </div>
-        </td>
-        <td class="amount">{{ inv.water_fee       | number:'1.2-2' }} ฿</td>
-      </tr>
-      <tr>
-        <td>3</td>
-        <td>ค่าส่วนกลาง</td>
-        <td class="amount">{{ inv.common_fee      | number:'1.2-2' }} ฿</td>
-      </tr>
-      <tr>
-        <td>4</td>
-        <td>ค่าเช่าห้อง</td>
-        <td class="amount">{{ inv.room_rent       | number:'1.2-2' }} ฿</td>
-      </tr>
-
-      <!-- ถ้ามี extra_charges แสดงยอดรวมแรก -->
-      <tr *ngIf="inv.extra_charges.length">
-        <td>5</td>
-        <td>อื่นๆ</td>
-        <td class="amount">{{ extrasSum(inv) | number:'1.2-2' }} ฿</td>
-      </tr>
-      <!-- แล้วไล่ปัดรายการย่อย -->
-      <tr *ngFor="let ex of inv.extra_charges">
-        <td></td>
-        <td>&nbsp;&nbsp;- {{ ex.label }}</td>
-        <td class="amount">{{ ex.amount | number:'1.2-2' }} ฿</td>
-      </tr>
-
-      <!-- แถวรวมยอดสุดท้าย -->
-      <tr>
-        <td colspan="2" class="total-label">รวม</td>
-        <td class="amount total-value">
-          <strong>{{ total(inv) | number:'1.2-2' }} ฿</strong>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-
-  <div style="text-align:right; margin-top:8px;">
-    <button (click)="downloadPdf(inv)">ดาวน์โหลด PDF</button>
+<!-- Main Content -->
+<div class="container">
+  <!-- Filter Section -->
+  <div class="filter-wrapper">
+    <div class="filter-header">
+      <h2 class="filter-title">
+        <i class="filter-icon">📅</i>
+        เลือกเดือน/ปี
+      </h2>
+    </div>
+    
+    <div class="filter-section">
+      <div class="filter-grid">
+        <div class="filter-group">
+          <label class="filter-label">เดือน</label>
+          <select [(ngModel)]="selectedMonth" class="filter-select">
+            <option value="">- เลือกเดือน -</option>
+            <option *ngFor="let month of months" [value]="month.value">
+              {{ month.label }}
+            </option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label class="filter-label">ปี</label>
+          <select [(ngModel)]="selectedYear" class="filter-select">
+            <option value="">- เลือกปี -</option>
+            <option *ngFor="let year of years" [value]="year">
+              {{ year }}
+            </option>
+          </select>
+        </div>
+        <div class="filter-actions">
+          <button (click)="filterInvoices()" class="btn btn-primary">
+            <i class="btn-icon">🔍</i>
+            แสดงข้อมูล
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div style="margin-top:8px;">
-    <p>สถานะการชำระเงิน: {{
-      inv.payment_status === 'paid' ? 'จ่ายเงินสำเร็จ'
-      : inv.payment_status === 'waiting_review' ? 'รอตรวจสอบการชำระเงิน'
-      : 'รอจ่ายเงิน' }}</p>
-
-    <img *ngIf="inv.payment_proof"
-         [src]="inv.payment_proof"
-         alt="slip"
-         class="slip-img"
-         (click)="openImage(inv.payment_proof)"
-         (error)="handleImgError($event)" />
-
-    <div *ngIf="inv.payment_status === 'waiting_payment'">
-      <img src="QR-ME/QR.jpg" alt="QR" style="max-width:200px;" />
-      <div>
-        <input type="file" (change)="uploadProof(inv, $event)" />
+  <!-- Statistics Section -->
+  <div class="stats-wrapper" *ngIf="filteredInvoices.length > 0">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">📋</div>
+        <div class="stat-content">
+          <div class="stat-number">{{filteredInvoices.length}}</div>
+          <div class="stat-label">ใบแจ้งหนี้</div>
+        </div>
       </div>
-      <div *ngIf="uploading[inv.id]">กำลังอัปโหลด...</div>
+      <div class="stat-card">
+        <div class="stat-icon">💰</div>
+        <div class="stat-content">
+          <div class="stat-number">{{getTotalAmount() | number:'1.0-0'}}</div>
+          <div class="stat-label">ยอดรวม (บาท)</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">✅</div>
+        <div class="stat-content">
+          <div class="stat-number">{{getPaidInvoices()}}</div>
+          <div class="stat-label">ชำระแล้ว</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🔍</div>
+        <div class="stat-content">
+          <div class="stat-number">{{getReviewInvoices()}}</div>
+          <div class="stat-label">รอตรวจสอบ</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">⏳</div>
+        <div class="stat-content">
+          <div class="stat-number">{{getPendingInvoices()}}</div>
+          <div class="stat-label">รอชำระ</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- No Invoice Message -->
+  <div *ngIf="filteredInvoices.length === 0" class="empty-state">
+    <div class="empty-icon">💰</div>
+    <h3 class="empty-title">ไม่พบใบแจ้งหนี้</h3>
+    <p class="empty-description">ไม่มีใบแจ้งหนี้ในเดือน/ปีที่เลือก</p>
+  </div>
+
+  <!-- Invoices Display Section -->
+  <div class="invoices-wrapper" *ngIf="filteredInvoices.length > 0">
+    <div class="invoice-card" *ngFor="let inv of filteredInvoices">
+      <!-- Invoice Header -->
+      <div class="invoice-header">
+        <div class="invoice-info">
+          <h3 class="invoice-title">
+            <i class="invoice-icon">🏠</i>
+            ห้อง {{inv.room_number}}
+          </h3>
+          <span class="invoice-period">{{inv.month_year}}</span>
+        </div>
+        <div class="invoice-status">
+          <span class="status-badge" [class]="getStatusClass(inv.payment_status)">
+            {{getStatusText(inv.payment_status)}}
+          </span>
+          <div class="invoice-total">{{total(inv) | number:'1.2-2'}} ฿</div>
+        </div>
+      </div>
+
+      <!-- Invoice Details -->
+      <div class="invoice-details">
+        <div class="details-table">
+          <div class="detail-row">
+            <div class="detail-item">
+              <span class="detail-label">ค่าไฟ</span>
+              <span class="detail-desc">{{inv.electricity_prev_meter}} → {{inv.electricity_curr_meter}} ({{electricityUsed(inv)}} หน่วย × {{inv.electricity_unit_price}} ฿)</span>
+              <span class="detail-amount">{{inv.electricity_fee | number:'1.2-2'}} ฿</span>
+            </div>
+          </div>
+          
+          <div class="detail-row">
+            <div class="detail-item">
+              <span class="detail-label">ค่าน้ำ</span>
+              <span class="detail-desc">{{inv.water_prev_meter}} → {{inv.water_curr_meter}} ({{waterUsed(inv)}} หน่วย × {{inv.water_unit_price}} ฿)</span>
+              <span class="detail-amount">{{inv.water_fee | number:'1.2-2'}} ฿</span>
+            </div>
+          </div>
+          
+          <div class="detail-row">
+            <div class="detail-item">
+              <span class="detail-label">ค่าส่วนกลาง</span>
+              <span class="detail-desc">รายการคงที่</span>
+              <span class="detail-amount">{{inv.common_fee | number:'1.2-2'}} ฿</span>
+            </div>
+          </div>
+          
+          <div class="detail-row">
+            <div class="detail-item">
+              <span class="detail-label">ค่าเช่าห้อง</span>
+              <span class="detail-desc">รายการคงที่</span>
+              <span class="detail-amount">{{inv.room_rent | number:'1.2-2'}} ฿</span>
+            </div>
+          </div>
+
+          <!-- Extra Charges -->
+          <div class="detail-row" *ngFor="let ex of inv.extra_charges">
+            <div class="detail-item">
+              <span class="detail-label">{{ex.label}}</span>
+              <span class="detail-desc">รายการเพิ่มเติม</span>
+              <span class="detail-amount">{{ex.amount | number:'1.2-2'}} ฿</span>
+            </div>
+          </div>
+
+          <!-- Total Row -->
+          <div class="detail-row total-row">
+            <div class="detail-item">
+              <span class="detail-label total-label">รวมทั้งสิ้น</span>
+              <span class="detail-desc"></span>
+              <span class="detail-amount total-amount">{{total(inv) | number:'1.2-2'}} ฿</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment Section -->
+      <div class="payment-section">
+        <!-- QR Code for Payment -->
+        <div class="qr-section" *ngIf="inv.payment_status === 'waiting_payment'">
+          <div class="qr-header">
+            <h4 class="qr-title">
+              <i class="qr-icon">📱</i>
+              สแกน QR Code เพื่อชำระเงิน
+            </h4>
+          </div>
+          <div class="qr-content">
+            <img src="QR-ME/QR.jpg" alt="QR Code" class="qr-image" />
+            <div class="upload-section">
+              <label class="upload-label">อัปโหลดหลักฐานการชำระเงิน</label>
+              <input type="file" (change)="uploadProof(inv, $event)" class="file-input" accept="image/*" />
+              <div *ngIf="uploading[inv.id]" class="upload-status">
+                <i class="upload-icon">⏳</i>
+                กำลังอัปโหลด...
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Payment Proof Display -->
+        <div class="proof-section" *ngIf="inv.payment_proof">
+          <div class="proof-header">
+            <h4 class="proof-title">
+              <i class="proof-icon">🧾</i>
+              หลักฐานการชำระเงิน
+            </h4>
+          </div>
+          <div class="proof-content">
+            <img [src]="inv.payment_proof" alt="Payment Proof" class="proof-image" 
+                 (click)="openImage(inv.payment_proof)" (error)="handleImgError($event)" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Invoice Actions -->
+      <div class="invoice-actions">
+        <button (click)="downloadPdf(inv)" class="btn btn-secondary">
+          <i class="btn-icon">📄</i>
+          ดาวน์โหลด PDF
+        </button>
+      </div>
     </div>
   </div>
 </div>
+
+<!-- Image Overlay -->
 <div class="img-overlay" *ngIf="selectedImage" (click)="selectedImage=null">
-  <img [src]="selectedImage" alt="slip" />
+  <img [src]="selectedImage" alt="Image" class="overlay-image" />
 </div>

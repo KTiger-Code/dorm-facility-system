@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule }        from '@angular/common';
 import { FormsModule }         from '@angular/forms';
 import { HttpClient, HttpHeaders, HttpClientModule } from '@angular/common/http';
+import { HeaderComponent }     from '../shared/header/header.component';
 
 interface User {
   id?: number;
@@ -15,7 +16,7 @@ interface User {
 @Component({
   selector: 'app-admin-users',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule],
+  imports: [CommonModule, FormsModule, HttpClientModule, HeaderComponent],
   templateUrl: './admin-users.component.html',
   styleUrls: ['./admin-users.component.css']
 })
@@ -92,5 +93,13 @@ export class AdminUsersComponent implements OnInit {
       u.fullname.toLowerCase().includes(key) ||
       u.room_number.toLowerCase().includes(key)
     );
+  }
+
+  getResidentCount(): number {
+    return this.users.filter(u => u.role === 'resident').length;
+  }
+
+  getAdminCount(): number {
+    return this.users.filter(u => u.role === 'admin').length;
   }
 }

@@ -1,11 +1,83 @@
-<h2>หน้าสำหรับเจ้าหน้าที่</h2>
-<nav>
-  <ul>
-    <li><a routerLink="/admin-parcels">📦 จัดการพัสดุ</a></li>
-    <li><a routerLink="/admin/announcement">📢 จัดการข่าวสาร</a></li>
-    <li><a routerLink="/admin-users">👥 จัดการผู้ใช้</a></li>
-    <li><a routerLink="/admin/invoice">📄 จัดการใบแจ้งหนี้</a></li>
-    <li><a routerLink="/admin/repairs">🛠️ จัดการคำขอซ่อม</a></li>
-    <li><a routerLink="/admin/facility-booking">🏢 จัดการการจองส่วนกลาง</a></li>
+<app-header [showHeaderActions]="false"></app-header>
+<nav class="home-nav">
+  <ul class="menu-list">
+    <li class="menu-item">
+      <a routerLink="/admin-parcels" class="menu-btn-horizontal">
+        <span class="menu-icon-horizontal-wrap">
+          <img src="/Photo/parcel-icon.svg" class="menu-icon-horizontal" alt="parcel">
+        </span>
+        <span class="menu-label-horizontal-wrap">
+          <span class="menu-labels-block">
+            <span class="menu-label-th">จัดการพัสดุ</span>
+            <span class="menu-label-en">PARCEL MANAGEMENT</span>
+          </span>
+        </span>
+      </a>
+    </li>
+    <li class="menu-item">
+      <a routerLink="/admin/announcement" class="menu-btn-horizontal">
+        <span class="menu-icon-horizontal-wrap">
+          <img src="/Photo/announcement-icon.svg" class="menu-icon-horizontal" alt="announcement">
+        </span>
+        <span class="menu-label-horizontal-wrap">
+          <span class="menu-labels-block">
+            <span class="menu-label-th">จัดการข่าวสาร</span>
+            <span class="menu-label-en">ANNOUNCEMENT MANAGEMENT</span>
+          </span>
+        </span>
+      </a>
+    </li>
+    <li class="menu-item">
+      <a routerLink="/admin-users" class="menu-btn-horizontal">
+        <span class="menu-icon-horizontal-wrap">
+          <img src="/Photo/For-admin-icon.svg" class="menu-icon-horizontal" alt="users">
+        </span>
+        <span class="menu-label-horizontal-wrap">
+          <span class="menu-labels-block">
+            <span class="menu-label-th">จัดการผู้ใช้</span>
+            <span class="menu-label-en">USER MANAGEMENT</span>
+          </span>
+        </span>
+      </a>
+    </li>
+    <li class="menu-item">
+      <a routerLink="/admin/invoice" class="menu-btn-horizontal">
+        <span class="menu-icon-horizontal-wrap">
+          <img src="/Photo/invoice-icon.svg" class="menu-icon-horizontal" alt="invoice">
+        </span>
+        <span class="menu-label-horizontal-wrap">
+          <span class="menu-labels-block">
+            <span class="menu-label-th">จัดการใบแจ้งหนี้</span>
+            <span class="menu-label-en">INVOICE MANAGEMENT</span>
+          </span>
+        </span>
+      </a>
+    </li>
+    <li class="menu-item">
+      <a routerLink="/admin/repairs" class="menu-btn-horizontal">
+        <span class="menu-icon-horizontal-wrap">
+          <img src="/Photo/service-request-icon.svg" class="menu-icon-horizontal" alt="repairs">
+        </span>
+        <span class="menu-label-horizontal-wrap">
+          <span class="menu-labels-block">
+            <span class="menu-label-th">จัดการคำขอซ่อม</span>
+            <span class="menu-label-en">REPAIR MANAGEMENT</span>
+          </span>
+        </span>
+      </a>
+    </li>
+    <li class="menu-item">
+      <a routerLink="/admin/facility-booking" class="menu-btn-horizontal">
+        <span class="menu-icon-horizontal-wrap">
+          <img src="/Photo/facility-booking-icon.svg" class="menu-icon-horizontal" alt="facility">
+        </span>
+        <span class="menu-label-horizontal-wrap">
+          <span class="menu-labels-block">
+            <span class="menu-label-th">จัดการการจองส่วนกลาง</span>
+            <span class="menu-label-en">FACILITY MANAGEMENT</span>
+          </span>
+        </span>
+      </a>
+    </li>
   </ul>
 </nav>

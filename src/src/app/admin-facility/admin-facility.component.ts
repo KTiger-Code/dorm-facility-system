@@ -3,12 +3,14 @@ import { CommonModule }     from '@angular/common';
 import { FormsModule }      from '@angular/forms';
 import { HttpClientModule, HttpClient, HttpHeaders } from '@angular/common/http';
 import { FacilityBookingService } from '../facility-booking/facility-booking.service';
+import { HeaderComponent } from '../shared/header/header.component';
 
 @Component({
   selector: 'app-admin-facility',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule],
-  templateUrl: './admin-facility.component.html'
+  imports: [CommonModule, FormsModule, HttpClientModule, HeaderComponent],
+  templateUrl: './admin-facility.component.html',
+  styleUrls: ['./admin-facility.component.css']
 })
 export class AdminFacilityComponent implements OnInit {
   bookings: any[] = [];

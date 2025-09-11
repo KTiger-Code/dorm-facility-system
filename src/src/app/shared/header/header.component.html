@@ -1,0 +1,18 @@
+<header class="home-header">
+  <div class="logo-section">
+    <img src="/Photo/Logo-icon.svg" class="logo-icon-img" alt="logo">
+    <span class="logo-title">FACILITY AND SERVICE SYSTEM</span>
+  </div>
+  <div class="header-actions-vertical" *ngIf="showHeaderActions">
+    <div class="admin-block">
+      <img src="/Photo/For-admin-icon.svg" class="admin-icon-img" alt="for admin">
+      <span class="admin-label">สำหรับเจ้าหน้าที่<br>FOR ADMIN</span>
+      <a *ngIf="isAdmin" routerLink="/staff" class="admin-link"></a>
+    </div>
+    <button class="line-connect" (click)="connectLine()">
+      <img src="/Photo/Line-icon.svg" class="line-icon-img" alt="line icon">
+      <span class="line-label">เชื่อมต่อบัญชี LINE<br>CONECT LINE ACCOUNT</span>
+    </button>
+  </div>
+</header>
+<div class="home-divider"></div>

@@ -1,43 +1,120 @@
-<h2>จัดการคำขอซ่อม (Admin)</h2>
+<!-- Header Component -->
+<app-header [showHeaderActions]="false"></app-header>
 
-<label>
-  สถานะ:
-  <select [(ngModel)]="filterStatus">
-    <option value="all">ทั้งหมด</option>
-    <option value="pending">รอดำเนินการ</option>
-    <option value="in_progress">กำลังดำเนินการ</option>
-    <option value="completed">เสร็จสิ้น</option>
-  </select>
-</label>
+<!-- Page Title Section -->
+<div class="page-title-section">
+  <div class="page-title-content">
+    <h1 class="page-title">
+      <i class="page-icon">🔧</i>
+      จัดการคำขอซ่อม
+    </h1>
+    <p class="page-description">ตรวจสอบและอัปเดตสถานะคำขอซ่อมแซมจากผู้เช่า</p>
+  </div>
+</div>
 
-<table class="repair-table">
-  <thead>
-    <tr>
-      <th>ห้อง</th>
-      <th>หัวข้อ</th>
-      <th>รายละเอียด</th>
-      <th>สถานะ</th>
-      <th>จัดการ</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let r of filteredRepairs()">
-      <td>{{ r.room_number }}</td>
-      <td>{{ r.title }}</td>
-      <td>{{ r.description }}</td>
-      <td>
-        <select
-          [(ngModel)]="r.status"
-          (ngModelChange)="updateStatus(r, $event)"
-        >
+<!-- Main Content -->
+<div class="container">
+  <!-- Search and Filter Section -->
+  <div class="search-section">
+    <div class="search-header">
+      <h2 class="search-title">
+        <i class="search-icon">📊</i>
+        รายการคำขอซ่อม
+      </h2>
+      <div class="search-stats">
+        <span class="stats-item">
+          <i class="stats-icon">📋</i>
+          ทั้งหมด: {{ repairs.length }}
+        </span>
+        <span class="stats-item">
+          <i class="stats-icon">⏳</i>
+          รอดำเนินการ: {{ getPendingCount() }}
+        </span>
+        <span class="stats-item">
+          <i class="stats-icon">⚙️</i>
+          กำลังดำเนินการ: {{ getInProgressCount() }}
+        </span>
+        <span class="stats-item">
+          <i class="stats-icon">✅</i>
+          เสร็จสิ้น: {{ getCompletedCount() }}
+        </span>
+      </div>
+    </div>
+    
+    <div class="search-controls">
+      <div class="form-group">
+        <label class="form-label">กรองตามสถานะ</label>
+        <select [(ngModel)]="filterStatus" class="form-select">
+          <option value="all">ทั้งหมด</option>
           <option value="pending">รอดำเนินการ</option>
           <option value="in_progress">กำลังดำเนินการ</option>
           <option value="completed">เสร็จสิ้น</option>
         </select>
-      </td>
-      <td>
-        <button (click)="deleteRepair(r.id)">🗑️</button>
-      </td>
-    </tr>
-  </tbody>
-</table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table Section -->
+  <div class="table-wrapper">
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>ห้อง</th>
+            <th>หัวข้อ</th>
+            <th>รายละเอียด</th>
+            <th>วันที่แจ้ง</th>
+            <th>สถานะ</th>
+            <th>จัดการ</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of filteredRepairs()">
+            <td>
+              <div class="room-cell">
+                <span class="room-badge">{{ r.room_number }}</span>
+              </div>
+            </td>
+            <td class="title-cell">
+              <div class="title-text">{{ r.title }}</div>
+            </td>
+            <td class="description-cell">
+              <div class="description-text">{{ r.description }}</div>
+            </td>
+            <td class="date-cell">
+              <span class="date-text">{{ r.created_at | date:'dd/MM/yyyy HH:mm' }}</span>
+            </td>
+            <td class="status-cell">
+              <select [(ngModel)]="r.status" (ngModelChange)="updateStatus(r, $event)" 
+                      class="status-select"
+                      [ngClass]="{
+                        'status-pending': r.status === 'pending',
+                        'status-progress': r.status === 'in_progress',
+                        'status-completed': r.status === 'completed'
+                      }">
+                <option value="pending">รอดำเนินการ</option>
+                <option value="in_progress">กำลังดำเนินการ</option>
+                <option value="completed">เสร็จสิ้น</option>
+              </select>
+            </td>
+            <td class="action-cell">
+              <div class="action-buttons">
+                <button (click)="deleteRepair(r.id)" class="btn btn-sm btn-danger" title="ลบคำขอ">
+                  <i class="btn-icon">🗑️</i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="filteredRepairs().length === 0" class="no-data-row">
+            <td colspan="6" class="no-data-cell">
+              <div class="no-data-message">
+                <i class="no-data-icon">🔧</i>
+                <p>ไม่พบคำขอซ่อม</p>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
