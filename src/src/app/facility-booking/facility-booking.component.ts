@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule }     from '@angular/common';
 import { FormsModule }      from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { FacilityBookingService } from './facility-booking.service';
 import { HeaderComponent } from '../shared/header/header.component';
 
@@ -22,10 +23,18 @@ export class FacilityBookingComponent implements OnInit {
     number_of_people: 1
   };
 
-  constructor(private svc: FacilityBookingService) {}
+  isAdmin: boolean = false;
+
+  constructor(private svc: FacilityBookingService, private router: Router) {}
 
   ngOnInit() {
+    this.checkAdminStatus();
     this.getBookings();
+  }
+
+  checkAdminStatus() {
+    const userRole = localStorage.getItem('userRole');
+    this.isAdmin = userRole === 'admin';
   }
 
   getBookings() {
@@ -130,5 +139,17 @@ export class FacilityBookingComponent implements OnInit {
       //   }
       // });
     }
+  }
+
+  onLineConnect() {
+    // เชื่อมต่อ LINE Account
+    window.open('https://line.me/R/ti/p/@your-line-bot', '_blank');
+  }
+
+  onLogout() {
+    // ออกจากระบบ
+    localStorage.removeItem('token');
+    localStorage.removeItem('userRole');
+    this.router.navigate(['/login']);
   }
 }

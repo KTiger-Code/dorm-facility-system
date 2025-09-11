@@ -4,6 +4,9 @@ import { FormsModule }      from '@angular/forms';
 import { HttpClientModule, HttpClient, HttpHeaders } from '@angular/common/http';
 import { FacilityBookingService } from '../facility-booking/facility-booking.service';
 import { HeaderComponent } from '../shared/header/header.component';
+import { AdminBaseComponent } from '../shared/admin-base.component';
+import { Router } from '@angular/router';
+import { SessionTimeoutService } from '../shared/session-timeout.service';
 
 @Component({
   selector: 'app-admin-facility',
@@ -12,7 +15,7 @@ import { HeaderComponent } from '../shared/header/header.component';
   templateUrl: './admin-facility.component.html',
   styleUrls: ['./admin-facility.component.css']
 })
-export class AdminFacilityComponent implements OnInit {
+export class AdminFacilityComponent extends AdminBaseComponent implements OnInit {
   bookings: any[] = [];
   users: any[] = [];
   filterRoom = '';
@@ -20,8 +23,12 @@ export class AdminFacilityComponent implements OnInit {
 
   constructor(
     private svc: FacilityBookingService,
-    private http: HttpClient
-  ) {}
+    private http: HttpClient,
+    router: Router,
+    sessionTimeoutService: SessionTimeoutService
+  ) {
+    super(router, sessionTimeoutService);
+  }
 
   ngOnInit() {
     this.loadBookings();

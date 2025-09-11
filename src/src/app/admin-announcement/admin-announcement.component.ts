@@ -3,6 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { HeaderComponent } from '../shared/header/header.component';
+import { AdminBaseComponent } from '../shared/admin-base.component';
+import { Router } from '@angular/router';
+import { SessionTimeoutService } from '../shared/session-timeout.service';
 
 @Component({
   selector: 'app-admin-announcement',
@@ -11,7 +14,7 @@ import { HeaderComponent } from '../shared/header/header.component';
   templateUrl: './admin-announcement.component.html',
   styleUrls: ['./admin-announcement.component.css']
 })
-export class AdminAnnouncementComponent {
+export class AdminAnnouncementComponent extends AdminBaseComponent {
   title = '';
   content = '';
   announcements: any[] = [];
@@ -19,7 +22,8 @@ export class AdminAnnouncementComponent {
   searchQuery: string = '';
   editingAnnouncement: any = null;
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, router: Router, sessionTimeoutService: SessionTimeoutService) {
+    super(router, sessionTimeoutService);
     this.loadAnnouncements();
   }
 

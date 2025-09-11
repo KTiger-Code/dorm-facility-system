@@ -16,6 +16,9 @@ import {
 import { InvoiceService } from '../invoice.service';
 import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from '../shared/header/header.component';
+import { AdminBaseComponent } from '../shared/admin-base.component';
+import { Router } from '@angular/router';
+import { SessionTimeoutService } from '../shared/session-timeout.service';
 
 @Component({
   selector: 'app-admin-invoice',
@@ -30,7 +33,7 @@ import { HeaderComponent } from '../shared/header/header.component';
   templateUrl: './admin-invoice.component.html',
   styleUrls: ['./admin-invoice.component.css']
 })
-export class AdminInvoiceComponent implements OnInit {
+export class AdminInvoiceComponent extends AdminBaseComponent implements OnInit {
   form!: FormGroup;
   invoices: any[] = [];
   users: any[] = [];
@@ -47,8 +50,11 @@ export class AdminInvoiceComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private svc: InvoiceService,
-    private http: HttpClient
+    private http: HttpClient,
+    router: Router,
+    sessionTimeoutService: SessionTimeoutService
   ) {
+    super(router, sessionTimeoutService);
     // สร้างรายการปีย้อนหลัง 5 ปี และล่วงหน้า 2 ปี
     const currentYear = new Date().getFullYear();
     for (let year = currentYear - 5; year <= currentYear + 2; year++) {

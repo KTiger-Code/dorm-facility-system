@@ -203,3 +203,60 @@
     padding: 16px;
   }
 }
+
+/* Remember Me Checkbox Styles */
+.remember-group {
+  margin-top: 16px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.remember-checkbox {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.95rem;
+  color: #444;
+}
+
+.remember-checkbox input[type="checkbox"] {
+  display: none;
+}
+
+.checkmark {
+  height: 18px;
+  width: 18px;
+  background-color: #fff;
+  border: 2px solid #888;
+  border-radius: 4px;
+  margin-right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.remember-checkbox:hover .checkmark {
+  border-color: #666;
+  background-color: #f5f5f5;
+}
+
+.remember-checkbox input[type="checkbox"]:checked ~ .checkmark {
+  background-color: #4CAF50;
+  border-color: #4CAF50;
+}
+
+.remember-checkbox input[type="checkbox"]:checked ~ .checkmark::after {
+  content: "✓";
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.remember-text {
+  font-weight: 400;
+  letter-spacing: 0.5px;
+}

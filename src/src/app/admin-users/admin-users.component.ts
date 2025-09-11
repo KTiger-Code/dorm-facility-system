@@ -3,6 +3,9 @@ import { CommonModule }        from '@angular/common';
 import { FormsModule }         from '@angular/forms';
 import { HttpClient, HttpHeaders, HttpClientModule } from '@angular/common/http';
 import { HeaderComponent }     from '../shared/header/header.component';
+import { AdminBaseComponent } from '../shared/admin-base.component';
+import { Router } from '@angular/router';
+import { SessionTimeoutService } from '../shared/session-timeout.service';
 
 interface User {
   id?: number;
@@ -20,7 +23,7 @@ interface User {
   templateUrl: './admin-users.component.html',
   styleUrls: ['./admin-users.component.css']
 })
-export class AdminUsersComponent implements OnInit {
+export class AdminUsersComponent extends AdminBaseComponent implements OnInit {
   users: User[] = [];
   searchKeyword = '';
 
@@ -34,7 +37,9 @@ export class AdminUsersComponent implements OnInit {
     role: 'resident'
   };
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, router: Router, sessionTimeoutService: SessionTimeoutService) {
+    super(router, sessionTimeoutService);
+  }
 
   ngOnInit() {
     this.fetchUsers();

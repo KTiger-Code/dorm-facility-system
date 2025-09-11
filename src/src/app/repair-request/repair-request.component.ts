@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule }   from '@angular/forms';
+import { Router } from '@angular/router';
 import { RepairService } from './repair.service';
 import { HeaderComponent } from '../shared/header/header.component';
 
@@ -17,11 +18,18 @@ export class RepairRequestComponent implements OnInit {
   repairs: any[] = [];
   filteredRepairs: any[] = [];
   searchQuery: string = '';
+  isAdmin: boolean = false;
 
-  constructor(private repairService: RepairService) {}
+  constructor(private repairService: RepairService, private router: Router) {}
 
   ngOnInit() {
+    this.checkAdminStatus();
     this.loadRepairs();
+  }
+
+  checkAdminStatus() {
+    const userRole = localStorage.getItem('userRole');
+    this.isAdmin = userRole === 'admin';
   }
 
   loadRepairs() {
@@ -147,5 +155,17 @@ export class RepairRequestComponent implements OnInit {
       //   }
       // });
     }
+  }
+
+  onLineConnect() {
+    // เชื่อมต่อ LINE Account
+    window.open('https://line.me/R/ti/p/@your-line-bot', '_blank');
+  }
+
+  onLogout() {
+    // ออกจากระบบ
+    localStorage.removeItem('token');
+    localStorage.removeItem('userRole');
+    this.router.navigate(['/login']);
   }
 }

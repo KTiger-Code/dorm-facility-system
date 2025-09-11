@@ -3,6 +3,9 @@ import { CommonModule }      from '@angular/common';
 import { FormsModule }       from '@angular/forms';
 import { HttpClientModule, HttpClient, HttpHeaders } from '@angular/common/http';
 import { HeaderComponent }   from '../shared/header/header.component';
+import { AdminBaseComponent } from '../shared/admin-base.component';
+import { Router } from '@angular/router';
+import { SessionTimeoutService } from '../shared/session-timeout.service';
 
 @Component({
   selector: 'app-admin-repair',
@@ -16,7 +19,7 @@ import { HeaderComponent }   from '../shared/header/header.component';
   templateUrl: './admin-repair.component.html',
   styleUrls: ['./admin-repair.component.css']
 })
-export class AdminRepairComponent implements OnInit {
+export class AdminRepairComponent extends AdminBaseComponent implements OnInit {
   repairs: {
     id: number;
     room_number: string;
@@ -28,7 +31,9 @@ export class AdminRepairComponent implements OnInit {
   }[] = [];
   filterStatus: 'all' | 'pending' | 'in_progress' | 'completed' = 'all';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, router: Router, sessionTimeoutService: SessionTimeoutService) {
+    super(router, sessionTimeoutService);
+  }
 
   ngOnInit() {
     this.loadAll();

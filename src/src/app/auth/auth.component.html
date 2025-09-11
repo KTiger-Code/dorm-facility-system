@@ -30,6 +30,13 @@
           </span>
           <input type="password" [(ngModel)]="password" name="password" placeholder="PASSWORD" required />
         </div>
+        <div class="remember-group">
+          <label class="remember-checkbox">
+            <input type="checkbox" [(ngModel)]="rememberMe" name="rememberMe" />
+            <span class="checkmark"></span>
+            <span class="remember-text">Remember Me</span>
+          </label>
+        </div>
         <button type="submit" class="login-btn">LOGIN</button>
       </form>
       <p class="message">{{ message }}</p>

@@ -1,7 +1,9 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { HeaderComponent } from '../shared/header/header.component';
+import { AdminBaseComponent } from '../shared/admin-base.component';
+import { SessionTimeoutService } from '../shared/session-timeout.service';
 
 @Component({
   selector: 'app-admin-home',
@@ -10,4 +12,8 @@ import { HeaderComponent } from '../shared/header/header.component';
   templateUrl: './admin-home.component.html',
   styleUrls: ['./admin-home.component.css']
 })
-export class AdminHomeComponent {}
+export class AdminHomeComponent extends AdminBaseComponent {
+  constructor(router: Router, sessionTimeoutService: SessionTimeoutService) {
+    super(router, sessionTimeoutService);
+  }
+}

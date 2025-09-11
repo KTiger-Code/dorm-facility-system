@@ -3,6 +3,9 @@ import { CommonModule }       from '@angular/common';
 import { FormsModule }        from '@angular/forms';
 import { HttpClient }         from '@angular/common/http';
 import { HeaderComponent }    from '../shared/header/header.component';
+import { AdminBaseComponent } from '../shared/admin-base.component';
+import { Router } from '@angular/router';
+import { SessionTimeoutService } from '../shared/session-timeout.service';
 
 @Component({
   selector: 'app-admin-parcels',
@@ -11,7 +14,7 @@ import { HeaderComponent }    from '../shared/header/header.component';
   templateUrl: './admin-parcels.component.html',
   styleUrls: ['./admin-parcels.component.css']
 })
-export class AdminParcelsComponent implements OnInit {
+export class AdminParcelsComponent extends AdminBaseComponent implements OnInit {
   allParcels: any[]      = [];
   filteredParcels: any[] = [];
   searchRoom: string     = '';
@@ -19,7 +22,9 @@ export class AdminParcelsComponent implements OnInit {
   newParcel = { room_number: '', description: '' };
   users: any[]          = [];
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, router: Router, sessionTimeoutService: SessionTimeoutService) {
+    super(router, sessionTimeoutService);
+  }
 
   ngOnInit() {
     this.loadUsers();

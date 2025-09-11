@@ -12,6 +12,7 @@ import { AdminParcelsComponent }       from './admin-parcels/admin-parcels.compo
 import { AdminAnnouncementComponent }  from './admin-announcement/admin-announcement.component';
 import { AdminUsersComponent }         from './admin-users/admin-users.component';
 import { AdminGuard }                  from './admin.guard';
+import { AuthGuard }                   from './auth.guard';
 import { AdminFacilityComponent }      from './admin-facility/admin-facility.component';
 import { AdminRepairComponent } from './admin-repair/admin-repair.component';
 import { AdminHomeComponent } from './admin-home/admin-home.component';
@@ -19,15 +20,38 @@ import { AdminHomeComponent } from './admin-home/admin-home.component';
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'login',      component: AuthComponent },
-  { path: 'home',       component: HomeComponent },
+  { 
+    path: 'home',       
+    component: HomeComponent,
+    canActivate: [AuthGuard] 
+  },
 
-  // Resident pages
-  { path: 'invoice',    component: ResidentInvoiceComponent },
-  { path: 'facility-booking', component: FacilityBookingComponent },
-  { path: 'repair',     component: RepairRequestComponent },
-
-  { path: 'announcements', component: AnnouncementComponent },
-  { path: 'parcel',     component: ParcelNotificationComponent },
+  // Resident pages (protected by AuthGuard)
+  { 
+    path: 'invoice',    
+    component: ResidentInvoiceComponent,
+    canActivate: [AuthGuard] 
+  },
+  { 
+    path: 'facility-booking', 
+    component: FacilityBookingComponent,
+    canActivate: [AuthGuard] 
+  },
+  { 
+    path: 'repair',     
+    component: RepairRequestComponent,
+    canActivate: [AuthGuard] 
+  },
+  { 
+    path: 'announcements', 
+    component: AnnouncementComponent,
+    canActivate: [AuthGuard] 
+  },
+  { 
+    path: 'parcel',     
+    component: ParcelNotificationComponent,
+    canActivate: [AuthGuard] 
+  },
 
   // Admin pages
   {
@@ -66,5 +90,5 @@ export const routes: Routes = [
     canActivate: [AdminGuard]
   },
 
-  { path: '**', redirectTo: 'home' }
+  { path: '**', redirectTo: 'login' }
 ];

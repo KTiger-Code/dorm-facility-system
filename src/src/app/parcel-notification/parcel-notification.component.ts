@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { ParcelService } from './parcel.service';
 import { HeaderComponent } from '../shared/header/header.component';
 
@@ -16,11 +17,18 @@ export class ParcelNotificationComponent implements OnInit {
   parcels: any[] = [];
   filteredParcels: any[] = [];
   searchQuery: string = '';
+  isAdmin: boolean = false;
 
-  constructor(private parcelService: ParcelService) {}
+  constructor(private parcelService: ParcelService, private router: Router) {}
 
   ngOnInit() {
+    this.checkAdminStatus();
     this.loadParcels();
+  }
+
+  checkAdminStatus() {
+    const userRole = localStorage.getItem('userRole');
+    this.isAdmin = userRole === 'admin';
   }
 
   loadParcels() {
@@ -144,6 +152,18 @@ export class ParcelNotificationComponent implements OnInit {
       //   }
       // });
     }
+  }
+
+  onLineConnect() {
+    // เชื่อมต่อ LINE Account
+    window.open('https://line.me/R/ti/p/@your-line-bot', '_blank');
+  }
+
+  onLogout() {
+    // ออกจากระบบ
+    localStorage.removeItem('token');
+    localStorage.removeItem('userRole');
+    this.router.navigate(['/login']);
   }
 
 }

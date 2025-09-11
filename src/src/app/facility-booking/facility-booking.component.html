@@ -1,5 +1,5 @@
 <!-- Header Component -->
-<app-header [showHeaderActions]="true"></app-header>
+<app-header [showHeaderActions]="true" [isAdmin]="isAdmin" (lineConnect)="onLineConnect()" (logout)="onLogout()"></app-header>
 
 <!-- Page Title Section -->
 <div class="page-title-section">
