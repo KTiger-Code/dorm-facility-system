@@ -363,10 +363,10 @@
   border: 1px solid #ffeaa7;
 }
 
-.status-active {
-  background: #d1ecf1;
-  color: #0c5460;
-  border: 1px solid #b8daff;
+.status-upcoming {
+  background: #cce5ff;
+  color: #0056b3;
+  border: 1px solid #66b3ff;
 }
 
 .status-completed {

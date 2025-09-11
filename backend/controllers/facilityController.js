@@ -14,13 +14,13 @@ exports.createBooking = async (req, res) => {
   try {
     const [result] = await db.query(
       `INSERT INTO facility_bookings
-         (user_id, facility_name, booking_date, time_slot_start, time_slot_end, number_of_people)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [userId, facility_name, booking_date, time_slot_start, time_slot_end, number_of_people]
+         (user_id, facility_name, booking_date, time_slot_start, time_slot_end, number_of_people, status)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [userId, facility_name, booking_date, time_slot_start, time_slot_end, number_of_people, 'pending']
     );
     // คืนข้อมูลใหม่กลับไป
     const [[newB]] = await db.query(
-      `SELECT id, user_id, facility_name, booking_date, time_slot_start, time_slot_end, number_of_people
+      `SELECT id, user_id, facility_name, booking_date, time_slot_start, time_slot_end, number_of_people, status
        FROM facility_bookings WHERE id = ?`,
       [result.insertId]
     );
@@ -36,7 +36,8 @@ exports.getUserBookings = async (req, res) => {
   const userId = req.user.id;
   try {
     const [rows] = await db.query(
-      `SELECT id, user_id, facility_name, booking_date, time_slot_start, time_slot_end, number_of_people
+      `SELECT id, user_id, facility_name, booking_date, time_slot_start, time_slot_end, number_of_people, 
+              COALESCE(status, 'pending') as status
        FROM facility_bookings
        WHERE user_id = ?
        ORDER BY booking_date DESC`,
@@ -54,7 +55,8 @@ exports.getAllBookings = async (req, res) => {
   try {
     const [rows] = await db.query(
       `SELECT b.id, b.user_id, u.room_number, b.facility_name,
-              b.booking_date, b.time_slot_start, b.time_slot_end, b.number_of_people
+              b.booking_date, b.time_slot_start, b.time_slot_end, b.number_of_people,
+              COALESCE(b.status, 'pending') as status
        FROM facility_bookings AS b
        JOIN users AS u ON b.user_id = u.id
        ORDER BY b.booking_date DESC`
@@ -117,6 +119,46 @@ exports.deleteBooking = async (req, res) => {
     res.json({ message: 'Booking deleted' });
   } catch (err) {
     console.error('❌ deleteBooking error:', err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// PATCH /api/facility-booking/:id/status (สำหรับ Admin)
+exports.updateBookingStatus = async (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  const { status } = req.body;
+
+  // ตรวจสอบว่า status ถูกต้อง
+  if (!['pending', 'approved', 'rejected'].includes(status)) {
+    return res.status(400).json({ error: 'Invalid status' });
+  }
+
+  try {
+    const [result] = await db.query(
+      `UPDATE facility_bookings 
+       SET status = ?
+       WHERE id = ?`,
+      [status, id]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Booking not found' });
+    }
+
+    // ดึงข้อมูลที่อัพเดตแล้ว
+    const [[updated]] = await db.query(
+      `SELECT b.id, b.user_id, u.room_number, b.facility_name,
+              b.booking_date, b.time_slot_start, b.time_slot_end, b.number_of_people,
+              b.status
+       FROM facility_bookings AS b
+       JOIN users AS u ON b.user_id = u.id
+       WHERE b.id = ?`,
+      [id]
+    );
+
+    res.json(updated);
+  } catch (err) {
+    console.error('❌ updateBookingStatus error:', err);
     res.status(500).json({ error: err.message });
   }
 };

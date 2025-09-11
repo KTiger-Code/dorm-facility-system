@@ -28,6 +28,9 @@ export class FacilityBookingService {
   updateBooking(id: number, data: any): Observable<any> {
     return this.http.patch<any>(`${this.api}/${id}`, data, this.auth());
   }
+  updateBookingStatus(id: number, status: string): Observable<any> {
+    return this.http.patch<any>(`${this.api}/${id}/status`, { status }, this.auth());
+  }
   deleteBooking(id: number): Observable<any> {
     return this.http.delete<any>(`${this.api}/${id}`, this.auth());
   }

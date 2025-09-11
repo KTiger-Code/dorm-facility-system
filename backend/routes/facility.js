@@ -12,4 +12,7 @@ router.get('/all', verify, ctr.getAllBookings);
 router.patch('/:id', verify, ctr.updateBooking);
 router.delete('/:id', verify, ctr.deleteBooking);
 
+// Admin: อนุมัติ/ปฏิเสธการจอง
+router.patch('/:id/status', verify, ctr.updateBookingStatus);
+
 module.exports = router;

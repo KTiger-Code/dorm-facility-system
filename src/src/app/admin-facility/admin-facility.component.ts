@@ -56,19 +56,150 @@ export class AdminFacilityComponent extends AdminBaseComponent implements OnInit
     );
   }
 
+  // สถานะและสี
+  getStatusText(status: string): string {
+    switch (status) {
+      case 'pending': return 'รอการอนุมัติ';
+      case 'approved': return 'อนุมัติแล้ว';
+      case 'rejected': return 'ถูกปฏิเสธ';
+      default: return 'ไม่ทราบสถานะ';
+    }
+  }
+
+  getStatusClass(status: string): string {
+    switch (status) {
+      case 'pending': return 'status-pending';
+      case 'approved': return 'status-approved';
+      case 'rejected': return 'status-rejected';
+      default: return 'status-unknown';
+    }
+  }
+
+  // การจัดการสถานะ
+  approveBooking(booking: any) {
+    console.log('Approving booking:', booking.id);
+    this.svc.updateBookingStatus(booking.id, 'approved').subscribe({
+      next: (updatedBooking) => {
+        console.log('Booking approved successfully:', updatedBooking);
+        // อัปเดตข้อมูลในตาราง
+        const index = this.bookings.findIndex(b => b.id === booking.id);
+        if (index !== -1) {
+          this.bookings[index] = { ...this.bookings[index], status: 'approved' };
+        }
+        alert('อนุมัติการจองเรียบร้อยแล้ว');
+      },
+      error: (err) => {
+        console.error('Error approving booking:', err);
+        alert('เกิดข้อผิดพลาดในการอนุมัติ: ' + (err.error?.message || err.message));
+      }
+    });
+  }
+
+  rejectBooking(booking: any) {
+    if (!confirm('คุณต้องการปฏิเสธการจองนี้หรือไม่?')) return;
+    
+    console.log('Rejecting booking:', booking.id);
+    this.svc.updateBookingStatus(booking.id, 'rejected').subscribe({
+      next: (updatedBooking) => {
+        console.log('Booking rejected successfully:', updatedBooking);
+        // อัปเดตข้อมูลในตาราง
+        const index = this.bookings.findIndex(b => b.id === booking.id);
+        if (index !== -1) {
+          this.bookings[index] = { ...this.bookings[index], status: 'rejected' };
+        }
+        alert('ปฏิเสธการจองเรียบร้อยแล้ว');
+      },
+      error: (err) => {
+        console.error('Error rejecting booking:', err);
+        alert('เกิดข้อผิดพลาดในการปฏิเสธ: ' + (err.error?.message || err.message));
+      }
+    });
+  }
+
+  // สถิติ
+  getPendingCount(): number {
+    return this.bookings.filter(b => b.status === 'pending').length;
+  }
+
+  getApprovedCount(): number {
+    return this.bookings.filter(b => b.status === 'approved').length;
+  }
+
+  getRejectedCount(): number {
+    return this.bookings.filter(b => b.status === 'rejected').length;
+  }
+
   edit(b: any) {
-    this.editData = { ...b };
+    this.editData = { 
+      id: b.id,
+      user_id: b.user_id,
+      facility_name: b.facility_name,
+      booking_date: this.formatDateForInput(b.booking_date),
+      time_slot_start: b.time_slot_start,
+      time_slot_end: b.time_slot_end,
+      number_of_people: b.number_of_people,
+      status: b.status
+    };
+  }
+
+  // แปลงวันที่ให้อยู่ในรูปแบบที่ input date รองรับ (YYYY-MM-DD)
+  formatDateForInput(dateString: string): string {
+    if (!dateString) return '';
+    
+    // หากเป็นรูปแบบ YYYY-MM-DD อยู่แล้ว
+    if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      return dateString;
+    }
+    
+    // หากเป็นรูปแบบอื่น ให้แปลง
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return '';
+    
+    return date.toISOString().split('T')[0];
+  }
+
+  // แปลงวันที่สำหรับการแสดงผล (เป็นภาษาไทย)
+  formatDateForDisplay(dateString: string): string {
+    if (!dateString) return '';
+    
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return dateString;
+    
+    return date.toLocaleDateString('th-TH', {
+      day: '2-digit',
+      month: '2-digit', 
+      year: 'numeric'
+    });
   }
 
   save() {
     const d = this.editData;
     if (d.id) {
-      this.svc.updateBooking(d.id, d).subscribe(() => this.loadBookings());
+      this.svc.updateBooking(d.id, d).subscribe({
+        next: () => {
+          this.loadBookings();
+          alert('บันทึกการแก้ไขเรียบร้อยแล้ว');
+          this.editData = { id: null };
+        },
+        error: (err) => {
+          console.error('Error updating booking:', err);
+          alert('เกิดข้อผิดพลาดในการบันทึก');
+        }
+      });
     }
   }
 
   delete(id: number) {
     if (!confirm('ลบการจองนี้?')) return;
-    this.svc.deleteBooking(id).subscribe(() => this.loadBookings());
+    this.svc.deleteBooking(id).subscribe({
+      next: () => {
+        this.loadBookings();
+        alert('ลบการจองเรียบร้อยแล้ว');
+      },
+      error: (err) => {
+        console.error('Error deleting booking:', err);
+        alert('เกิดข้อผิดพลาดในการลบ');
+      }
+    });
   }
 }

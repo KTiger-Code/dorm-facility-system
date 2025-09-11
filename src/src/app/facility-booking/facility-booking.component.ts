@@ -73,41 +73,111 @@ export class FacilityBookingComponent implements OnInit {
 
   getUpcomingBookings(): number {
     const now = new Date();
-    return this.bookings.filter(booking => {
-      const bookingDate = new Date(booking.booking_date + ' ' + booking.time_slot_start);
-      return bookingDate > now;
-    }).length;
+    console.log('Current time:', now.toLocaleString('th-TH'));
+    
+    const upcomingBookings = this.bookings.filter(booking => {
+      // แปลง booking_date เป็น Date object ก่อน
+      const bookingDate = new Date(booking.booking_date);
+      
+      // แยกเวลาจาก time_slot_start (format: "HH:MM:SS") 
+      const [hours, minutes] = booking.time_slot_start.split(':').map(Number);
+      
+      // สร้าง Date object ใหม่โดยใช้วันที่จากฐานข้อมูลและเวลาที่แยกได้
+      const bookingDateTime = new Date(bookingDate);
+      bookingDateTime.setHours(hours, minutes, 0, 0);
+      
+      console.log(`Checking booking ${booking.id}:`, {
+        facility_name: booking.facility_name,
+        booking_date: booking.booking_date,
+        time_slot_start: booking.time_slot_start,
+        parsed_datetime: bookingDateTime.toLocaleString('th-TH'),
+        status: booking.status,
+        is_future: bookingDateTime > now,
+        is_approved: booking.status === 'approved'
+      });
+      
+      return bookingDateTime > now && booking.status === 'approved';
+    });
+    
+    console.log('Upcoming bookings count:', upcomingBookings.length);
+    return upcomingBookings.length;
   }
 
   getCompletedBookings(): number {
     const now = new Date();
-    return this.bookings.filter(booking => {
-      const bookingDate = new Date(booking.booking_date + ' ' + booking.time_slot_end);
-      return bookingDate < now;
-    }).length;
+    console.log('=== getCompletedBookings called ===');
+    console.log('Current time:', now.toLocaleString('th-TH'));
+    
+    const completedBookings = this.bookings.filter(booking => {
+      // แปลง booking_date เป็น Date object ก่อน
+      const bookingDate = new Date(booking.booking_date);
+      
+      // แยกเวลาจาก time_slot_end (format: "HH:MM:SS")
+      const [hours, minutes] = booking.time_slot_end.split(':').map(Number);
+      
+      // สร้าง Date object โดยใช้เวลาสิ้นสุด
+      const bookingEndDateTime = new Date(bookingDate);
+      bookingEndDateTime.setHours(hours, minutes, 0, 0);
+      
+      const isPast = bookingEndDateTime < now;
+      const isApproved = booking.status === 'approved';
+      
+      console.log(`Checking completed booking ${booking.id}:`, {
+        facility_name: booking.facility_name,
+        booking_date: booking.booking_date,
+        time_slot_end: booking.time_slot_end,
+        end_datetime: bookingEndDateTime.toLocaleString('th-TH'),
+        status: booking.status,
+        is_past: isPast,
+        is_approved: isApproved
+      });
+      
+      return isPast && isApproved;
+    });
+    
+    console.log('Completed bookings count:', completedBookings.length);
+    return completedBookings.length;
   }
 
   // Booking status methods
   getBookingStatus(booking: any): string {
-    const now = new Date();
-    const bookingStart = new Date(booking.booking_date + ' ' + booking.time_slot_start);
-    const bookingEnd = new Date(booking.booking_date + ' ' + booking.time_slot_end);
+    // หาก Admin ยังไม่อนุมัติ
+    if (booking.status === 'pending') {
+      return 'รอยืนยันการจอง';
+    } else if (booking.status === 'rejected') {
+      return 'ถูกปฏิเสธ';
+    }
 
-    if (bookingEnd < now) {
-      return 'เสร็จสิ้น';
-    } else if (bookingStart <= now && now <= bookingEnd) {
-      return 'กำลังดำเนินการ';
+    // หาก approved แล้ว ให้ดูจากเวลา
+    const now = new Date();
+    const bookingDate = new Date(booking.booking_date);
+    
+    // แยกเวลาสิ้นสุด
+    const [endHours, endMinutes] = booking.time_slot_end.split(':').map(Number);
+    const bookingEndDateTime = new Date(bookingDate);
+    bookingEndDateTime.setHours(endHours, endMinutes, 0, 0);
+    
+    // แยกเวลาเริ่มต้น
+    const [startHours, startMinutes] = booking.time_slot_start.split(':').map(Number);
+    const bookingStartDateTime = new Date(bookingDate);
+    bookingStartDateTime.setHours(startHours, startMinutes, 0, 0);
+
+    if (bookingEndDateTime < now) {
+      return 'สำเร็จ';
+    } else if (bookingStartDateTime <= now && now <= bookingEndDateTime) {
+      return 'กำลังจะมาถึง';
     } else {
-      return 'รอการดำเนินการ';
+      return 'กำลังจะมาถึง';
     }
   }
 
   getBookingStatusClass(booking: any): string {
     const status = this.getBookingStatus(booking);
     switch (status) {
-      case 'เสร็จสิ้น': return 'status-completed';
-      case 'กำลังดำเนินการ': return 'status-active';
-      case 'รอการดำเนินการ': return 'status-pending';
+      case 'สำเร็จ': return 'status-completed';
+      case 'กำลังจะมาถึง': return 'status-upcoming'; 
+      case 'รอยืนยันการจอง': return 'status-pending';
+      case 'ถูกปฏิเสธ': return 'status-rejected';
       default: return 'status-pending';
     }
   }
