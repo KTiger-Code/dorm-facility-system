@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class InvoiceService {
-  private api = '/api/invoices';
+  private api = '/api/invoice'; // แก้ไขจาก invoices เป็น invoice
 
   constructor(private http: HttpClient) {}
 

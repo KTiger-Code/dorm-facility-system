@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -19,7 +20,7 @@ export class SessionTimeoutService {
   public warningSubject = new Subject<number>();
   public timeoutSubject = new Subject<void>();
 
-  constructor(private router: Router) {
+  constructor(private router: Router, private authService: AuthService) {
     // เริ่มต้นการตรวจจับ user activity ทันที
     this.initUserActivityDetection();
     
@@ -79,9 +80,8 @@ export class SessionTimeoutService {
   private performLogout() {
     console.log('Session timeout - Auto logout');
     
-    // ลบข้อมูล authentication
-    localStorage.removeItem('token');
-    localStorage.removeItem('userRole');
+    // ใช้ AuthService สำหรับ logout (ลบข้อมูล authentication)
+    this.authService.logout();
     
     // แจ้ง components อื่นๆ ว่า timeout แล้ว
     this.timeoutSubject.next();

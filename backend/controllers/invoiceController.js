@@ -340,3 +340,19 @@ exports.deleteInvoice = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+// Admin: ดึงใบแจ้งหนี้ทั้งหมด
+exports.getAllInvoices = async (req, res) => {
+  try {
+    const [invoices] = await db.query(
+      `SELECT i.*, u.username, u.room_number 
+       FROM invoices i 
+       LEFT JOIN users u ON i.user_id = u.id 
+       ORDER BY i.created_at DESC`
+    );
+    res.json(invoices);
+  } catch (err) {
+    console.error('Error in getAllInvoices:', err);
+    res.status(500).json({ error: err.message });
+  }
+};

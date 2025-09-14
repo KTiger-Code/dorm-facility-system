@@ -48,7 +48,7 @@ export class AdminRepairComponent extends AdminBaseComponent implements OnInit {
 
   loadAll() {
     this.http
-      .get<any[]>('/api/repair-request/all', this.authHeaders())
+      .get<any[]>('/api/repair/all', this.authHeaders()) // แก้ไขจาก repair-request เป็น repair
       .subscribe({
         next: data => {
           // สมมติ backend ส่งมาพร้อม room_number, title, description, status, timestamps
@@ -78,14 +78,14 @@ export class AdminRepairComponent extends AdminBaseComponent implements OnInit {
 
   deleteRepair(id: number) {
     if (!confirm('ลบคำขอนี้?')) return;
-    this.http.delete(`/api/repair-request/${id}`, this.authHeaders())
+    this.http.delete(`/api/repair/${id}`, this.authHeaders()) // แก้ไขจาก repair-request เป็น repair
       .subscribe(() => this.loadAll());
   }
 
   updateStatus(req: any, newStatus: 'pending' | 'in_progress' | 'completed') {
     this.http
       .patch(
-        `/api/repair-request/${req.id}/status`,
+        `/api/repair/${req.id}/status`, // แก้ไขจาก repair-request เป็น repair
         { status: newStatus },
         this.authHeaders()
       )

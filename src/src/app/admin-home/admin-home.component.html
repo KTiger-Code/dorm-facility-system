@@ -1,4 +1,139 @@
 <app-header [showHeaderActions]="true" [isAdmin]="isAdmin" (lineConnect)="onLineConnect()" (logout)="onLogout()"></app-header>
+
+<!-- Dashboard Section -->
+<div class="dashboard-container">
+  <div class="dashboard-header">
+    <h2>แดชบอร์ดการแจ้งเตือน</h2>
+    <div class="total-pending">
+      <span class="total-count" [class.has-pending]="dashboardStats.totalPendingItems > 0">
+        รวม {{ dashboardStats.totalPendingItems }} รายการที่รอดำเนินการ
+      </span>
+    </div>
+  </div>
+  
+  <div class="dashboard-grid">
+    <!-- การแจ้งหนี้ที่รอตรวจสอบ -->
+    <div class="dashboard-card" [class.has-pending]="dashboardStats.pendingInvoices > 0" (click)="navigateToInvoices()">
+      <div class="card-header">
+        <img src="/Photo/invoice-icon.svg" alt="invoice" class="card-icon">
+        <span class="card-title">การชำระเงิน</span>
+      </div>
+      <div class="card-content">
+        <div class="pending-count">{{ dashboardStats.pendingInvoices }}</div>
+        <div class="pending-label">รายการรอตรวจสอบ</div>
+      </div>
+      <div class="card-action">คลิกเพื่อดูรายละเอียด</div>
+    </div>
+
+    <!-- คำขอซ่อมที่รอดำเนินการ -->
+    <div class="dashboard-card" [class.has-pending]="dashboardStats.pendingRepairs > 0" (click)="navigateToRepairs()">
+      <div class="card-header">
+        <img src="/Photo/service-request-icon.svg" alt="repair" class="card-icon">
+        <span class="card-title">คำขอซ่อม</span>
+      </div>
+      <div class="card-content">
+        <div class="pending-count">{{ dashboardStats.pendingRepairs }}</div>
+        <div class="pending-label">รายการรอดำเนินการ</div>
+      </div>
+      <div class="card-action">คลิกเพื่อดูรายละเอียด</div>
+    </div>
+
+    <!-- การจองส่วนกลางที่รออนุมัติ -->
+    <div class="dashboard-card" [class.has-pending]="dashboardStats.pendingFacilityBookings > 0" (click)="navigateToFacilityBookings()">
+      <div class="card-header">
+        <img src="/Photo/facility-booking-icon.svg" alt="facility" class="card-icon">
+        <span class="card-title">การจองส่วนกลาง</span>
+      </div>
+      <div class="card-content">
+        <div class="pending-count">{{ dashboardStats.pendingFacilityBookings }}</div>
+        <div class="pending-label">รายการรออนุมัติ</div>
+      </div>
+      <div class="card-action">คลิกเพื่อดูรายละเอียด</div>
+    </div>
+  </div>
+</div>
+
+<!-- Admin Logs Section -->
+<div class="admin-logs-container">
+  <div class="logs-header">
+    <h3>Admin Activity Log</h3>
+    <div class="logs-stats" *ngIf="adminLogStats">
+      <div class="stat-item">
+        <span class="stat-value">{{ adminLogStats.today_logs }}</span>
+        <span class="stat-label">วันนี้</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value">{{ adminLogStats.active_admins }}</span>
+        <span class="stat-label">Admin ที่ทำงาน (7 วัน)</span>
+      </div>
+    </div>
+    <button class="toggle-logs-btn" (click)="toggleAdminLogs()">
+      {{ showAdminLogs ? 'ซ่อน Logs' : 'แสดง Logs' }}
+    </button>
+  </div>
+
+  <div class="logs-content" *ngIf="showAdminLogs">
+    <!-- สถิติ actions -->
+    <div class="action-stats" *ngIf="adminLogStats && adminLogStats.action_stats && adminLogStats.action_stats.length > 0">
+      <h4>กิจกรรมยอดนิยม (7 วันล่าสุด)</h4>
+      <div class="stats-grid">
+        <div 
+          class="action-stat-item" 
+          *ngFor="let stat of adminLogStats.action_stats.slice(0, 5)"
+          [class]="'action-' + getActionColor(stat.action)"
+        >
+          <span class="action-name">{{ stat.action }}</span>
+          <span class="action-count">{{ stat.count }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- รายการ logs -->
+    <div class="logs-list">
+      <div class="logs-list-header">
+        <h4>รายการกิจกรรมล่าสุด</h4>
+        <button class="refresh-btn" (click)="loadAdminLogs()" [disabled]="logsLoading">
+          <span *ngIf="!logsLoading">รีเฟรช</span>
+          <span *ngIf="logsLoading">กำลังโหลด...</span>
+        </button>
+      </div>
+
+      <div class="logs-loading" *ngIf="logsLoading">
+        กำลังโหลดข้อมูล...
+      </div>
+
+      <div class="logs-table" *ngIf="!logsLoading && adminLogs.length > 0">
+        <div class="log-item" *ngFor="let log of adminLogs">
+          <div class="log-header">
+            <div class="admin-info">
+              <strong>{{ log.admin_fullname }}</strong>
+              <span class="username">({{ log.admin_username }})</span>
+            </div>
+            <div class="log-time">{{ formatLogDate(log.created_at) }}</div>
+          </div>
+          <div class="log-body">
+            <div class="log-action" [class]="'action-' + getActionColor(log.action)">
+              {{ log.action }}
+            </div>
+            <div class="log-details" *ngIf="log.details">
+              {{ log.details }}
+            </div>
+            <div class="log-meta">
+              <span *ngIf="log.target_table">ตาราง: {{ log.target_table }}</span>
+              <span *ngIf="log.target_id">ID: {{ log.target_id }}</span>
+              <span>IP: {{ log.ip_address }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="no-logs" *ngIf="!logsLoading && adminLogs.length === 0">
+        ไม่พบข้อมูล Admin Logs
+      </div>
+    </div>
+  </div>
+</div>
+
 <nav class="home-nav">
   <ul class="menu-list">
     <li class="menu-item">

@@ -39,9 +39,52 @@ export class FacilityBookingComponent implements OnInit {
 
   getBookings() {
     this.svc.getBookings().subscribe({
-      next: res => this.bookings = res,
+      next: res => {
+        this.bookings = res;
+        this.sortBookingsByStatus();
+      },
       error: err => console.error(err)
     });
+  }
+
+  // ฟังก์ชันเรียงลำดับการจองตามสถานะ
+  sortBookingsByStatus() {
+    this.bookings.sort((a: any, b: any) => {
+      const statusA = this.getBookingStatus(a);
+      const statusB = this.getBookingStatus(b);
+      
+      // กำหนดลำดับความสำคัญ (เลขน้อย = อยู่บนสุด)
+      const statusPriority: { [key: string]: number } = {
+        'รอยืนยันการจอง': 1,    // บนสุด
+        'กำลังจะมาถึง': 2,       // กลาง
+        'สำเร็จ': 3,             // ล่างสุด
+        'ถูกปฏิเสธ': 4          // ล่างสุด (หากมี)
+      };
+      
+      const priorityA = statusPriority[statusA] || 999;
+      const priorityB = statusPriority[statusB] || 999;
+      
+      // หากสถานะเหมือนกัน ให้เรียงตามวันที่และเวลา
+      if (priorityA === priorityB) {
+        // สร้าง Date object รวมวันที่และเวลาเริ่มต้น
+        const dateTimeA = this.createBookingDateTime(a);
+        const dateTimeB = this.createBookingDateTime(b);
+        
+        // เรียงตามเวลา: การจองที่มีเวลาเร็วกว่าอยู่บนสุด
+        return dateTimeA.getTime() - dateTimeB.getTime();
+      }
+      
+      return priorityA - priorityB;
+    });
+  }
+
+  // ฟังก์ชันสำหรับสร้าง DateTime object จากการจอง
+  private createBookingDateTime(booking: any): Date {
+    const bookingDate = new Date(booking.booking_date);
+    const [hours, minutes] = booking.time_slot_start.split(':').map(Number);
+    const dateTime = new Date(bookingDate);
+    dateTime.setHours(hours, minutes, 0, 0);
+    return dateTime;
   }
 
   bookFacility() {
@@ -195,6 +238,7 @@ export class FacilityBookingComponent implements OnInit {
     if (confirm('คุณต้องการยกเลิกการจองนี้หรือไม่?')) {
       // For now, just remove from local array since cancelBooking method doesn't exist in service
       this.bookings = this.bookings.filter(booking => booking.booking_id !== bookingId);
+      this.sortBookingsByStatus(); // เรียงลำดับใหม่หลังจากลบ
       alert('ยกเลิกการจองเรียบร้อยแล้ว');
       
       // TODO: Implement cancelBooking in FacilityBookingService

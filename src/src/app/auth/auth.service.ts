@@ -33,4 +33,16 @@ export class AuthService {
   isAdmin(): boolean {
     return this.getUserRole() === 'admin';
   }
+
+  /** ล้าง token และข้อมูล session */
+  logout(): void {
+    localStorage.removeItem('token');
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('sessionTimeout');
+  }
+
+  /** ตรวจสอบว่าผู้ใช้ล็อกอินอยู่หรือไม่ */
+  isLoggedIn(): boolean {
+    return this.getToken() !== null;
+  }
 }

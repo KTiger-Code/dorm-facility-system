@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class FacilityBookingService {
-  private api = '/api/facility-booking';
+  private api = '/api/facility'; // แก้ไขจาก facility-booking เป็น facility
 
   constructor(private http: HttpClient) {}
 

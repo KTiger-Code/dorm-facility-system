@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class RepairService {
-  private api = '/api/repair-request';
+  private api = '/api/repair'; // แก้ไขจาก repair-request เป็น repair
 
   constructor(private http: HttpClient) {}
 
