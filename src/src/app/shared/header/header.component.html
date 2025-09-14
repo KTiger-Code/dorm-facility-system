@@ -35,7 +35,14 @@
               <span class="menu-desc">จัดการระบบ</span>
             </div>
           </a>
-          <button class="menu-item logout-item" (click)="onLogout()">
+          <a routerLink="/change-password" class="menu-item" (click)="closeMenu()">
+            <i class="menu-icon">🔐</i>
+            <div class="menu-text">
+              <span class="menu-label">Change Password</span>
+              <span class="menu-desc">เปลี่ยนรหัสผ่าน</span>
+            </div>
+          </a>
+          <button class="menu-item logout-item" (click)="onLogout()">>
             <i class="menu-icon">🚪</i>
             <div class="menu-text">
               <span class="menu-label">Logout</span>

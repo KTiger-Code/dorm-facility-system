@@ -4,6 +4,7 @@ import { HomeComponent }               from './home/home.component';
 import { ResidentInvoiceComponent }    from './resident-invoice/resident-invoice.component';
 import { AdminInvoiceComponent }       from './admin-invoice/admin-invoice.component';
 import { RepairRequestComponent }      from './repair-request/repair-request.component';
+import { ChangePasswordComponent }     from './change-password/change-password.component';
 
 import { AnnouncementComponent }       from './announcements/announcement.component';
 import { FacilityBookingComponent }    from './facility-booking/facility-booking.component';
@@ -50,6 +51,13 @@ export const routes: Routes = [
   { 
     path: 'parcel',     
     component: ParcelNotificationComponent,
+    canActivate: [AuthGuard] 
+  },
+
+  // Change Password (available to all authenticated users)
+  { 
+    path: 'change-password',     
+    component: ChangePasswordComponent,
     canActivate: [AuthGuard] 
   },
 

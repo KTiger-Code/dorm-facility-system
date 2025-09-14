@@ -106,3 +106,90 @@ exports.deleteUser = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+// PATCH /api/users/change-password ▶️ เปลี่ยนรหัสผ่าน
+exports.changePassword = async (req, res) => {
+  try {
+    const userId = req.user.id; // จาก JWT token
+    const { currentPassword, newPassword, confirmPassword } = req.body;
+
+    // ตรวจสอบข้อมูลที่ส่งมา
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      return res.status(400).json({ 
+        success: false,
+        message: 'กรุณากรอกข้อมูลให้ครบถ้วน' 
+      });
+    }
+
+    // ตรวจสอบรหัสผ่านใหม่ตรงกันหรือไม่
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({ 
+        success: false,
+        message: 'รหัสผ่านใหม่ไม่ตรงกัน' 
+      });
+    }
+
+    // ตรวจสอบความยาวรหัสผ่านใหม่
+    if (newPassword.length < 6) {
+      return res.status(400).json({ 
+        success: false,
+        message: 'รหัสผ่านใหม่ต้องมีความยาวอย่างน้อย 6 ตัวอักษร' 
+      });
+    }
+
+    // ดึงข้อมูลผู้ใช้ปัจจุบัน
+    const [users] = await db.query(
+      'SELECT id, username, password, fullname FROM users WHERE id = ?',
+      [userId]
+    );
+
+    if (users.length === 0) {
+      return res.status(404).json({ 
+        success: false,
+        message: 'ไม่พบข้อมูลผู้ใช้' 
+      });
+    }
+
+    const user = users[0];
+
+    // ตรวจสอบรหัสผ่านเก่า
+    const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.password);
+    if (!isCurrentPasswordValid) {
+      return res.status(400).json({ 
+        success: false,
+        message: 'รหัสผ่านปัจจุบันไม่ถูกต้อง' 
+      });
+    }
+
+    // เข้ารหัสรหัสผ่านใหม่
+    const hashedNewPassword = await bcrypt.hash(newPassword, SALT_ROUNDS);
+
+    // อัปเดตรหัสผ่านในฐานข้อมูล
+    const [result] = await db.query(
+      'UPDATE users SET password = ? WHERE id = ?',
+      [hashedNewPassword, userId]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(500).json({ 
+        success: false,
+        message: 'เกิดข้อผิดพลาดในการอัปเดตรหัสผ่าน' 
+      });
+    }
+
+    res.json({ 
+      success: true,
+      message: 'เปลี่ยนรหัสผ่านสำเร็จ' 
+    });
+
+    console.log(`✅ Password changed for user: ${user.username} (${user.fullname})`);
+
+  } catch (err) {
+    console.error('❌ changePassword error:', err);
+    res.status(500).json({ 
+      success: false,
+      message: 'เกิดข้อผิดพลาดในระบบ',
+      error: err.message 
+    });
+  }
+};
