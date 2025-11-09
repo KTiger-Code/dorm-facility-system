@@ -19,6 +19,8 @@ import { HeaderComponent } from '../shared/header/header.component';
 import { AdminBaseComponent } from '../shared/admin-base.component';
 import { Router } from '@angular/router';
 import { SessionTimeoutService } from '../shared/session-timeout.service';
+import { NotificationsComponent } from '../shared/components/notifications/notifications.component';
+import { NotificationService } from '../shared/services/notification.service';
 
 @Component({
   selector: 'app-admin-invoice',
@@ -28,7 +30,8 @@ import { SessionTimeoutService } from '../shared/session-timeout.service';
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
-    HeaderComponent
+    HeaderComponent,
+    NotificationsComponent
   ],
   templateUrl: './admin-invoice.component.html',
   styleUrls: ['./admin-invoice.component.css']
@@ -52,7 +55,8 @@ export class AdminInvoiceComponent extends AdminBaseComponent implements OnInit 
     private svc: InvoiceService,
     private http: HttpClient,
     router: Router,
-    sessionTimeoutService: SessionTimeoutService
+    sessionTimeoutService: SessionTimeoutService,
+    private notificationService: NotificationService
   ) {
     super(router, sessionTimeoutService);
     // สร้างรายการปีย้อนหลัง 5 ปี และล่วงหน้า 2 ปี
@@ -223,13 +227,15 @@ export class AdminInvoiceComponent extends AdminBaseComponent implements OnInit 
 
   save() {
     if (this.form.invalid) {
-      return alert('กรุณากรอกข้อมูลในฟอร์มให้ครบและถูกต้อง');
+      this.notificationService.error('กรุณากรอกข้อมูลในฟอร์มให้ครบและถูกต้อง');
+      return;
     }
     const v = this.form.value;
     // หา user_id ตาม room_number
     const user = this.users.find(u => u.room_number === v.room_number);
     if (!user) {
-      return alert(`ไม่พบห้อง "${v.room_number}" ในระบบ`);
+      this.notificationService.error(`ไม่พบห้อง "${v.room_number}" ในระบบ`);
+      return;
     }
 
     // สร้าง month_year ในรูปแบบ MM/YYYY
@@ -253,27 +259,41 @@ export class AdminInvoiceComponent extends AdminBaseComponent implements OnInit 
 
     if (v.id) {
       this.svc.updateInvoice(v.id, payload)
-        .subscribe(() => {
-          this.loadAll();
-          this.form.reset({
-            id:null, room_number:'', month_year:'',
-            water_prev_meter:0, water_curr_meter:0, water_unit_price:0, water_fee:0,
-            electricity_prev_meter:0, electricity_curr_meter:0, electricity_unit_price:0, electricity_fee:0,
-            common_fee:0, room_rent:0, extra_charges:[]
-          });
-          this.extras.clear();
+        .subscribe({
+          next: () => {
+            this.notificationService.success('อัปเดตใบแจ้งหนี้สำเร็จ');
+            this.loadAll();
+            this.form.reset({
+              id:null, room_number:'', month_year:'',
+              water_prev_meter:0, water_curr_meter:0, water_unit_price:0, water_fee:0,
+              electricity_prev_meter:0, electricity_curr_meter:0, electricity_unit_price:0, electricity_fee:0,
+              common_fee:0, room_rent:0, extra_charges:[]
+            });
+            this.extras.clear();
+          },
+          error: (error) => {
+            console.error('อัปเดตใบแจ้งหนี้ไม่สำเร็จ:', error);
+            this.notificationService.error('เกิดข้อผิดพลาดในการอัปเดตใบแจ้งหนี้');
+          }
         });
     } else {
       this.svc.createInvoice(payload)
-        .subscribe(() => {
-          this.loadAll();
-          this.form.reset({
-            id:null, room_number:'', month_year:'',
-            water_prev_meter:0, water_curr_meter:0, water_unit_price:0, water_fee:0,
-            electricity_prev_meter:0, electricity_curr_meter:0, electricity_unit_price:0, electricity_fee:0,
-            common_fee:0, room_rent:0, extra_charges:[]
-          });
-          this.extras.clear();
+        .subscribe({
+          next: () => {
+            this.notificationService.success('สร้างใบแจ้งหนี้สำเร็จ');
+            this.loadAll();
+            this.form.reset({
+              id:null, room_number:'', month_year:'',
+              water_prev_meter:0, water_curr_meter:0, water_unit_price:0, water_fee:0,
+              electricity_prev_meter:0, electricity_curr_meter:0, electricity_unit_price:0, electricity_fee:0,
+              common_fee:0, room_rent:0, extra_charges:[]
+            });
+            this.extras.clear();
+          },
+          error: (error) => {
+            console.error('สร้างใบแจ้งหนี้ไม่สำเร็จ:', error);
+            this.notificationService.error('เกิดข้อผิดพลาดในการสร้างใบแจ้งหนี้');
+          }
         });
     }
   }
@@ -307,7 +327,16 @@ export class AdminInvoiceComponent extends AdminBaseComponent implements OnInit 
 
   delete(id: number) {
     if (!confirm('ลบใบแจ้งหนี้นี้?')) return;
-    this.svc.deleteInvoice(id).subscribe(() => this.loadAll());
+    this.svc.deleteInvoice(id).subscribe({
+      next: () => {
+        this.notificationService.success('ลบใบแจ้งหนี้สำเร็จ');
+        this.loadAll();
+      },
+      error: (error) => {
+        console.error('ลบใบแจ้งหนี้ไม่สำเร็จ:', error);
+        this.notificationService.error('เกิดข้อผิดพลาดในการลบใบแจ้งหนี้');
+      }
+    });
   }
 
   handleImgError(event: Event) {

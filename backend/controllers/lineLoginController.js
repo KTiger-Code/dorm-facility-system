@@ -3,20 +3,14 @@ const axios = require('axios');
 const querystring = require('querystring');
 const jwt = require('jsonwebtoken');
 
-const LINE_CLIENT_ID = process.env.LINE_CLIENT_ID;
-const LINE_CLIENT_SECRET = process.env.LINE_CLIENT_SECRET;
-const LINE_REDIRECT_URI = process.env.LINE_REDIRECT_URI;
+const LINE_CLIENT_ID = process.env.LINE_LOGIN_CLIENT_ID;
+const LINE_CLIENT_SECRET = process.env.LINE_LOGIN_CLIENT_SECRET;
+const LINE_REDIRECT_URI = process.env.LINE_LOGIN_REDIRECT_URI;
 const JWT_SECRET = process.env.JWT_SECRET;
 
-// ✅ รับ webhook จาก LINE Bot
-exports.handleWebhook = (req, res) => {
-  console.log('📨 ได้รับ Webhook จาก LINE:', req.body);
-  res.sendStatus(200);
-};
-
-// ✅ เริ่ม Login (แนบ token ของ user ใน state เพื่อรู้ว่าใคร login)
+// ✅ เริ่ม Login
 exports.lineLogin = (req, res) => {
-  const token = req.query.token; // รับ token จาก frontend
+  const token = req.query.token;
   if (!token) return res.status(400).send('Missing token');
   
   console.log('LINE Login Debug:', {
@@ -25,9 +19,15 @@ exports.lineLogin = (req, res) => {
     token: token
   });
 
-  // Double encode the redirect_uri as per LINE's requirements
-  const encodedRedirectUri = encodeURIComponent(encodeURIComponent(LINE_REDIRECT_URI));
-  const redirectUrl = `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=${LINE_CLIENT_ID}&redirect_uri=${encodedRedirectUri}&state=${token}&scope=profile%20openid`;
+  // ใช้ URL ตรงจาก LINE Login settings
+  const encodedRedirectUri = encodeURIComponent(LINE_REDIRECT_URI);
+  const redirectUrl = `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=${LINE_CLIENT_ID}&redirect_uri=${encodedRedirectUri}&state=${token}&scope=profile%20openid&bot_prompt=normal`;
+  
+  console.log('Debug - Login URL:', {
+    redirectUrl,
+    originalRedirectUri: LINE_REDIRECT_URI,
+    encodedRedirectUri
+  });
 
   res.redirect(redirectUrl);
 };
@@ -35,14 +35,18 @@ exports.lineLogin = (req, res) => {
 // ✅ Callback หลังจากผู้ใช้ login แล้ว
 exports.lineCallback = async (req, res) => {
   const code = req.query.code;
-  const state = req.query.state; // รับ JWT token จาก state
+  const state = req.query.state;
+
+  console.log('LINE Callback Debug:', {
+    code: code,
+    state: state,
+    redirect_uri: LINE_REDIRECT_URI
+  });
 
   try {
-    // ถอด JWT เพื่อดึง user.id
     const decoded = jwt.verify(state, JWT_SECRET);
     const systemUserId = decoded.id;
 
-    // ขอ access token จาก LINE
     const tokenRes = await axios.post('https://api.line.me/oauth2/v2.1/token',
       querystring.stringify({
         grant_type: 'authorization_code',
@@ -60,7 +64,6 @@ exports.lineCallback = async (req, res) => {
 
     const accessToken = tokenRes.data.access_token;
 
-    // ✅ ดึง profile ผู้ใช้
     const profileRes = await axios.get('https://api.line.me/v2/profile', {
       headers: {
         Authorization: `Bearer ${accessToken}`
@@ -69,22 +72,21 @@ exports.lineCallback = async (req, res) => {
 
     const { userId: lineUserId, displayName } = profileRes.data;
 
-    // ✅ อัปเดต line_user_id ในระบบ
     await db.query('UPDATE users SET line_user_id = ? WHERE id = ?', [lineUserId, systemUserId]);
 
-    console.log('✅ LINE User ID:', lineUserId);
-    console.log('👤 Display Name:', displayName);
-    console.log('🔗 ผูกกับ user.id:', systemUserId);
+    console.log('LINE Login Success:', {
+      lineUserId: lineUserId,
+      displayName: displayName,
+      systemUserId: systemUserId
+    });
 
-    // ✅ Redirect กลับไปหน้า Home หลังผูกบัญชีเสร็จ
     res.redirect(process.env.FRONTEND_URL || 'http://localhost:4200/home');
   } catch (err) {
-    console.error('❌ LINE Callback Error:', {
+    console.error('LINE Callback Error:', {
       error: err.message,
       response: err.response?.data,
       code: req.query.code,
-      state: req.query.state,
-      decoded: decoded || null
+      state: req.query.state
     });
     res.status(500).json({
       error: err.message,

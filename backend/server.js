@@ -6,10 +6,8 @@ dotenv.config();
 
 const app = express();
 
-// ✅ เปิด CORS และ JSON ก่อน route ทั้งหมด
-app.use(cors({
-  origin: 'http://localhost:4200' // หรือ app.use(cors()); ถ้าจะเปิดทั้งหมด
-}));
+// ✅ เปิด CORS สำหรับทุก origin
+app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
@@ -27,4 +25,7 @@ app.use('/api/admin-logs', require('./routes/adminLogs'));
 
 // ✅ Start Server
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server running on http://0.0.0.0:${PORT}`);
+  console.log('Access from other devices using your computer IP address');
+});

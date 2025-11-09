@@ -1,11 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const { handleWebhook, lineLogin, lineCallback } = require('../controllers/lineWebhookController');
+const { handleWebhook } = require('../controllers/lineWebhookController');
+const { lineLogin, lineCallback } = require('../controllers/lineLoginController');
 
-// Webhook
+// Webhook endpoints
 router.post('/webhook', handleWebhook);
 
-// ✅ LINE Login
+// LINE Login endpoints
 router.get('/login', lineLogin);
 router.get('/callback', lineCallback);
 

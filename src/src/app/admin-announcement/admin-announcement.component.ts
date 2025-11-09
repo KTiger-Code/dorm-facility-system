@@ -6,11 +6,13 @@ import { HeaderComponent } from '../shared/header/header.component';
 import { AdminBaseComponent } from '../shared/admin-base.component';
 import { Router } from '@angular/router';
 import { SessionTimeoutService } from '../shared/session-timeout.service';
+import { NotificationsComponent } from '../shared/components/notifications/notifications.component';
+import { NotificationService } from '../shared/services/notification.service';
 
 @Component({
   selector: 'app-admin-announcement',
   standalone: true,
-  imports: [CommonModule, FormsModule, HeaderComponent],
+  imports: [CommonModule, FormsModule, HeaderComponent, NotificationsComponent],
   templateUrl: './admin-announcement.component.html',
   styleUrls: ['./admin-announcement.component.css']
 })
@@ -22,7 +24,12 @@ export class AdminAnnouncementComponent extends AdminBaseComponent {
   searchQuery: string = '';
   editingAnnouncement: any = null;
 
-  constructor(private http: HttpClient, router: Router, sessionTimeoutService: SessionTimeoutService) {
+  constructor(
+    private http: HttpClient, 
+    router: Router, 
+    sessionTimeoutService: SessionTimeoutService,
+    private notificationService: NotificationService
+  ) {
     super(router, sessionTimeoutService);
     this.loadAnnouncements();
   }
@@ -48,7 +55,7 @@ export class AdminAnnouncementComponent extends AdminBaseComponent {
 
   postAnnouncement() {
     if (!this.title.trim() || !this.content.trim()) {
-      alert('กรุณากรอกทั้งหัวข้อและเนื้อหาก่อนประกาศ');
+      this.notificationService.error('กรุณากรอกทั้งหัวข้อและเนื้อหาก่อนประกาศ');
       return;
     }
 
@@ -61,26 +68,26 @@ export class AdminAnnouncementComponent extends AdminBaseComponent {
       // Update existing announcement
       this.http.put(`/api/announcements/${this.editingAnnouncement.id}`, announcementData, this.getAuthHeaders()).subscribe({
         next: () => {
-          alert('แก้ไขประกาศสำเร็จ');
+          this.notificationService.success('แก้ไขประกาศสำเร็จ');
           this.clearForm();
           this.loadAnnouncements();
         },
         error: (err) => {
           console.error('แก้ไขประกาศล้มเหลว:', err);
-          alert('เกิดข้อผิดพลาดในการแก้ไขประกาศ');
+          this.notificationService.error('เกิดข้อผิดพลาดในการแก้ไขประกาศ');
         }
       });
     } else {
       // Create new announcement
       this.http.post('/api/announcements', announcementData, this.getAuthHeaders()).subscribe({
         next: () => {
-          alert('ประกาศข่าวสารสำเร็จ');
+          this.notificationService.success('ประกาศข่าวสารสำเร็จ');
           this.clearForm();
           this.loadAnnouncements();
         },
         error: (err) => {
           console.error('โพสต์ประกาศล้มเหลว:', err);
-          alert('เกิดข้อผิดพลาดในการโพสต์ประกาศ');
+          this.notificationService.error('เกิดข้อผิดพลาดในการโพสต์ประกาศ');
         }
       });
     }
@@ -152,12 +159,12 @@ export class AdminAnnouncementComponent extends AdminBaseComponent {
     if (confirm('คุณต้องการลบประกาศนี้หรือไม่?')) {
       this.http.delete(`/api/announcements/${announcementId}`, this.getAuthHeaders()).subscribe({
         next: () => {
-          alert('ลบประกาศสำเร็จ');
+          this.notificationService.success('ลบประกาศสำเร็จ');
           this.loadAnnouncements();
         },
         error: (err) => {
           console.error('ลบประกาศล้มเหลว:', err);
-          alert('เกิดข้อผิดพลาดในการลบประกาศ');
+          this.notificationService.error('เกิดข้อผิดพลาดในการลบประกาศ');
         }
       });
     }

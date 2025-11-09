@@ -5,11 +5,13 @@ import { HttpClientModule } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { FacilityBookingService } from './facility-booking.service';
 import { HeaderComponent } from '../shared/header/header.component';
+import { NotificationsComponent } from '../shared/components/notifications/notifications.component';
+import { NotificationService } from '../shared/services/notification.service';
 
 @Component({
   selector: 'app-facility-booking',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule, HeaderComponent],
+  imports: [CommonModule, FormsModule, HttpClientModule, HeaderComponent, NotificationsComponent],
   templateUrl: './facility-booking.component.html',
   styleUrls: ['./facility-booking.component.css']
 })
@@ -25,7 +27,11 @@ export class FacilityBookingComponent implements OnInit {
 
   isAdmin: boolean = false;
 
-  constructor(private svc: FacilityBookingService, private router: Router) {}
+  constructor(
+    private svc: FacilityBookingService, 
+    private router: Router,
+    private notificationService: NotificationService
+  ) {}
 
   ngOnInit() {
     this.checkAdminStatus();
@@ -88,8 +94,15 @@ export class FacilityBookingComponent implements OnInit {
   }
 
   bookFacility() {
+    if (!this.newBooking.facility_name || !this.newBooking.booking_date || 
+        !this.newBooking.time_slot_start || !this.newBooking.time_slot_end) {
+      this.notificationService.error('กรุณากรอกข้อมูลการจองให้ครบถ้วน');
+      return;
+    }
+
     this.svc.createBooking(this.newBooking).subscribe({
       next: () => {
+        this.notificationService.success('จองสิ่งอำนวยความสะดวกสำเร็จ');
         this.getBookings();
         this.newBooking = {
           facility_name: '',
@@ -99,7 +112,10 @@ export class FacilityBookingComponent implements OnInit {
           number_of_people: 1
         };
       },
-      error: err => console.error(err)
+      error: err => {
+        console.error(err);
+        this.notificationService.error('เกิดข้อผิดพลาดในการจอง กรุณาลองใหม่อีกครั้ง');
+      }
     });
   }
 
@@ -239,7 +255,7 @@ export class FacilityBookingComponent implements OnInit {
       // For now, just remove from local array since cancelBooking method doesn't exist in service
       this.bookings = this.bookings.filter(booking => booking.booking_id !== bookingId);
       this.sortBookingsByStatus(); // เรียงลำดับใหม่หลังจากลบ
-      alert('ยกเลิกการจองเรียบร้อยแล้ว');
+      this.notificationService.success('ยกเลิกการจองเรียบร้อยแล้ว');
       
       // TODO: Implement cancelBooking in FacilityBookingService
       // this.svc.cancelBooking(bookingId).subscribe({

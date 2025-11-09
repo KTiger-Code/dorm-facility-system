@@ -6,6 +6,8 @@ import { HeaderComponent }     from '../shared/header/header.component';
 import { AdminBaseComponent } from '../shared/admin-base.component';
 import { Router } from '@angular/router';
 import { SessionTimeoutService } from '../shared/session-timeout.service';
+import { NotificationsComponent } from '../shared/components/notifications/notifications.component';
+import { NotificationService } from '../shared/services/notification.service';
 
 interface User {
   id?: number;
@@ -19,7 +21,7 @@ interface User {
 @Component({
   selector: 'app-admin-users',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule, HeaderComponent],
+  imports: [CommonModule, FormsModule, HttpClientModule, HeaderComponent, NotificationsComponent],
   templateUrl: './admin-users.component.html',
   styleUrls: ['./admin-users.component.css']
 })
@@ -37,7 +39,12 @@ export class AdminUsersComponent extends AdminBaseComponent implements OnInit {
     role: 'resident'
   };
 
-  constructor(private http: HttpClient, router: Router, sessionTimeoutService: SessionTimeoutService) {
+  constructor(
+    private http: HttpClient, 
+    router: Router, 
+    sessionTimeoutService: SessionTimeoutService,
+    private notificationService: NotificationService
+  ) {
     super(router, sessionTimeoutService);
   }
 
@@ -78,18 +85,45 @@ export class AdminUsersComponent extends AdminBaseComponent implements OnInit {
     if (this.isEdit) {
       // PUT /api/users/:id
       this.http.put(`/api/users/${this.formModel.id}`, this.formModel, this.getHeaders())
-        .subscribe({ next: () => this.fetchUsers(), error: e=>console.error(e) });
+        .subscribe({
+          next: () => {
+            this.fetchUsers();
+            this.notificationService.success('อัปเดตข้อมูลผู้ใช้สำเร็จ');
+          },
+          error: e => {
+            console.error(e);
+            this.notificationService.error('เกิดข้อผิดพลาดในการอัปเดตข้อมูลผู้ใช้');
+          }
+        });
     } else {
       // POST /api/users
       this.http.post(`/api/users`, this.formModel, this.getHeaders())
-        .subscribe({ next: () => this.fetchUsers(), error: e=>console.error(e) });
+        .subscribe({
+          next: () => {
+            this.fetchUsers();
+            this.notificationService.success('สร้างผู้ใช้ใหม่สำเร็จ');
+          },
+          error: e => {
+            console.error(e);
+            this.notificationService.error('เกิดข้อผิดพลาดในการสร้างผู้ใช้');
+          }
+        });
     }
   }
 
   deleteUser(id: number) {
     if (!confirm('ยืนยันการลบผู้ใช้นี้?')) return;
     this.http.delete(`/api/users/${id}`, this.getHeaders())
-      .subscribe({ next: ()=>this.fetchUsers(), error: e=>console.error(e) });
+      .subscribe({
+        next: () => {
+          this.fetchUsers();
+          this.notificationService.success('ลบผู้ใช้สำเร็จ');
+        },
+        error: e => {
+          console.error(e);
+          this.notificationService.error('เกิดข้อผิดพลาดในการลบผู้ใช้');
+        }
+      });
   }
 
   get filteredUsers() {

@@ -6,11 +6,13 @@ import { HeaderComponent }    from '../shared/header/header.component';
 import { AdminBaseComponent } from '../shared/admin-base.component';
 import { Router } from '@angular/router';
 import { SessionTimeoutService } from '../shared/session-timeout.service';
+import { NotificationService } from '../shared/services/notification.service';
+import { NotificationsComponent } from '../shared/components/notifications/notifications.component';
 
 @Component({
   selector: 'app-admin-parcels',
   standalone: true,
-  imports: [ CommonModule, FormsModule, HeaderComponent ],
+  imports: [ CommonModule, FormsModule, HeaderComponent, NotificationsComponent ],
   templateUrl: './admin-parcels.component.html',
   styleUrls: ['./admin-parcels.component.css']
 })
@@ -22,7 +24,12 @@ export class AdminParcelsComponent extends AdminBaseComponent implements OnInit 
   newParcel = { room_number: '', description: '' };
   users: any[]          = [];
 
-  constructor(private http: HttpClient, router: Router, sessionTimeoutService: SessionTimeoutService) {
+  constructor(
+    private http: HttpClient,
+    router: Router,
+    sessionTimeoutService: SessionTimeoutService,
+    private notificationService: NotificationService
+  ) {
     super(router, sessionTimeoutService);
   }
 
@@ -94,15 +101,41 @@ export class AdminParcelsComponent extends AdminBaseComponent implements OnInit 
     }
   }
 
+  showNotification(message: string, isSuccess: boolean = true) {
+    if (isSuccess) {
+      this.notificationService.success(message);
+    } else {
+      this.notificationService.error(message);
+    }
+  }
+
   addParcel() {
     if (!this.users.find(u => u.room_number === this.newParcel.room_number)) {
-      return alert('ไม่พบห้องในระบบ');
+      this.showNotification('ไม่พบห้องในระบบ', false);
+      return;
     }
-    this.http.post('/api/parcels', this.newParcel, this.getAuth())
+
+    if (!this.newParcel.description.trim()) {
+      this.showNotification('กรุณากรอกรายละเอียดพัสดุ', false);
+      return;
+    }
+
+    this.http.post<any>('/api/parcels', this.newParcel, this.getAuth())
       .subscribe({
-        next: () => {
+        next: (response) => {
           this.newParcel = { room_number: '', description: '' };
           this.fetchAllParcels();
+          this.showNotification('เพิ่มพัสดุสำเร็จ');
+          
+          if (response.data?.line_notification_sent) {
+            this.showNotification('ส่งการแจ้งเตือน LINE สำเร็จ');
+          }
+        },
+        error: (error) => {
+          this.showNotification(
+            error.error?.message || 'เกิดข้อผิดพลาดในการเพิ่มพัสดุ',
+            false
+          );
         }
       });
   }

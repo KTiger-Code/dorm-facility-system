@@ -7,11 +7,13 @@ import { HeaderComponent } from '../shared/header/header.component';
 import { AdminBaseComponent } from '../shared/admin-base.component';
 import { Router } from '@angular/router';
 import { SessionTimeoutService } from '../shared/session-timeout.service';
+import { NotificationsComponent } from '../shared/components/notifications/notifications.component';
+import { NotificationService } from '../shared/services/notification.service';
 
 @Component({
   selector: 'app-admin-facility',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule, HeaderComponent],
+  imports: [CommonModule, FormsModule, HttpClientModule, HeaderComponent, NotificationsComponent],
   templateUrl: './admin-facility.component.html',
   styleUrls: ['./admin-facility.component.css']
 })
@@ -25,7 +27,8 @@ export class AdminFacilityComponent extends AdminBaseComponent implements OnInit
     private svc: FacilityBookingService,
     private http: HttpClient,
     router: Router,
-    sessionTimeoutService: SessionTimeoutService
+    sessionTimeoutService: SessionTimeoutService,
+    private notificationService: NotificationService
   ) {
     super(router, sessionTimeoutService);
   }
@@ -86,11 +89,11 @@ export class AdminFacilityComponent extends AdminBaseComponent implements OnInit
         if (index !== -1) {
           this.bookings[index] = { ...this.bookings[index], status: 'approved' };
         }
-        alert('อนุมัติการจองเรียบร้อยแล้ว');
+        this.notificationService.success('อนุมัติการจองเรียบร้อยแล้ว');
       },
       error: (err) => {
         console.error('Error approving booking:', err);
-        alert('เกิดข้อผิดพลาดในการอนุมัติ: ' + (err.error?.message || err.message));
+        this.notificationService.error('เกิดข้อผิดพลาดในการอนุมัติ: ' + (err.error?.message || err.message));
       }
     });
   }
@@ -107,11 +110,11 @@ export class AdminFacilityComponent extends AdminBaseComponent implements OnInit
         if (index !== -1) {
           this.bookings[index] = { ...this.bookings[index], status: 'rejected' };
         }
-        alert('ปฏิเสธการจองเรียบร้อยแล้ว');
+        this.notificationService.success('ปฏิเสธการจองเรียบร้อยแล้ว');
       },
       error: (err) => {
         console.error('Error rejecting booking:', err);
-        alert('เกิดข้อผิดพลาดในการปฏิเสธ: ' + (err.error?.message || err.message));
+        this.notificationService.error('เกิดข้อผิดพลาดในการปฏิเสธ: ' + (err.error?.message || err.message));
       }
     });
   }
@@ -178,12 +181,12 @@ export class AdminFacilityComponent extends AdminBaseComponent implements OnInit
       this.svc.updateBooking(d.id, d).subscribe({
         next: () => {
           this.loadBookings();
-          alert('บันทึกการแก้ไขเรียบร้อยแล้ว');
+          this.notificationService.success('บันทึกการแก้ไขเรียบร้อยแล้ว');
           this.editData = { id: null };
         },
         error: (err) => {
           console.error('Error updating booking:', err);
-          alert('เกิดข้อผิดพลาดในการบันทึก');
+          this.notificationService.error('เกิดข้อผิดพลาดในการบันทึก');
         }
       });
     }
@@ -194,11 +197,11 @@ export class AdminFacilityComponent extends AdminBaseComponent implements OnInit
     this.svc.deleteBooking(id).subscribe({
       next: () => {
         this.loadBookings();
-        alert('ลบการจองเรียบร้อยแล้ว');
+        this.notificationService.success('ลบการจองเรียบร้อยแล้ว');
       },
       error: (err) => {
         console.error('Error deleting booking:', err);
-        alert('เกิดข้อผิดพลาดในการลบ');
+        this.notificationService.error('เกิดข้อผิดพลาดในการลบ');
       }
     });
   }

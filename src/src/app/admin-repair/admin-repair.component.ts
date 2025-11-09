@@ -6,6 +6,8 @@ import { HeaderComponent }   from '../shared/header/header.component';
 import { AdminBaseComponent } from '../shared/admin-base.component';
 import { Router } from '@angular/router';
 import { SessionTimeoutService } from '../shared/session-timeout.service';
+import { NotificationsComponent } from '../shared/components/notifications/notifications.component';
+import { NotificationService } from '../shared/services/notification.service';
 
 @Component({
   selector: 'app-admin-repair',
@@ -14,7 +16,8 @@ import { SessionTimeoutService } from '../shared/session-timeout.service';
     CommonModule,
     FormsModule,
     HttpClientModule,
-    HeaderComponent
+    HeaderComponent,
+    NotificationsComponent
   ],
   templateUrl: './admin-repair.component.html',
   styleUrls: ['./admin-repair.component.css']
@@ -31,7 +34,12 @@ export class AdminRepairComponent extends AdminBaseComponent implements OnInit {
   }[] = [];
   filterStatus: 'all' | 'pending' | 'in_progress' | 'completed' = 'all';
 
-  constructor(private http: HttpClient, router: Router, sessionTimeoutService: SessionTimeoutService) {
+  constructor(
+    private http: HttpClient, 
+    router: Router, 
+    sessionTimeoutService: SessionTimeoutService,
+    private notificationService: NotificationService
+  ) {
     super(router, sessionTimeoutService);
   }
 
@@ -79,7 +87,16 @@ export class AdminRepairComponent extends AdminBaseComponent implements OnInit {
   deleteRepair(id: number) {
     if (!confirm('ลบคำขอนี้?')) return;
     this.http.delete(`/api/repair/${id}`, this.authHeaders()) // แก้ไขจาก repair-request เป็น repair
-      .subscribe(() => this.loadAll());
+      .subscribe({
+        next: () => {
+          this.notificationService.success('ลบคำขอซ่อมสำเร็จ');
+          this.loadAll();
+        },
+        error: (err) => {
+          console.error('ลบคำขอซ่อมไม่สำเร็จ:', err);
+          this.notificationService.error('เกิดข้อผิดพลาดในการลบคำขอซ่อม');
+        }
+      });
   }
 
   updateStatus(req: any, newStatus: 'pending' | 'in_progress' | 'completed') {
@@ -91,10 +108,13 @@ export class AdminRepairComponent extends AdminBaseComponent implements OnInit {
       )
       .subscribe({
         next: () => {
-          // อัปเดตในตารางบนหน้าเลย
           req.status = newStatus;
+          this.notificationService.success('อัปเดตสถานะคำขอซ่อมสำเร็จ');
         },
-        error: err => console.error('อัปเดตสถานะไม่สำเร็จ:', err)
+        error: (err) => {
+          console.error('อัปเดตสถานะไม่สำเร็จ:', err);
+          this.notificationService.error('เกิดข้อผิดพลาดในการอัปเดตสถานะคำขอซ่อม');
+        }
       });
   }
 }

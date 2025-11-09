@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private apiUrl = 'http://localhost:3000/api/auth/login';
+  private apiUrl = `${environment.apiUrl}/api/auth/login`;
 
   constructor(private http: HttpClient) {}
 
@@ -41,8 +42,24 @@ export class AuthService {
     localStorage.removeItem('sessionTimeout');
   }
 
+  /** ตรวจสอบว่า token ยังไม่หมดอายุ */
+  isTokenValid(token: string): boolean {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      // เช็คว่า token ยังไม่หมดอายุ
+      if (payload.exp) {
+        return payload.exp * 1000 > Date.now();
+      }
+      return true; // ถ้าไม่มี exp ให้ถือว่ายังใช้ได้
+    } catch {
+      return false;
+    }
+  }
+
   /** ตรวจสอบว่าผู้ใช้ล็อกอินอยู่หรือไม่ */
   isLoggedIn(): boolean {
-    return this.getToken() !== null;
+    const token = this.getToken();
+    if (!token) return false;
+    return this.isTokenValid(token);
   }
 }

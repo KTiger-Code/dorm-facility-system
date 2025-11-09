@@ -1,6 +1,9 @@
 <!-- Header Component -->
 <app-header [showHeaderActions]="true" [isAdmin]="isAdmin" (lineConnect)="onLineConnect()" (logout)="onLogout()"></app-header>
 
+<!-- Notifications -->
+<app-notifications></app-notifications>
+
 <!-- Page Title Section -->
 <div class="page-title-section">
   <div class="page-title-content">
@@ -23,7 +26,7 @@
       </h2>
     </div>
     
-    <form class="announcement-form">
+    <form class="announcement-form" (ngSubmit)="postAnnouncement()">
       <div class="form-section">
         <div class="form-grid">
           <div class="form-group full-width">

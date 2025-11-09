@@ -15,43 +15,36 @@ export class App implements OnInit {
   constructor(private authService: AuthService) {}
 
   ngOnInit() {
-    // ตรวจสอบเมื่อเปิดแอปใหม่ว่ามีการปิด browser ผิดปกติหรือไม่
-    this.checkBrowserClose();
-  }
-
-  // ฟังก์ชันสำหรับตรวจสอบการปิด browser
-  private checkBrowserClose() {
-    const wasClosedIncorrectly = sessionStorage.getItem('browserClosed');
-    if (wasClosedIncorrectly === 'true') {
-      // ถ้าปิด browser ผิดปกติ ให้ล้าง token
-      this.authService.logout();
-      sessionStorage.removeItem('browserClosed');
+    // เช็คสถานะการ login เมื่อโหลดแอพ
+    if (this.authService.isLoggedIn()) {
+      const token = this.authService.getToken();
+      if (token && !this.authService.isTokenValid(token)) {
+        // ถ้า token หมดอายุ ให้ logout
+        this.authService.logout();
+        window.location.href = '/login';
+      }
     }
-    // ตั้งค่าว่าแอปกำลังทำงาน
-    sessionStorage.setItem('browserClosed', 'false');
   }
 
   // Event listener สำหรับการปิด browser/tab
   @HostListener('window:beforeunload', ['$event'])
   onBeforeUnload(event: BeforeUnloadEvent) {
-    // ตั้งค่าว่า browser ถูกปิด
-    sessionStorage.setItem('browserClosed', 'true');
-    
-    // หากผู้ใช้ล็อกอินอยู่ ให้ล้าง token
+    // เก็บสถานะการ login ก่อนปิด browser
     if (this.authService.isLoggedIn()) {
-      this.authService.logout();
+      localStorage.setItem('lastLoginState', 'true');
     }
   }
 
-  // Event listener สำหรับการปิด tab (เพิ่มเติม)
-  @HostListener('window:unload', ['$event'])
-  onUnload(event: Event) {
-    // ตั้งค่าว่า browser ถูกปิด
-    sessionStorage.setItem('browserClosed', 'true');
-    
-    // ล้าง token
+  // Event listener สำหรับการโหลดหน้าใหม่
+  @HostListener('window:load', ['$event'])
+  onLoad(event: Event) {
+    // ตรวจสอบ token ทุกครั้งที่โหลดหน้า
     if (this.authService.isLoggedIn()) {
-      this.authService.logout();
+      const token = this.authService.getToken();
+      if (token && !this.authService.isTokenValid(token)) {
+        this.authService.logout();
+        window.location.href = '/login';
+      }
     }
   }
 }

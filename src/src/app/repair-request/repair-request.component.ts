@@ -4,11 +4,13 @@ import { FormsModule }   from '@angular/forms';
 import { Router } from '@angular/router';
 import { RepairService } from './repair.service';
 import { HeaderComponent } from '../shared/header/header.component';
+import { NotificationsComponent } from '../shared/components/notifications/notifications.component';
+import { NotificationService } from '../shared/services/notification.service';
 
 @Component({
   selector: 'app-repair-request',
   standalone: true,
-  imports: [CommonModule, FormsModule, HeaderComponent],
+  imports: [CommonModule, FormsModule, HeaderComponent, NotificationsComponent],
   templateUrl: './repair-request.component.html',
   styleUrls: ['./repair-request.component.css']
 })
@@ -20,7 +22,11 @@ export class RepairRequestComponent implements OnInit {
   searchQuery: string = '';
   isAdmin: boolean = false;
 
-  constructor(private repairService: RepairService, private router: Router) {}
+  constructor(
+    private repairService: RepairService, 
+    private router: Router,
+    private notificationService: NotificationService
+  ) {}
 
   ngOnInit() {
     this.checkAdminStatus();
@@ -44,20 +50,24 @@ export class RepairRequestComponent implements OnInit {
 
   submitRepair() {
     if (!this.title.trim() || !this.description.trim()) {
-      return alert('กรุณากรอกหัวข้อและรายละเอียดให้ครบ');
+      this.notificationService.error('กรุณากรอกหัวข้อและรายละเอียดให้ครบ');
+      return;
     }
     this.repairService.createRepair({
       title: this.title,
       description: this.description
     }).subscribe({
-      next: newReq => {
+      next: (newReq) => {
         this.repairs.unshift(newReq);
         this.filteredRepairs.unshift(newReq);
         this.title = '';
         this.description = '';
-        alert('แจ้งซ่อมเรียบร้อยแล้ว');
+        this.notificationService.success('แจ้งซ่อมเรียบร้อยแล้ว');
       },
-      error: err => console.error('แจ้งซ่อมไม่สำเร็จ:', err)
+      error: (err) => {
+        console.error('แจ้งซ่อมไม่สำเร็จ:', err);
+        this.notificationService.error('เกิดข้อผิดพลาดในการแจ้งซ่อม');
+      }
     });
   }
 
@@ -141,7 +151,7 @@ export class RepairRequestComponent implements OnInit {
       // Update local data (since we don't have cancelRepair in service)
       this.repairs = this.repairs.filter(repair => repair.id !== repairId);
       this.filteredRepairs = this.filteredRepairs.filter(repair => repair.id !== repairId);
-      alert('ยกเลิกการแจ้งซ่อมเรียบร้อยแล้ว');
+      this.notificationService.success('ยกเลิกการแจ้งซ่อมเรียบร้อยแล้ว');
       
       // TODO: Implement cancelRepair in RepairService
       // this.repairService.cancelRepair(repairId).subscribe({

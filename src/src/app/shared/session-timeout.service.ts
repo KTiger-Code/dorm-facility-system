@@ -8,8 +8,8 @@ import { AuthService } from '../auth/auth.service';
 })
 export class SessionTimeoutService {
   // กำหนดเวลาตาม role - เวลาจริงสำหรับ Production
-  private readonly USER_SESSION_TIMEOUT = 10 * 60 * 1000; // 10 นาที สำหรับ user ธรรมดา
-  private readonly ADMIN_SESSION_TIMEOUT = 40 * 60 * 1000; // 40 นาที สำหรับ admin
+  private readonly USER_SESSION_TIMEOUT = 5 * 60 * 1000; // 5 นาที สำหรับ user ธรรมดา
+  private readonly ADMIN_SESSION_TIMEOUT = 20 * 60 * 1000; // 20 นาที สำหรับ admin
   private readonly WARNING_TIME = 1 * 60 * 1000; // เตือนก่อน 1 นาที
   
   private timeoutId: any;
@@ -24,8 +24,8 @@ export class SessionTimeoutService {
     // เริ่มต้นการตรวจจับ user activity ทันที
     this.initUserActivityDetection();
     
-    // ตรวจสอบและเริ่ม timeout หากมี session
-    if (this.hasValidSession()) {
+    // ตรวจสอบ token และ session
+    if (this.authService.isLoggedIn()) {
       this.startTimeout();
     }
   }
