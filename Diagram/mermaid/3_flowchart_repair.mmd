@@ -1,0 +1,20 @@
+---
+title: Flowchart - กระบวนการแจ้งซ่อม
+---
+flowchart TD
+    A([ผู้พักอาศัยแจ้งซ่อม]) --> B[กรอก title, description]
+    B --> C["POST /api/repair"]
+    C --> D["INSERT repair_requests<br/>status = pending"]
+    D --> E([สร้างคำขอสำเร็จ])
+
+    F([Admin จัดการคำขอซ่อม]) --> G["GET /api/repair/all"]
+    G --> H[แสดงรายการคำขอซ่อมทั้งหมด]
+    H --> I{เลือกดำเนินการ}
+    I -- อัปเดตสถานะ --> J{เลือกสถานะ}
+    J -- กำลังดำเนินการ --> K["PATCH status = in_progress"]
+    J -- ซ่อมเสร็จ --> L["PATCH status = completed"]
+    K --> M[บันทึก Admin Log]
+    L --> M
+    I -- ลบคำขอ --> N["DELETE /api/repair/:id"]
+    N --> M
+    M --> O([อัปเดตสำเร็จ])

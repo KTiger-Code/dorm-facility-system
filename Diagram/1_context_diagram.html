@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Context Diagram - Dorm Facility System</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0f172a; color: #e2e8f0; padding: 20px; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { font-size: 2rem; color: #38bdf8; }
+        .header p { color: #94a3b8; margin-top: 8px; }
+        .nav { text-align: center; margin-bottom: 30px; }
+        .nav a { color: #38bdf8; text-decoration: none; margin: 0 10px; padding: 8px 16px; border: 1px solid #334155; border-radius: 8px; display: inline-block; margin-bottom: 8px; transition: all 0.2s; }
+        .nav a:hover { background: #1e3a5f; border-color: #38bdf8; }
+        .nav a.active { background: #1e3a5f; border-color: #38bdf8; }
+        .diagram-container { background: #1e293b; border-radius: 12px; padding: 30px; margin: 20px auto; max-width: 1200px; border: 1px solid #334155; }
+        .diagram-container h2 { color: #38bdf8; margin-bottom: 15px; font-size: 1.3rem; }
+        .diagram-container p { color: #94a3b8; margin-bottom: 20px; line-height: 1.6; }
+        .mermaid { display: flex; justify-content: center; }
+        .mermaid svg { max-width: 100%; }
+        .description { background: #0f172a; border-radius: 8px; padding: 20px; margin-top: 20px; border: 1px solid #334155; }
+        .description h3 { color: #f59e0b; margin-bottom: 10px; }
+        .description ul { padding-left: 20px; }
+        .description li { margin-bottom: 6px; color: #cbd5e1; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📊 Context Diagram</h1>
+        <p>Dorm Facility and Service System — ระบบบริหารจัดการหอพักและบริการส่วนกลาง</p>
+    </div>
+
+    <div class="nav">
+        <a href="index.html">🏠 หน้าหลัก</a>
+        <a href="1_context_diagram.html" class="active">Context Diagram</a>
+        <a href="2_dfd.html">DFD</a>
+        <a href="3_system_flowchart.html">System Flowchart</a>
+        <a href="4_er_diagram.html">ER-Diagram</a>
+        <a href="5_data_dictionary.html">Data Dictionary</a>
+        <a href="6_ux_ui.html">UX/UI</a>
+    </div>
+
+    <div class="diagram-container">
+        <h2>Context Diagram (Level 0)</h2>
+        <p>แสดงภาพรวมของระบบ โดยแสดงความสัมพันธ์ระหว่าง External Entities กับระบบหลัก</p>
+        <div class="mermaid">
+graph TB
+    subgraph External Entities
+        R["👤 ผู้พักอาศัย<br/>(Resident)"]
+        A["👨‍💼 ผู้ดูแลระบบ<br/>(Admin/Staff)"]
+        LINE["📱 LINE Platform<br/>(LINE Messaging API)"]
+    end
+
+    subgraph System["🏢 ระบบบริหารจัดการหอพักและบริการส่วนกลาง<br/>(Dorm Facility and Service System)"]
+        S["ระบบหลัก<br/>Dorm Facility &amp; Service System"]
+    end
+
+    subgraph Database
+        DB[("🗄️ MySQL 8.0<br/>Database<br/>dorm_pwa")]
+    end
+
+    R -- "เข้าสู่ระบบ (Login)" --> S
+    R -- "ดูใบแจ้งหนี้ / อัปโหลดสลิป" --> S
+    R -- "แจ้งซ่อม" --> S
+    R -- "จองพื้นที่ส่วนกลาง" --> S
+    R -- "ดูประกาศ / ดูพัสดุ" --> S
+    R -- "เปลี่ยนรหัสผ่าน" --> S
+    S -- "แสดงข้อมูล / สถานะ" --> R
+
+    A -- "เข้าสู่ระบบ (Login)" --> S
+    A -- "จัดการใบแจ้งหนี้ (CRUD)" --> S
+    A -- "จัดการคำขอซ่อม" --> S
+    A -- "อนุมัติ/ปฏิเสธการจอง" --> S
+    A -- "จัดการพัสดุ" --> S
+    A -- "จัดการประกาศ" --> S
+    A -- "จัดการผู้ใช้ (CRUD)" --> S
+    S -- "แสดงรายงาน / สถิติ / Logs" --> A
+
+    S -- "ส่งแจ้งเตือนพัสดุ<br/>(Push Message)" --> LINE
+    LINE -- "แจ้งเตือนผู้พักอาศัย" --> R
+
+    S <-- "อ่าน/เขียนข้อมูล" --> DB
+        </div>
+    </div>
+
+    <div class="diagram-container">
+        <div class="description">
+            <h3>📋 คำอธิบาย External Entities</h3>
+            <ul>
+                <li><strong>ผู้พักอาศัย (Resident):</strong> ผู้ใช้ที่พักอาศัยในหอพัก สามารถดูใบแจ้งหนี้ แจ้งซ่อม จองพื้นที่ส่วนกลาง ดูประกาศ และรับแจ้งเตือนพัสดุ</li>
+                <li><strong>ผู้ดูแลระบบ (Admin/Staff):</strong> เจ้าหน้าที่หอพัก มีสิทธิ์จัดการข้อมูลทั้งหมด รวมถึงการสร้างใบแจ้งหนี้ อนุมัติการจอง จัดการพัสดุ และดูแลผู้ใช้</li>
+                <li><strong>LINE Platform:</strong> ระบบ LINE Messaging API ใช้สำหรับส่งแจ้งเตือนพัสดุถึงผู้พักอาศัยแบบอัตโนมัติผ่าน LINE Bot</li>
+                <li><strong>MySQL Database:</strong> ฐานข้อมูล MySQL 8.0 (dorm_pwa) เก็บข้อมูลผู้ใช้ ใบแจ้งหนี้ คำขอซ่อม การจอง พัสดุ ประกาศ และ Admin Logs</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'dark',
+            flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' },
+            themeVariables: {
+                primaryColor: '#1e3a5f',
+                primaryTextColor: '#e2e8f0',
+                primaryBorderColor: '#38bdf8',
+                lineColor: '#64748b',
+                secondaryColor: '#1e293b',
+                tertiaryColor: '#0f172a'
+            }
+        });
+    </script>
+</body>
+</html>

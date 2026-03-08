@@ -1,0 +1,36 @@
+---
+title: Flowchart - กระบวนการจัดการใบแจ้งหนี้
+---
+flowchart TD
+    A([Admin สร้างใบแจ้งหนี้]) --> B[เลือกห้อง / เดือน-ปี]
+    B --> C[กรอกค่ามิเตอร์น้ำ<br/>prev_meter, curr_meter, unit_price]
+    C --> D[กรอกค่ามิเตอร์ไฟ<br/>prev_meter, curr_meter, unit_price]
+    D --> E[กรอก ค่าส่วนกลาง / ค่าเช่า]
+    E --> F{เพิ่มรายการ<br/>Extra?}
+    F -- ใช่ --> G[เพิ่ม label + amount]
+    G --> F
+    F -- ไม่ --> H["คำนวณ:<br/>water_fee = (curr - prev) × unit_price<br/>electricity_fee = (curr - prev) × unit_price"]
+    H --> I["POST /api/invoice"]
+    I --> J[บันทึกลง DB: invoices + invoice_extras]
+    J --> K[บันทึก Admin Log]
+    K --> L([สร้างใบแจ้งหนี้สำเร็จ])
+
+    M([ผู้พักอาศัยดูใบแจ้งหนี้]) --> N["GET /api/invoice"]
+    N --> O[แสดงรายการใบแจ้งหนี้]
+    O --> P{ต้องการ<br/>ชำระเงิน?}
+    P -- ใช่ --> Q[อัปโหลดสลิปชำระเงิน]
+    Q --> R["POST /api/invoice/:id/proof"]
+    R --> S[payment_status = waiting_review]
+    S --> T([รอ Admin ตรวจสอบ])
+    P -- ไม่ --> U{ดาวน์โหลด PDF?}
+    U -- ใช่ --> V[สร้าง PDF ฝั่ง Client]
+    V --> W([ดาวน์โหลดสำเร็จ])
+    U -- ไม่ --> X([จบ])
+
+    T --> Y([Admin ตรวจสอบสลิป])
+    Y --> Z{สลิปถูกต้อง?}
+    Z -- ใช่ --> AA["PATCH /api/invoice/:id/paid<br/>payment_status = paid"]
+    Z -- ไม่ --> AB[ปฏิเสธ / แจ้งผู้พักอาศัย]
+    AA --> AC[บันทึก Admin Log]
+    AB --> AC
+    AC --> AD([จบกระบวนการ])

@@ -1,0 +1,119 @@
+---
+title: ER-Diagram - ฐานข้อมูล dorm_pwa
+---
+erDiagram
+    users {
+        int id PK "AUTO_INCREMENT"
+        varchar username UK "NOT NULL, UNIQUE"
+        varchar password "NOT NULL, bcrypt hash"
+        varchar fullname "ชื่อ-นามสกุล"
+        varchar room_number "เลขห้อง"
+        enum role "resident | admin"
+        timestamp created_at "DEFAULT CURRENT_TIMESTAMP"
+        varchar line_user_id "LINE User ID"
+    }
+
+    announcements {
+        int id PK "AUTO_INCREMENT"
+        varchar title "หัวข้อประกาศ"
+        text content "เนื้อหาประกาศ"
+        int posted_by FK "อ้างอิง users.id"
+        timestamp posted_at "DEFAULT CURRENT_TIMESTAMP"
+        int updated_by FK "ผู้แก้ไขล่าสุด"
+        timestamp updated_at "วันที่แก้ไขล่าสุด"
+    }
+
+    invoices {
+        int id PK "AUTO_INCREMENT"
+        int user_id FK "NOT NULL, อ้างอิง users.id"
+        decimal water_fee "ค่าน้ำ"
+        decimal electricity_fee "ค่าไฟ"
+        decimal common_fee "ค่าส่วนกลาง"
+        decimal room_rent "ค่าเช่าห้อง"
+        char month_year "เดือน-ปี (MM/YYYY)"
+        tinyint paid "สถานะจ่ายแล้ว 0/1"
+        datetime paid_at "วันที่จ่าย"
+        timestamp created_at "DEFAULT CURRENT_TIMESTAMP"
+        decimal water_prev_meter "มิเตอร์น้ำก่อนหน้า"
+        decimal water_curr_meter "มิเตอร์น้ำปัจจุบัน"
+        decimal water_unit_price "ราคาต่อหน่วยน้ำ"
+        decimal electricity_prev_meter "มิเตอร์ไฟก่อนหน้า"
+        decimal electricity_curr_meter "มิเตอร์ไฟปัจจุบัน"
+        decimal electricity_unit_price "ราคาต่อหน่วยไฟ"
+        varchar payment_status "waiting_payment | waiting_review | paid"
+        varchar payment_proof "ไฟล์สลิปชำระเงิน"
+    }
+
+    invoice_extras {
+        int id PK "AUTO_INCREMENT"
+        int invoice_id FK "NOT NULL, อ้างอิง invoices.id"
+        varchar label "รายการเพิ่มเติม"
+        decimal amount "จำนวนเงิน"
+    }
+
+    facility_bookings {
+        int id PK "AUTO_INCREMENT"
+        int user_id FK "อ้างอิง users.id"
+        varchar facility_name "ชื่อสถานที่"
+        date booking_date "วันที่จอง"
+        int number_of_people "จำนวนคน"
+        timestamp created_at "DEFAULT CURRENT_TIMESTAMP"
+        time time_slot_start "เวลาเริ่ม"
+        time time_slot_end "เวลาสิ้นสุด"
+        enum status "pending | approved | rejected"
+    }
+
+    repair_requests {
+        int id PK "AUTO_INCREMENT"
+        int user_id FK "อ้างอิง users.id"
+        varchar title "หัวข้อแจ้งซ่อม"
+        text description "รายละเอียด"
+        varchar room_number "เลขห้อง"
+        enum status "pending | in_progress | completed"
+        timestamp created_at "DEFAULT CURRENT_TIMESTAMP"
+        timestamp updated_at "วันที่อัปเดต"
+    }
+
+    parcels {
+        int id PK "AUTO_INCREMENT"
+        varchar room_number "เลขห้อง"
+        text description "รายละเอียดพัสดุ"
+        timestamp received_at "DEFAULT CURRENT_TIMESTAMP"
+        tinyint picked_up "สถานะรับแล้ว 0/1"
+        timestamp picked_up_at "วันที่รับพัสดุ"
+    }
+
+    checkins {
+        int id PK "AUTO_INCREMENT"
+        int user_id FK "อ้างอิง users.id"
+        varchar facility_name "ชื่อสถานที่"
+        timestamp checkin_time "DEFAULT CURRENT_TIMESTAMP"
+    }
+
+    qr_checkins {
+        int id PK "AUTO_INCREMENT"
+        int user_id "NOT NULL"
+        varchar room_number "NOT NULL"
+        datetime checkin_time "NOT NULL"
+        timestamp created_at "DEFAULT CURRENT_TIMESTAMP"
+    }
+
+    admin_logs {
+        int id PK "AUTO_INCREMENT"
+        int admin_id FK "NOT NULL, อ้างอิง users.id"
+        varchar action "การกระทำ"
+        varchar target_table "ตารางเป้าหมาย"
+        int target_id "ID เป้าหมาย"
+        text details "รายละเอียด"
+        varchar ip_address "IP Address"
+        timestamp created_at "DEFAULT CURRENT_TIMESTAMP"
+    }
+
+    users ||--o{ announcements : "posted_by"
+    users ||--o{ announcements : "updated_by"
+    users ||--o{ invoices : "user_id"
+    users ||--o{ facility_bookings : "user_id"
+    users ||--o{ repair_requests : "user_id"
+    users ||--o{ checkins : "user_id"
+    users ||--o{ admin_logs : "admin_id"
+    invoices ||--o{ invoice_extras : "invoice_id"

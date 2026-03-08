@@ -1,0 +1,47 @@
+---
+title: Flowchart หลัก - การทำงานภาพรวมของระบบ
+---
+flowchart TD
+    START([เริ่มต้น]) --> LOGIN[เข้าสู่หน้า Login]
+    LOGIN --> INPUT[กรอก Username / Password]
+    INPUT --> AUTH{ตรวจสอบ<br/>ข้อมูลถูกต้อง?}
+    AUTH -- ไม่ถูกต้อง --> ERR[แสดงข้อความ Error]
+    ERR --> INPUT
+    AUTH -- ถูกต้อง --> TOKEN[สร้าง JWT Token<br/>เก็บใน localStorage]
+    TOKEN --> ROLE{ตรวจสอบ Role}
+
+    ROLE -- resident --> RHOME[หน้าหลักผู้พักอาศัย<br/>/home]
+    ROLE -- admin --> AHOME[หน้า Admin Dashboard<br/>/staff]
+
+    RHOME --> RMENU{เลือกเมนู}
+    RMENU -- ใบแจ้งหนี้ --> RINV[ดูใบแจ้งหนี้<br/>อัปโหลดสลิป / ดาวน์โหลด PDF]
+    RMENU -- แจ้งซ่อม --> RREP[สร้าง/ดูคำขอซ่อม]
+    RMENU -- จองพื้นที่ --> RFAC[จองพื้นที่ส่วนกลาง]
+    RMENU -- ประกาศ --> RANN[ดูประกาศข่าวสาร]
+    RMENU -- พัสดุ --> RPAR[ดูพัสดุ / ยืนยันรับ]
+    RMENU -- เปลี่ยนรหัส --> RPWD[เปลี่ยนรหัสผ่าน]
+    RMENU -- ออกจากระบบ --> LOGOUT([ออกจากระบบ<br/>ลบ Token])
+
+    AHOME --> AMENU{เลือกเมนู Admin}
+    AMENU -- จัดการใบแจ้งหนี้ --> AINV[สร้าง/แก้ไข/อนุมัติใบแจ้งหนี้]
+    AMENU -- จัดการซ่อม --> AREP[ดู/อัปเดตสถานะซ่อม]
+    AMENU -- จัดการจอง --> AFAC[อนุมัติ/ปฏิเสธการจอง]
+    AMENU -- จัดการพัสดุ --> APAR[ลงทะเบียน/แจ้งเตือนพัสดุ]
+    AMENU -- จัดการประกาศ --> AANN[สร้าง/แก้ไข/ลบประกาศ]
+    AMENU -- จัดการผู้ใช้ --> AUSR[CRUD ผู้ใช้]
+    AMENU -- Admin Logs --> ALOG[ดูประวัติการทำงาน]
+    AMENU -- ออกจากระบบ --> LOGOUT
+
+    RINV --> RHOME
+    RREP --> RHOME
+    RFAC --> RHOME
+    RANN --> RHOME
+    RPAR --> RHOME
+    RPWD --> RHOME
+    AINV --> AHOME
+    AREP --> AHOME
+    AFAC --> AHOME
+    APAR --> AHOME
+    AANN --> AHOME
+    AUSR --> AHOME
+    ALOG --> AHOME

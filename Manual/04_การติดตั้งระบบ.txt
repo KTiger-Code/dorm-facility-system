@@ -1,0 +1,379 @@
+╔══════════════════════════════════════════════════════════════════════╗
+║           บทที่ 4 — การติดตั้งและตั้งค่าระบบ (System Setup)           ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+4.1  ความต้องการของระบบ (System Requirements)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Software ที่ต้องติดตั้ง:
+
+  ซอฟต์แวร์          เวอร์ชัน     หมายเหตุ
+  ─────────────────  ──────────  ────────────────────────
+  Node.js            18.x ขึ้นไป  Runtime สำหรับ Backend
+  npm                9.x ขึ้นไป   จัดการ Package (มาพร้อม Node)
+  MySQL Server       8.0         ฐานข้อมูล
+  Angular CLI        20.x        Frontend Framework
+  Git                (optional)  Version Control
+
+  ดาวน์โหลด:
+  • Node.js:  https://nodejs.org/
+  • MySQL:    https://dev.mysql.com/downloads/mysql/
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+4.2  โครงสร้างโปรเจค
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  dorm-facility-system/
+  ├── backend/              ← Backend (Node.js + Express)
+  │   ├── server.js         ← Entry point
+  │   ├── db.js             ← Database connection
+  │   ├── .env              ← Environment variables
+  │   ├── package.json
+  │   ├── controllers/      ← Business logic
+  │   ├── routes/           ← API routes
+  │   ├── middlewares/       ← Auth & logging middleware
+  │   ├── utils/            ← Utilities
+  │   └── uploads/          ← Uploaded files (slips)
+  │
+  ├── src/                  ← Frontend (Angular)
+  │   ├── package.json
+  │   ├── angular.json
+  │   └── src/
+  │       ├── app/          ← Angular components
+  │       ├── environments/ ← Environment config
+  │       └── proxy.conf.json ← Dev proxy config
+  │
+  ├── database/             ← SQL schema files
+  │   └── complete_schema.sql
+  │
+  ├── Diagram/              ← System diagrams (Mermaid)
+  └── Manual/               ← คู่มือการใช้งาน (ไฟล์นี้)
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+4.3  ขั้นตอนการติดตั้ง (Step-by-Step)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ╔════════════════════════════════╗
+  ║  ขั้นตอนที่ 1: ตั้งค่า Database  ║
+  ╚════════════════════════════════╝
+
+  1. เปิด MySQL Command Line หรือ MySQL Workbench
+
+  2. Login เข้า MySQL:
+     > mysql -u root -p
+     (กรอก Password)
+
+  3. สร้างฐานข้อมูล:
+     > CREATE DATABASE dorm_pwa CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+  4. Import Schema:
+     > mysql -u root -p dorm_pwa < database/complete_schema.sql
+
+  5. ตรวจสอบ:
+     > USE dorm_pwa;
+     > SHOW TABLES;
+
+     ผลลัพธ์ควรแสดง 10 ตาราง:
+     - users
+     - announcements
+     - invoices
+     - invoice_extras
+     - facility_bookings
+     - repair_requests
+     - parcels
+     - checkins
+     - qr_checkins
+     - admin_logs
+
+
+  ╔════════════════════════════════╗
+  ║  ขั้นตอนที่ 2: ตั้งค่า Backend  ║
+  ╚════════════════════════════════╝
+
+  1. เปิด Terminal เข้าไปที่โฟลเดอร์ backend:
+     > cd backend
+
+  2. ติดตั้ง Dependencies:
+     > npm install
+
+  3. สร้างไฟล์ .env (หรือแก้ไข .env ที่มีอยู่):
+
+     ┌─────────────────────────────────────────────────┐
+     │  DB_HOST=localhost                              │
+     │  DB_USER=root                                   │
+     │  DB_PASSWORD=P@ssw0rd                           │
+     │  DB_NAME=dorm_pwa                               │
+     │  JWT_SECRET=supersecretkey                      │
+     │  LINE_CHANNEL_ACCESS_TOKEN=your_token_here      │
+     │  LINE_CHANNEL_SECRET=your_secret_here           │
+     │  LINE_LOGIN_CHANNEL_ID=your_channel_id          │
+     │  LINE_LOGIN_CHANNEL_SECRET=your_channel_secret  │
+     │  LINE_LOGIN_CALLBACK_URL=http://localhost:3000/api/line/callback │
+     └─────────────────────────────────────────────────┘
+
+     คำอธิบาย:
+     - DB_HOST           : ที่อยู่ MySQL Server (ปกติ localhost)
+     - DB_USER           : Username ของ MySQL
+     - DB_PASSWORD       : Password ของ MySQL
+     - DB_NAME           : ชื่อ Database (dorm_pwa)
+     - JWT_SECRET        : คีย์ลับสำหรับสร้าง JWT Token
+     - LINE_*            : ข้อมูลจาก LINE Developers Console
+
+  4. เริ่มต้น Backend Server:
+     > node server.js
+
+     ผลลัพธ์:
+     "Server running on port 3000"
+
+  5. ทดสอบ API:
+     เปิดเบราว์เซอร์ไปที่ http://localhost:3000
+     หรือใช้คำสั่ง:
+     > curl http://localhost:3000/api/auth/login -X POST -H "Content-Type: application/json" -d "{\"username\":\"admin\",\"password\":\"admin1234\"}"
+
+
+  ╔════════════════════════════════╗
+  ║  ขั้นตอนที่ 3: ตั้งค่า Frontend ║
+  ╚════════════════════════════════╝
+
+  1. เปิด Terminal ใหม่ เข้าไปที่โฟลเดอร์ src:
+     > cd src
+
+  2. ติดตั้ง Dependencies:
+     > npm install
+
+  3. ตรวจสอบไฟล์ proxy.conf.json:
+     ไฟล์นี้กำหนดให้ /api และ /uploads proxy ไป localhost:3000
+
+     ┌──────────────────────────────────┐
+     │  {                               │
+     │    "/api": {                     │
+     │      "target": "http://localhost:3000", │
+     │      "secure": false             │
+     │    },                            │
+     │    "/uploads": {                 │
+     │      "target": "http://localhost:3000", │
+     │      "secure": false             │
+     │    }                             │
+     │  }                               │
+     └──────────────────────────────────┘
+
+  4. ตรวจสอบ environment.ts:
+     apiUrl ควรเป็นค่าว่าง '' (ใช้ proxy)
+
+  5. เริ่มต้น Angular Dev Server:
+     > npm start
+     หรือ
+     > ng serve --proxy-config src/proxy.conf.json
+
+     ผลลัพธ์:
+     "Angular Live Development Server is listening on localhost:4200"
+
+  6. เปิดเบราว์เซอร์:
+     http://localhost:4200
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+4.4  การตั้งค่า LINE Integration
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  LINE ใช้สำหรับ 2 วัตถุประสงค์:
+  1. LINE Login    — ให้ผู้พักอาศัยเชื่อมบัญชี LINE
+  2. LINE Messaging — ส่งแจ้งเตือนพัสดุ
+
+  ขั้นตอนตั้งค่า:
+
+  1. ไปที่ LINE Developers Console:
+     https://developers.line.biz/console/
+
+  2. สร้าง Provider (หากยังไม่มี)
+
+  3. สร้าง LINE Login Channel:
+     - ประเภท: LINE Login
+     - Callback URL: http://localhost:3000/api/line/callback
+       (หรือ domain จริง)
+     - คัดลอก Channel ID และ Channel Secret
+
+  4. สร้าง Messaging API Channel:
+     - ประเภท: Messaging API
+     - ตั้งค่า Webhook URL: http://your-domain/api/line/webhook
+     - Issue Channel Access Token (Long-lived)
+     - คัดลอก Channel Access Token และ Channel Secret
+
+  5. นำค่าที่ได้มาใส่ในไฟล์ .env:
+     LINE_CHANNEL_ACCESS_TOKEN=    ← จาก Messaging API
+     LINE_CHANNEL_SECRET=          ← จาก Messaging API
+     LINE_LOGIN_CHANNEL_ID=        ← จาก LINE Login
+     LINE_LOGIN_CHANNEL_SECRET=    ← จาก LINE Login
+     LINE_LOGIN_CALLBACK_URL=      ← Callback URL
+
+  6. รีสตาร์ท Backend Server
+
+  หมายเหตุ:
+  • หากไม่ต้องการใช้ LINE สามารถปล่อยค่า LINE_* ว่างได้
+  • ระบบยังทำงานปกติ แต่จะไม่ส่ง LINE แจ้งเตือน
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+4.5  บัญชีผู้ใช้เริ่มต้น
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ระบบมีบัญชีตัวอย่างติดตั้งมาให้:
+
+  Username    Password      ชื่อ               ห้อง    บทบาท
+  ──────────  ────────────  ─────────────────  ──────  ──────
+  admin       admin1234     Admin User         A101    admin
+  user01      user1234      User One           B101    resident
+  C101        C1011234      narongsa peng      C101    resident
+
+  ⚠️ ควรเปลี่ยนรหัสผ่านทันทีหลังจากเข้าใช้งานครั้งแรก
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+4.6  Port ที่ใช้งาน
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Service        Port    URL
+  ─────────────  ──────  ──────────────────────────
+  Frontend       4200    http://localhost:4200
+  Backend API    3000    http://localhost:3000
+  MySQL          3306    localhost:3306
+
+  หมายเหตุ: Frontend จะ Proxy /api/* และ /uploads/* ไปยัง Backend
+  โดยอัตโนมัติ ไม่ต้องเข้า port 3000 โดยตรง
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+4.7  การสำรองข้อมูล (Backup)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  แนะนำให้สำรองข้อมูลเป็นประจำ:
+
+  สำรอง Database:
+  > mysqldump -u root -p dorm_pwa > backup_YYYYMMDD.sql
+
+  กู้คืน Database:
+  > mysql -u root -p dorm_pwa < backup_YYYYMMDD.sql
+
+  ไฟล์ที่ควรสำรอง:
+  • database/  — ไฟล์ SQL Schema
+  • backend/.env — ค่า Config
+  • backend/uploads/ — ไฟล์สลิปที่อัปโหลด
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+4.8  การแก้ปัญหาเบื้องต้น (Troubleshooting)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ปัญหา: เข้า http://localhost:4200 ไม่ได้
+  สาเหตุ: Angular Dev Server ไม่ได้รัน
+  แก้ไข:  เปิด Terminal > cd src > npm start
+
+  ─────────────────────────────────────────────
+
+  ปัญหา: Login แล้วแสดง Error "Network error"
+  สาเหตุ: Backend ไม่ได้รัน หรือ proxy ไม่ทำงาน
+  แก้ไข:  ตรวจสอบว่า Backend รันอยู่ที่ port 3000
+          > cd backend > node server.js
+
+  ─────────────────────────────────────────────
+
+  ปัญหา: "Access denied for user" เมื่อรัน Backend
+  สาเหตุ: ค่า DB_USER หรือ DB_PASSWORD ใน .env ไม่ถูกต้อง
+  แก้ไข:  แก้ไขไฟล์ backend/.env ให้ตรงกับ MySQL
+
+  ─────────────────────────────────────────────
+
+  ปัญหา: มิเตอร์ก่อนหน้าไม่แสดงอัตโนมัติ
+  สาเหตุ: ยังไม่มีใบแจ้งหนี้เดือนก่อนของห้องนั้น
+  แก้ไข:  กรอกค่ามิเตอร์ก่อนหน้าเอง (ครั้งแรก)
+
+  ─────────────────────────────────────────────
+
+  ปัญหา: LINE แจ้งเตือนไม่ทำงาน
+  สาเหตุ: ผู้พักอาศัยยังไม่เชื่อมต่อ LINE หรือค่า LINE API ไม่ถูกต้อง
+  แก้ไข:  1. ผู้พักอาศัยกด "เชื่อมต่อ LINE" ที่หน้าหลัก
+          2. ตรวจสอบค่า LINE_* ใน .env
+          3. ตรวจสอบ Webhook URL ใน LINE Developers Console
+
+  ─────────────────────────────────────────────
+
+  ปัญหา: Session หมดอายุบ่อยเกินไป
+  สาเหตุ: Session timeout ตั้งไว้ 5 นาที (ผู้พักอาศัย)
+  แก้ไข:  ขยับเม้าส์/กดคีย์บอร์ดเพื่อรีเซ็ตตัวนับ
+          หรือแก้ไขค่าใน session-timeout.service.ts
+
+  ─────────────────────────────────────────────
+
+  ปัญหา: อัปโหลดสลิปไม่ได้
+  สาเหตุ: ใบแจ้งหนี้ไม่ได้อยู่ในสถานะ "waiting_payment"
+  แก้ไข:  ตรวจสอบสถานะใบแจ้งหนี้ อัปโหลดได้เฉพาะสถานะ "รอชำระเงิน"
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+4.9  API Endpoints อ้างอิง
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Base URL: http://localhost:3000
+
+  ■ Authentication
+    POST   /api/auth/login                  Login
+
+  ■ Invoice
+    GET    /api/invoice                     ใบแจ้งหนี้ของฉัน (resident)
+    GET    /api/invoice/all                 ใบแจ้งหนี้ทั้งหมด (admin)
+    POST   /api/invoice                     สร้างใบแจ้งหนี้ (admin)
+    PATCH  /api/invoice/:id                 แก้ไขใบแจ้งหนี้ (admin)
+    PATCH  /api/invoice/:id/paid            เปลี่ยนสถานะชำระ (admin)
+    POST   /api/invoice/:id/proof           อัปโหลดสลิป (resident)
+    DELETE /api/invoice/:id                 ลบใบแจ้งหนี้ (admin)
+
+  ■ Repair
+    POST   /api/repair                      สร้างคำขอซ่อม (resident)
+    GET    /api/repair                      คำขอซ่อมของฉัน (resident)
+    GET    /api/repair/all                  คำขอซ่อมทั้งหมด (admin)
+    PATCH  /api/repair/:id/status           อัปเดตสถานะ (admin)
+    PATCH  /api/repair/:id                  แก้ไขคำขอ (admin)
+    DELETE /api/repair/:id                  ลบคำขอ (admin)
+
+  ■ Facility Booking
+    GET    /api/facility-booking            การจองของฉัน (resident)
+    POST   /api/facility-booking            สร้างการจอง (resident)
+    GET    /api/facility-booking/all        การจองทั้งหมด (admin)
+    PATCH  /api/facility-booking/:id        แก้ไขการจอง (admin)
+    PATCH  /api/facility-booking/:id/status อนุมัติ/ปฏิเสธ (admin)
+    DELETE /api/facility-booking/:id        ลบการจอง (admin)
+
+  ■ Announcement
+    GET    /api/announcements               รายการประกาศ
+    POST   /api/announcements               สร้างประกาศ (admin)
+    PUT    /api/announcements/:id           แก้ไขประกาศ (admin)
+    DELETE /api/announcements/:id           ลบประกาศ (admin)
+
+  ■ Parcel
+    GET    /api/parcels                     พัสดุของฉัน (resident)
+    GET    /api/parcels/all                 พัสดุทั้งหมด (admin)
+    POST   /api/parcels                     ลงทะเบียนพัสดุ (admin)
+    PATCH  /api/parcels/:id                 Toggle สถานะรับ
+    PUT    /api/parcels/:id                 แก้ไขพัสดุ (admin)
+    DELETE /api/parcels/:id                 ลบพัสดุ (admin)
+
+  ■ User
+    GET    /api/users                       รายชื่อผู้ใช้ (admin)
+    POST   /api/users                       สร้างผู้ใช้ (admin)
+    PUT    /api/users/:id                   แก้ไขผู้ใช้ (admin)
+    PATCH  /api/users/:id/role              เปลี่ยน Role (admin)
+    DELETE /api/users/:id                   ลบผู้ใช้ (admin)
+    PATCH  /api/users/change-password       เปลี่ยนรหัสผ่าน
+
+  ■ LINE
+    GET    /api/line/login                  เริ่ม LINE Login
+    GET    /api/line/callback               LINE OAuth Callback
+    POST   /api/line/webhook                LINE Webhook
+    POST   /api/line/parcel                 ส่งแจ้งเตือนพัสดุ
+
+  ■ Admin Logs
+    GET    /api/admin-logs                  ดู Logs ทั้งหมด

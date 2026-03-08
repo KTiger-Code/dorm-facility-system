@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Dictionary - Dorm Facility System</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0f172a; color: #e2e8f0; padding: 20px; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { font-size: 2rem; color: #38bdf8; }
+        .header p { color: #94a3b8; margin-top: 8px; }
+        .nav { text-align: center; margin-bottom: 30px; }
+        .nav a { color: #38bdf8; text-decoration: none; margin: 0 10px; padding: 8px 16px; border: 1px solid #334155; border-radius: 8px; display: inline-block; margin-bottom: 8px; transition: all 0.2s; }
+        .nav a:hover { background: #1e3a5f; border-color: #38bdf8; }
+        .nav a.active { background: #1e3a5f; border-color: #38bdf8; }
+        .table-section { background: #1e293b; border-radius: 12px; padding: 30px; margin: 20px auto; max-width: 1400px; border: 1px solid #334155; }
+        .table-section h2 { color: #38bdf8; margin-bottom: 8px; font-size: 1.3rem; }
+        .table-section .subtitle { color: #94a3b8; margin-bottom: 20px; font-size: 0.9rem; }
+        .dict-table { width: 100%; border-collapse: collapse; }
+        .dict-table th { background: #1e3a5f; color: #38bdf8; padding: 12px; text-align: left; font-size: 0.85rem; border: 1px solid #334155; white-space: nowrap; }
+        .dict-table td { padding: 10px 12px; border: 1px solid #334155; font-size: 0.85rem; color: #cbd5e1; }
+        .dict-table tr:nth-child(even) { background: rgba(30, 41, 59, 0.5); }
+        .dict-table tr:nth-child(odd) { background: rgba(15, 23, 42, 0.5); }
+        .pk { color: #f59e0b; font-weight: bold; }
+        .fk { color: #a78bfa; font-weight: bold; }
+        .uk { color: #34d399; font-weight: bold; }
+        .nn { color: #f87171; }
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; margin-right: 4px; }
+        .badge-pk { background: #78350f; color: #fbbf24; }
+        .badge-fk { background: #3b0764; color: #c4b5fd; }
+        .badge-uk { background: #064e3b; color: #6ee7b7; }
+        .badge-nn { background: #450a0a; color: #fca5a5; }
+        .badge-ai { background: #172554; color: #93c5fd; }
+        .toc { background: #1e293b; border-radius: 12px; padding: 20px 30px; margin: 20px auto; max-width: 1400px; border: 1px solid #334155; }
+        .toc h2 { color: #38bdf8; margin-bottom: 15px; }
+        .toc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; }
+        .toc-item { padding: 10px 15px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; }
+        .toc-item a { color: #38bdf8; text-decoration: none; font-weight: 500; }
+        .toc-item a:hover { text-decoration: underline; }
+        .toc-item .info { color: #64748b; font-size: 0.85rem; margin-top: 4px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📖 Data Dictionary</h1>
+        <p>Dorm Facility and Service System — พจนานุกรมข้อมูล (ฐานข้อมูล dorm_pwa)</p>
+    </div>
+
+    <div class="nav">
+        <a href="index.html">🏠 หน้าหลัก</a>
+        <a href="1_context_diagram.html">Context Diagram</a>
+        <a href="2_dfd.html">DFD</a>
+        <a href="3_system_flowchart.html">System Flowchart</a>
+        <a href="4_er_diagram.html">ER-Diagram</a>
+        <a href="5_data_dictionary.html" class="active">Data Dictionary</a>
+        <a href="6_ux_ui.html">UX/UI</a>
+    </div>
+
+    <!-- Table of Contents -->
+    <div class="toc">
+        <h2>📋 สารบัญตาราง (10 ตาราง)</h2>
+        <div class="toc-grid">
+            <div class="toc-item"><a href="#users">1. users</a><div class="info">ข้อมูลผู้ใช้ — 8 คอลัมน์</div></div>
+            <div class="toc-item"><a href="#announcements">2. announcements</a><div class="info">ประกาศข่าวสาร — 7 คอลัมน์</div></div>
+            <div class="toc-item"><a href="#invoices">3. invoices</a><div class="info">ใบแจ้งหนี้ — 18 คอลัมน์</div></div>
+            <div class="toc-item"><a href="#invoice_extras">4. invoice_extras</a><div class="info">รายการเพิ่มเติมในใบแจ้งหนี้ — 4 คอลัมน์</div></div>
+            <div class="toc-item"><a href="#facility_bookings">5. facility_bookings</a><div class="info">การจองพื้นที่ส่วนกลาง — 9 คอลัมน์</div></div>
+            <div class="toc-item"><a href="#repair_requests">6. repair_requests</a><div class="info">คำขอแจ้งซ่อม — 8 คอลัมน์</div></div>
+            <div class="toc-item"><a href="#parcels">7. parcels</a><div class="info">พัสดุ — 6 คอลัมน์</div></div>
+            <div class="toc-item"><a href="#checkins">8. checkins</a><div class="info">เช็คอินสถานที่ — 4 คอลัมน์</div></div>
+            <div class="toc-item"><a href="#qr_checkins">9. qr_checkins</a><div class="info">เช็คอิน QR Code — 5 คอลัมน์</div></div>
+            <div class="toc-item"><a href="#admin_logs">10. admin_logs</a><div class="info">ประวัติการทำงาน Admin — 8 คอลัมน์</div></div>
+        </div>
+    </div>
+
+    <!-- 1. users -->
+    <div class="table-section" id="users">
+        <h2>1. ตาราง users</h2>
+        <div class="subtitle">เก็บข้อมูลผู้ใช้งานระบบ ทั้งผู้พักอาศัย (resident) และผู้ดูแลระบบ (admin) | Engine: InnoDB | Charset: utf8mb4</div>
+        <table class="dict-table">
+            <thead><tr><th>#</th><th>ชื่อคอลัมน์</th><th>ชนิดข้อมูล</th><th>ข้อจำกัด</th><th>Default</th><th>คำอธิบาย</th></tr></thead>
+            <tbody>
+                <tr><td>1</td><td>id</td><td>INT</td><td><span class="badge badge-pk">PK</span><span class="badge badge-ai">AI</span><span class="badge badge-nn">NOT NULL</span></td><td>AUTO_INCREMENT</td><td>รหัสผู้ใช้ (Primary Key)</td></tr>
+                <tr><td>2</td><td>username</td><td>VARCHAR(50)</td><td><span class="badge badge-uk">UNIQUE</span><span class="badge badge-nn">NOT NULL</span></td><td>-</td><td>ชื่อผู้ใช้สำหรับเข้าสู่ระบบ</td></tr>
+                <tr><td>3</td><td>password</td><td>VARCHAR(255)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>-</td><td>รหัสผ่านที่เข้ารหัส bcrypt</td></tr>
+                <tr><td>4</td><td>fullname</td><td>VARCHAR(100)</td><td>NULLABLE</td><td>NULL</td><td>ชื่อ-นามสกุลเต็ม</td></tr>
+                <tr><td>5</td><td>room_number</td><td>VARCHAR(10)</td><td>NULLABLE</td><td>NULL</td><td>เลขห้องพัก เช่น A101, B205</td></tr>
+                <tr><td>6</td><td>role</td><td>ENUM('resident','admin')</td><td>-</td><td>'resident'</td><td>บทบาท: ผู้พักอาศัย หรือ ผู้ดูแลระบบ</td></tr>
+                <tr><td>7</td><td>created_at</td><td>TIMESTAMP</td><td>NULLABLE</td><td>CURRENT_TIMESTAMP</td><td>วันที่สร้างบัญชี</td></tr>
+                <tr><td>8</td><td>line_user_id</td><td>VARCHAR(100)</td><td>NULLABLE</td><td>NULL</td><td>LINE User ID สำหรับรับแจ้งเตือน</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 2. announcements -->
+    <div class="table-section" id="announcements">
+        <h2>2. ตาราง announcements</h2>
+        <div class="subtitle">เก็บข้อมูลประกาศข่าวสารของหอพัก | Engine: InnoDB | Charset: utf8mb4</div>
+        <table class="dict-table">
+            <thead><tr><th>#</th><th>ชื่อคอลัมน์</th><th>ชนิดข้อมูล</th><th>ข้อจำกัด</th><th>Default</th><th>คำอธิบาย</th></tr></thead>
+            <tbody>
+                <tr><td>1</td><td>id</td><td>INT</td><td><span class="badge badge-pk">PK</span><span class="badge badge-ai">AI</span><span class="badge badge-nn">NOT NULL</span></td><td>AUTO_INCREMENT</td><td>รหัสประกาศ</td></tr>
+                <tr><td>2</td><td>title</td><td>VARCHAR(100)</td><td>NULLABLE</td><td>NULL</td><td>หัวข้อประกาศ</td></tr>
+                <tr><td>3</td><td>content</td><td>TEXT</td><td>NULLABLE</td><td>NULL</td><td>เนื้อหาประกาศ</td></tr>
+                <tr><td>4</td><td>posted_by</td><td>INT</td><td><span class="badge badge-fk">FK</span> → users.id</td><td>NULL</td><td>รหัส Admin ผู้สร้างประกาศ</td></tr>
+                <tr><td>5</td><td>posted_at</td><td>TIMESTAMP</td><td>NULLABLE</td><td>CURRENT_TIMESTAMP</td><td>วันเวลาที่โพสต์</td></tr>
+                <tr><td>6</td><td>updated_by</td><td>INT</td><td><span class="badge badge-fk">FK</span> → users.id</td><td>NULL</td><td>รหัส Admin ผู้แก้ไขล่าสุด</td></tr>
+                <tr><td>7</td><td>updated_at</td><td>TIMESTAMP</td><td>NULLABLE</td><td>NULL</td><td>วันเวลาที่แก้ไขล่าสุด</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 3. invoices -->
+    <div class="table-section" id="invoices">
+        <h2>3. ตาราง invoices</h2>
+        <div class="subtitle">เก็บข้อมูลใบแจ้งหนี้ค่าเช่า ค่าน้ำ ค่าไฟ ค่าส่วนกลาง | Engine: InnoDB | Charset: utf8mb4</div>
+        <table class="dict-table">
+            <thead><tr><th>#</th><th>ชื่อคอลัมน์</th><th>ชนิดข้อมูล</th><th>ข้อจำกัด</th><th>Default</th><th>คำอธิบาย</th></tr></thead>
+            <tbody>
+                <tr><td>1</td><td>id</td><td>INT</td><td><span class="badge badge-pk">PK</span><span class="badge badge-ai">AI</span><span class="badge badge-nn">NOT NULL</span></td><td>AUTO_INCREMENT</td><td>รหัสใบแจ้งหนี้</td></tr>
+                <tr><td>2</td><td>user_id</td><td>INT</td><td><span class="badge badge-fk">FK</span><span class="badge badge-nn">NOT NULL</span> → users.id</td><td>-</td><td>รหัสผู้พักอาศัย</td></tr>
+                <tr><td>3</td><td>water_fee</td><td>DECIMAL(10,2)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>0.00</td><td>ค่าน้ำประปา (บาท)</td></tr>
+                <tr><td>4</td><td>electricity_fee</td><td>DECIMAL(10,2)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>0.00</td><td>ค่าไฟฟ้า (บาท)</td></tr>
+                <tr><td>5</td><td>common_fee</td><td>DECIMAL(10,2)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>0.00</td><td>ค่าส่วนกลาง (บาท)</td></tr>
+                <tr><td>6</td><td>room_rent</td><td>DECIMAL(10,2)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>0.00</td><td>ค่าเช่าห้อง (บาท)</td></tr>
+                <tr><td>7</td><td>month_year</td><td>CHAR(7)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>-</td><td>เดือน/ปี เช่น 06/2025</td></tr>
+                <tr><td>8</td><td>paid</td><td>TINYINT(1)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>0</td><td>สถานะชำระ: 0=ยังไม่จ่าย, 1=จ่ายแล้ว</td></tr>
+                <tr><td>9</td><td>paid_at</td><td>DATETIME</td><td>NULLABLE</td><td>NULL</td><td>วันเวลาที่ชำระเงิน</td></tr>
+                <tr><td>10</td><td>created_at</td><td>TIMESTAMP</td><td><span class="badge badge-nn">NOT NULL</span></td><td>CURRENT_TIMESTAMP</td><td>วันเวลาที่สร้างใบแจ้งหนี้</td></tr>
+                <tr><td>11</td><td>water_prev_meter</td><td>DECIMAL(10,2)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>0.00</td><td>มิเตอร์น้ำครั้งก่อน (หน่วย)</td></tr>
+                <tr><td>12</td><td>water_curr_meter</td><td>DECIMAL(10,2)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>0.00</td><td>มิเตอร์น้ำปัจจุบัน (หน่วย)</td></tr>
+                <tr><td>13</td><td>water_unit_price</td><td>DECIMAL(10,2)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>0.00</td><td>ราคาน้ำต่อหน่วย (บาท/หน่วย)</td></tr>
+                <tr><td>14</td><td>electricity_prev_meter</td><td>DECIMAL(10,2)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>0.00</td><td>มิเตอร์ไฟครั้งก่อน (หน่วย)</td></tr>
+                <tr><td>15</td><td>electricity_curr_meter</td><td>DECIMAL(10,2)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>0.00</td><td>มิเตอร์ไฟปัจจุบัน (หน่วย)</td></tr>
+                <tr><td>16</td><td>electricity_unit_price</td><td>DECIMAL(10,2)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>0.00</td><td>ราคาไฟต่อหน่วย (บาท/หน่วย)</td></tr>
+                <tr><td>17</td><td>payment_status</td><td>VARCHAR(50)</td><td>NULLABLE</td><td>'waiting_payment'</td><td>สถานะการชำระ: waiting_payment, waiting_review, paid</td></tr>
+                <tr><td>18</td><td>payment_proof</td><td>VARCHAR(255)</td><td>NULLABLE</td><td>NULL</td><td>พาธไฟล์สลิปชำระเงิน</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 4. invoice_extras -->
+    <div class="table-section" id="invoice_extras">
+        <h2>4. ตาราง invoice_extras</h2>
+        <div class="subtitle">เก็บรายการค่าใช้จ่ายเพิ่มเติมต่อใบแจ้งหนี้ (เช่น ค่าซ่อม, ค่าเสียหาย) | Engine: InnoDB | Charset: utf8mb4</div>
+        <table class="dict-table">
+            <thead><tr><th>#</th><th>ชื่อคอลัมน์</th><th>ชนิดข้อมูล</th><th>ข้อจำกัด</th><th>Default</th><th>คำอธิบาย</th></tr></thead>
+            <tbody>
+                <tr><td>1</td><td>id</td><td>INT</td><td><span class="badge badge-pk">PK</span><span class="badge badge-ai">AI</span><span class="badge badge-nn">NOT NULL</span></td><td>AUTO_INCREMENT</td><td>รหัสรายการเพิ่มเติม</td></tr>
+                <tr><td>2</td><td>invoice_id</td><td>INT</td><td><span class="badge badge-fk">FK</span><span class="badge badge-nn">NOT NULL</span> → invoices.id (CASCADE)</td><td>-</td><td>รหัสใบแจ้งหนี้ที่อ้างอิง</td></tr>
+                <tr><td>3</td><td>label</td><td>VARCHAR(255)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>-</td><td>ชื่อรายการ เช่น "ค่าซ่อมแอร์"</td></tr>
+                <tr><td>4</td><td>amount</td><td>DECIMAL(10,2)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>0.00</td><td>จำนวนเงิน (บาท)</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 5. facility_bookings -->
+    <div class="table-section" id="facility_bookings">
+        <h2>5. ตาราง facility_bookings</h2>
+        <div class="subtitle">เก็บข้อมูลการจองพื้นที่ส่วนกลาง (ห้องประชุม, สระว่ายน้ำ, ห้องฟิตเนส ฯลฯ) | Engine: InnoDB | Charset: utf8mb4</div>
+        <table class="dict-table">
+            <thead><tr><th>#</th><th>ชื่อคอลัมน์</th><th>ชนิดข้อมูล</th><th>ข้อจำกัด</th><th>Default</th><th>คำอธิบาย</th></tr></thead>
+            <tbody>
+                <tr><td>1</td><td>id</td><td>INT</td><td><span class="badge badge-pk">PK</span><span class="badge badge-ai">AI</span><span class="badge badge-nn">NOT NULL</span></td><td>AUTO_INCREMENT</td><td>รหัสการจอง</td></tr>
+                <tr><td>2</td><td>user_id</td><td>INT</td><td><span class="badge badge-fk">FK</span> → users.id</td><td>NULL</td><td>รหัสผู้จอง</td></tr>
+                <tr><td>3</td><td>facility_name</td><td>VARCHAR(100)</td><td>NULLABLE</td><td>NULL</td><td>ชื่อสถานที่ เช่น ห้องประชุม, สระว่ายน้ำ</td></tr>
+                <tr><td>4</td><td>booking_date</td><td>DATE</td><td>NULLABLE</td><td>NULL</td><td>วันที่ต้องการจอง</td></tr>
+                <tr><td>5</td><td>number_of_people</td><td>INT</td><td>NULLABLE</td><td>NULL</td><td>จำนวนคนที่ใช้งาน</td></tr>
+                <tr><td>6</td><td>created_at</td><td>TIMESTAMP</td><td>NULLABLE</td><td>CURRENT_TIMESTAMP</td><td>วันเวลาที่สร้างคำขอ</td></tr>
+                <tr><td>7</td><td>time_slot_start</td><td>TIME</td><td><span class="badge badge-nn">NOT NULL</span></td><td>-</td><td>เวลาเริ่มต้นใช้งาน</td></tr>
+                <tr><td>8</td><td>time_slot_end</td><td>TIME</td><td><span class="badge badge-nn">NOT NULL</span></td><td>-</td><td>เวลาสิ้นสุดใช้งาน</td></tr>
+                <tr><td>9</td><td>status</td><td>ENUM('pending','approved','rejected')</td><td>-</td><td>'pending'</td><td>สถานะ: รออนุมัติ / อนุมัติ / ปฏิเสธ</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 6. repair_requests -->
+    <div class="table-section" id="repair_requests">
+        <h2>6. ตาราง repair_requests</h2>
+        <div class="subtitle">เก็บข้อมูลคำขอแจ้งซ่อมจากผู้พักอาศัย | Engine: InnoDB | Charset: utf8mb4</div>
+        <table class="dict-table">
+            <thead><tr><th>#</th><th>ชื่อคอลัมน์</th><th>ชนิดข้อมูล</th><th>ข้อจำกัด</th><th>Default</th><th>คำอธิบาย</th></tr></thead>
+            <tbody>
+                <tr><td>1</td><td>id</td><td>INT</td><td><span class="badge badge-pk">PK</span><span class="badge badge-ai">AI</span><span class="badge badge-nn">NOT NULL</span></td><td>AUTO_INCREMENT</td><td>รหัสคำขอซ่อม</td></tr>
+                <tr><td>2</td><td>user_id</td><td>INT</td><td><span class="badge badge-fk">FK</span> → users.id</td><td>NULL</td><td>รหัสผู้แจ้งซ่อม</td></tr>
+                <tr><td>3</td><td>title</td><td>VARCHAR(100)</td><td>NULLABLE</td><td>NULL</td><td>หัวข้อการซ่อม เช่น "เก้าอี้หัก"</td></tr>
+                <tr><td>4</td><td>description</td><td>TEXT</td><td>NULLABLE</td><td>NULL</td><td>รายละเอียดปัญหา</td></tr>
+                <tr><td>5</td><td>room_number</td><td>VARCHAR(10)</td><td>NULLABLE</td><td>NULL</td><td>เลขห้องที่แจ้งซ่อม</td></tr>
+                <tr><td>6</td><td>status</td><td>ENUM('pending','in_progress','completed')</td><td>-</td><td>'pending'</td><td>สถานะ: รอดำเนินการ / กำลังดำเนินการ / เสร็จสิ้น</td></tr>
+                <tr><td>7</td><td>created_at</td><td>TIMESTAMP</td><td>NULLABLE</td><td>CURRENT_TIMESTAMP</td><td>วันเวลาที่แจ้งซ่อม</td></tr>
+                <tr><td>8</td><td>updated_at</td><td>TIMESTAMP</td><td>NULLABLE</td><td>NULL</td><td>วันเวลาที่อัปเดตสถานะล่าสุด</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 7. parcels -->
+    <div class="table-section" id="parcels">
+        <h2>7. ตาราง parcels</h2>
+        <div class="subtitle">เก็บข้อมูลพัสดุที่ส่งมาถึงหอพัก | Engine: InnoDB | Charset: utf8mb4</div>
+        <table class="dict-table">
+            <thead><tr><th>#</th><th>ชื่อคอลัมน์</th><th>ชนิดข้อมูล</th><th>ข้อจำกัด</th><th>Default</th><th>คำอธิบาย</th></tr></thead>
+            <tbody>
+                <tr><td>1</td><td>id</td><td>INT</td><td><span class="badge badge-pk">PK</span><span class="badge badge-ai">AI</span><span class="badge badge-nn">NOT NULL</span></td><td>AUTO_INCREMENT</td><td>รหัสพัสดุ</td></tr>
+                <tr><td>2</td><td>room_number</td><td>VARCHAR(10)</td><td>NULLABLE</td><td>NULL</td><td>เลขห้องผู้รับ</td></tr>
+                <tr><td>3</td><td>description</td><td>TEXT</td><td>NULLABLE</td><td>NULL</td><td>รายละเอียด เช่น "กล่องจาก Shopee"</td></tr>
+                <tr><td>4</td><td>received_at</td><td>TIMESTAMP</td><td>NULLABLE</td><td>CURRENT_TIMESTAMP</td><td>วันเวลาที่รับพัสดุเข้าระบบ</td></tr>
+                <tr><td>5</td><td>picked_up</td><td>TINYINT(1)</td><td>-</td><td>0</td><td>สถานะรับแล้ว: 0=ยังไม่รับ, 1=รับแล้ว</td></tr>
+                <tr><td>6</td><td>picked_up_at</td><td>TIMESTAMP</td><td>NULLABLE</td><td>NULL</td><td>วันเวลาที่ผู้พักอาศัยมารับพัสดุ</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 8. checkins -->
+    <div class="table-section" id="checkins">
+        <h2>8. ตาราง checkins</h2>
+        <div class="subtitle">เก็บข้อมูลการเช็คอินเข้าใช้สถานที่ | Engine: InnoDB | Charset: utf8mb4</div>
+        <table class="dict-table">
+            <thead><tr><th>#</th><th>ชื่อคอลัมน์</th><th>ชนิดข้อมูล</th><th>ข้อจำกัด</th><th>Default</th><th>คำอธิบาย</th></tr></thead>
+            <tbody>
+                <tr><td>1</td><td>id</td><td>INT</td><td><span class="badge badge-pk">PK</span><span class="badge badge-ai">AI</span><span class="badge badge-nn">NOT NULL</span></td><td>AUTO_INCREMENT</td><td>รหัสการเช็คอิน</td></tr>
+                <tr><td>2</td><td>user_id</td><td>INT</td><td><span class="badge badge-fk">FK</span> → users.id</td><td>NULL</td><td>รหัสผู้เช็คอิน</td></tr>
+                <tr><td>3</td><td>facility_name</td><td>VARCHAR(100)</td><td>NULLABLE</td><td>NULL</td><td>ชื่อสถานที่ที่เช็คอิน</td></tr>
+                <tr><td>4</td><td>checkin_time</td><td>TIMESTAMP</td><td>NULLABLE</td><td>CURRENT_TIMESTAMP</td><td>วันเวลาที่เช็คอิน</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 9. qr_checkins -->
+    <div class="table-section" id="qr_checkins">
+        <h2>9. ตาราง qr_checkins</h2>
+        <div class="subtitle">เก็บข้อมูลการเช็คอินผ่าน QR Code | Engine: InnoDB | Charset: utf8mb4</div>
+        <table class="dict-table">
+            <thead><tr><th>#</th><th>ชื่อคอลัมน์</th><th>ชนิดข้อมูล</th><th>ข้อจำกัด</th><th>Default</th><th>คำอธิบาย</th></tr></thead>
+            <tbody>
+                <tr><td>1</td><td>id</td><td>INT</td><td><span class="badge badge-pk">PK</span><span class="badge badge-ai">AI</span><span class="badge badge-nn">NOT NULL</span></td><td>AUTO_INCREMENT</td><td>รหัสการเช็คอิน QR</td></tr>
+                <tr><td>2</td><td>user_id</td><td>INT</td><td><span class="badge badge-nn">NOT NULL</span></td><td>-</td><td>รหัสผู้เช็คอิน</td></tr>
+                <tr><td>3</td><td>room_number</td><td>VARCHAR(50)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>-</td><td>เลขห้องที่เช็คอิน</td></tr>
+                <tr><td>4</td><td>checkin_time</td><td>DATETIME</td><td><span class="badge badge-nn">NOT NULL</span></td><td>-</td><td>วันเวลาที่เช็คอิน</td></tr>
+                <tr><td>5</td><td>created_at</td><td>TIMESTAMP</td><td>NULLABLE</td><td>CURRENT_TIMESTAMP</td><td>วันเวลาที่บันทึกลงระบบ</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 10. admin_logs -->
+    <div class="table-section" id="admin_logs">
+        <h2>10. ตาราง admin_logs</h2>
+        <div class="subtitle">เก็บประวัติการทำงานของ Admin (Audit Trail) | Engine: InnoDB | Charset: utf8mb4</div>
+        <table class="dict-table">
+            <thead><tr><th>#</th><th>ชื่อคอลัมน์</th><th>ชนิดข้อมูล</th><th>ข้อจำกัด</th><th>Default</th><th>คำอธิบาย</th></tr></thead>
+            <tbody>
+                <tr><td>1</td><td>id</td><td>INT</td><td><span class="badge badge-pk">PK</span><span class="badge badge-ai">AI</span><span class="badge badge-nn">NOT NULL</span></td><td>AUTO_INCREMENT</td><td>รหัส Log</td></tr>
+                <tr><td>2</td><td>admin_id</td><td>INT</td><td><span class="badge badge-fk">FK</span><span class="badge badge-nn">NOT NULL</span> → users.id (CASCADE)</td><td>-</td><td>รหัส Admin ผู้ดำเนินการ</td></tr>
+                <tr><td>3</td><td>action</td><td>VARCHAR(255)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>-</td><td>การกระทำ เช่น "สร้างใบแจ้งหนี้", "อนุมัติการจอง"</td></tr>
+                <tr><td>4</td><td>target_table</td><td>VARCHAR(100)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>-</td><td>ตารางเป้าหมาย เช่น invoices, users</td></tr>
+                <tr><td>5</td><td>target_id</td><td>INT</td><td>NULLABLE</td><td>NULL</td><td>รหัสเป้าหมายที่ถูกดำเนินการ</td></tr>
+                <tr><td>6</td><td>details</td><td>TEXT</td><td>NULLABLE</td><td>NULL</td><td>รายละเอียดเพิ่มเติม</td></tr>
+                <tr><td>7</td><td>ip_address</td><td>VARCHAR(45)</td><td>NULLABLE</td><td>NULL</td><td>IP Address ของผู้ดำเนินการ</td></tr>
+                <tr><td>8</td><td>created_at</td><td>TIMESTAMP</td><td><span class="badge badge-nn">NOT NULL</span></td><td>CURRENT_TIMESTAMP</td><td>วันเวลาที่บันทึก Log</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+</body>
+</html>

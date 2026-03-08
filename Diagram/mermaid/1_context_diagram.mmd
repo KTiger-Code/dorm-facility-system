@@ -1,0 +1,39 @@
+---
+title: Context Diagram - ระบบบริหารจัดการหอพักและบริการส่วนกลาง
+---
+graph TB
+    subgraph External Entities
+        R["👤 ผู้พักอาศัย<br/>(Resident)"]
+        A["👨‍💼 ผู้ดูแลระบบ<br/>(Admin/Staff)"]
+        LINE["📱 LINE Platform<br/>(LINE Messaging API)"]
+    end
+
+    subgraph System["🏢 ระบบบริหารจัดการหอพักและบริการส่วนกลาง<br/>(Dorm Facility and Service System)"]
+        S["ระบบหลัก<br/>Dorm Facility & Service System"]
+    end
+
+    subgraph Database
+        DB[("🗄️ MySQL 8.0<br/>Database<br/>dorm_pwa")]
+    end
+
+    R -- "เข้าสู่ระบบ (Login)" --> S
+    R -- "ดูใบแจ้งหนี้ / อัปโหลดสลิป" --> S
+    R -- "แจ้งซ่อม" --> S
+    R -- "จองพื้นที่ส่วนกลาง" --> S
+    R -- "ดูประกาศ / ดูพัสดุ" --> S
+    R -- "เปลี่ยนรหัสผ่าน" --> S
+    S -- "แสดงข้อมูล / สถานะ" --> R
+
+    A -- "เข้าสู่ระบบ (Login)" --> S
+    A -- "จัดการใบแจ้งหนี้ (CRUD)" --> S
+    A -- "จัดการคำขอซ่อม" --> S
+    A -- "อนุมัติ/ปฏิเสธการจอง" --> S
+    A -- "จัดการพัสดุ" --> S
+    A -- "จัดการประกาศ" --> S
+    A -- "จัดการผู้ใช้ (CRUD)" --> S
+    S -- "แสดงรายงาน / สถิติ / Logs" --> A
+
+    S -- "ส่งแจ้งเตือนพัสดุ<br/>(Push Message)" --> LINE
+    LINE -- "แจ้งเตือนผู้พักอาศัย" --> R
+
+    S <-- "อ่าน/เขียนข้อมูล" --> DB

@@ -1,4 +1,4 @@
 export const environment = {
   production: false,
-  apiUrl: 'http://10.124.149.182:3000' // แก้ไข IP Address ตามเครื่องของคุณ
+  apiUrl: '' // ใช้ relative path ผ่าน proxy (proxy.conf.json จะ forward ไป localhost:3000)
 };

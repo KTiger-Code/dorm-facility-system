@@ -1,0 +1,24 @@
+---
+title: Flowchart - กระบวนการจัดการพัสดุ & LINE Notification
+---
+flowchart TD
+    A([Admin ลงทะเบียนพัสดุ]) --> B[กรอก room_number, description]
+    B --> C["POST /api/parcels"]
+    C --> D[INSERT INTO parcels]
+    D --> E["SELECT line_user_id<br/>FROM users WHERE room_number = ?"]
+    E --> F{ผู้พักอาศัยเชื่อม<br/>LINE แล้ว?}
+    F -- มี line_user_id --> G["เรียก LINE Messaging API<br/>ส่ง Flex Message"]
+    G --> H{ส่งสำเร็จ?}
+    H -- สำเร็จ --> I["Response: line_sent = true"]
+    H -- ล้มเหลว --> J["Response: line_sent = false"]
+    F -- ไม่มี line_user_id --> J
+    I --> K([แจ้งเตือนสำเร็จ])
+    J --> K
+
+    L([ผู้พักอาศัยรับพัสดุ]) --> M[ดูรายการพัสดุ]
+    M --> N{มีพัสดุ<br/>รอรับ?}
+    N -- มี --> O[กดยืนยันรับพัสดุ]
+    O --> P["PATCH /api/parcels/:id/toggle"]
+    P --> Q["UPDATE picked_up = 1<br/>picked_up_at = NOW()"]
+    Q --> R([รับพัสดุสำเร็จ])
+    N -- ไม่มี --> S([ไม่มีพัสดุ])

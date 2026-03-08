@@ -1,0 +1,33 @@
+---
+title: Flowchart - กระบวนการ Login & Session
+---
+flowchart TD
+    A([เริ่มต้น]) --> B[เปิดหน้า /login]
+    B --> C{มี Token<br/>ใน localStorage?}
+    C -- มี --> D{Token<br/>ยังไม่หมดอายุ?}
+    D -- ยังใช้ได้ --> E[Redirect ไป /home]
+    D -- หมดอายุ --> F[ลบ Token เก่า]
+    F --> G[แสดงฟอร์ม Login]
+    C -- ไม่มี --> G
+
+    G --> H{มี Remember Me<br/>credentials?}
+    H -- มี --> I[โหลด username ที่บันทึกไว้]
+    I --> J[กรอก Password]
+    H -- ไม่มี --> J
+
+    J --> K[กด Login]
+    K --> L["POST /api/auth/login"]
+    L --> M{Server ตรวจสอบ}
+    M -- User not found --> N[แสดง Error: User not found]
+    N --> J
+    M -- Password ผิด --> O[แสดง Error: Invalid credentials]
+    O --> J
+    M -- สำเร็จ --> P[รับ JWT Token + Role]
+    P --> Q[เก็บ Token ใน localStorage]
+    Q --> R{เลือก<br/>Remember Me?}
+    R -- ใช่ --> S[บันทึก username ใน localStorage]
+    R -- ไม่ --> T[ลบ Remembered credentials]
+    S --> U[เริ่ม Session Timeout 30 นาที]
+    T --> U
+    U --> V[Redirect ไป /home]
+    V --> W([จบ])

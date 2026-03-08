@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Flowchart - Dorm Facility System</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0f172a; color: #e2e8f0; padding: 20px; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { font-size: 2rem; color: #38bdf8; }
+        .header p { color: #94a3b8; margin-top: 8px; }
+        .nav { text-align: center; margin-bottom: 30px; }
+        .nav a { color: #38bdf8; text-decoration: none; margin: 0 10px; padding: 8px 16px; border: 1px solid #334155; border-radius: 8px; display: inline-block; margin-bottom: 8px; transition: all 0.2s; }
+        .nav a:hover { background: #1e3a5f; border-color: #38bdf8; }
+        .nav a.active { background: #1e3a5f; border-color: #38bdf8; }
+        .diagram-container { background: #1e293b; border-radius: 12px; padding: 30px; margin: 20px auto; max-width: 1200px; border: 1px solid #334155; }
+        .diagram-container h2 { color: #38bdf8; margin-bottom: 15px; font-size: 1.3rem; }
+        .diagram-container p { color: #94a3b8; margin-bottom: 20px; line-height: 1.6; }
+        .mermaid { display: flex; justify-content: center; }
+        .mermaid svg { max-width: 100%; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📊 System Flowchart</h1>
+        <p>Dorm Facility and Service System — แผนผังการทำงานของระบบ</p>
+    </div>
+
+    <div class="nav">
+        <a href="index.html">🏠 หน้าหลัก</a>
+        <a href="1_context_diagram.html">Context Diagram</a>
+        <a href="2_dfd.html">DFD</a>
+        <a href="3_system_flowchart.html" class="active">System Flowchart</a>
+        <a href="4_er_diagram.html">ER-Diagram</a>
+        <a href="5_data_dictionary.html">Data Dictionary</a>
+        <a href="6_ux_ui.html">UX/UI</a>
+    </div>
+
+    <!-- Main System Flow -->
+    <div class="diagram-container">
+        <h2>Flowchart หลัก — การทำงานภาพรวมของระบบ</h2>
+        <p>แสดงลำดับขั้นตอนการใช้งานระบบตั้งแต่เข้าสู่ระบบจนถึงใช้งานฟีเจอร์ต่าง ๆ</p>
+        <div class="mermaid">
+flowchart TD
+    START([เริ่มต้น]) --> LOGIN[เข้าสู่หน้า Login]
+    LOGIN --> INPUT[กรอก Username / Password]
+    INPUT --> AUTH{ตรวจสอบ<br/>ข้อมูลถูกต้อง?}
+    AUTH -- ไม่ถูกต้อง --> ERR[แสดงข้อความ Error]
+    ERR --> INPUT
+    AUTH -- ถูกต้อง --> TOKEN[สร้าง JWT Token<br/>เก็บใน localStorage]
+    TOKEN --> ROLE{ตรวจสอบ Role}
+
+    ROLE -- resident --> RHOME[หน้าหลักผู้พักอาศัย<br/>/home]
+    ROLE -- admin --> AHOME[หน้า Admin Dashboard<br/>/staff]
+
+    RHOME --> RMENU{เลือกเมนู}
+    RMENU -- ใบแจ้งหนี้ --> RINV[ดูใบแจ้งหนี้<br/>อัปโหลดสลิป / ดาวน์โหลด PDF]
+    RMENU -- แจ้งซ่อม --> RREP[สร้าง/ดูคำขอซ่อม]
+    RMENU -- จองพื้นที่ --> RFAC[จองพื้นที่ส่วนกลาง]
+    RMENU -- ประกาศ --> RANN[ดูประกาศข่าวสาร]
+    RMENU -- พัสดุ --> RPAR[ดูพัสดุ / ยืนยันรับ]
+    RMENU -- เปลี่ยนรหัส --> RPWD[เปลี่ยนรหัสผ่าน]
+    RMENU -- ออกจากระบบ --> LOGOUT([ออกจากระบบ<br/>ลบ Token])
+
+    AHOME --> AMENU{เลือกเมนู Admin}
+    AMENU -- จัดการใบแจ้งหนี้ --> AINV[สร้าง/แก้ไข/อนุมัติใบแจ้งหนี้]
+    AMENU -- จัดการซ่อม --> AREP[ดู/อัปเดตสถานะซ่อม]
+    AMENU -- จัดการจอง --> AFAC[อนุมัติ/ปฏิเสธการจอง]
+    AMENU -- จัดการพัสดุ --> APAR[ลงทะเบียน/แจ้งเตือนพัสดุ]
+    AMENU -- จัดการประกาศ --> AANN[สร้าง/แก้ไข/ลบประกาศ]
+    AMENU -- จัดการผู้ใช้ --> AUSR[CRUD ผู้ใช้]
+    AMENU -- Admin Logs --> ALOG[ดูประวัติการทำงาน]
+    AMENU -- ออกจากระบบ --> LOGOUT
+
+    RINV --> RHOME
+    RREP --> RHOME
+    RFAC --> RHOME
+    RANN --> RHOME
+    RPAR --> RHOME
+    RPWD --> RHOME
+    AINV --> AHOME
+    AREP --> AHOME
+    AFAC --> AHOME
+    APAR --> AHOME
+    AANN --> AHOME
+    AUSR --> AHOME
+    ALOG --> AHOME
+        </div>
+    </div>
+
+    <!-- Login Flow -->
+    <div class="diagram-container">
+        <h2>Flowchart — กระบวนการ Login &amp; Session</h2>
+        <div class="mermaid">
+flowchart TD
+    A([เริ่มต้น]) --> B[เปิดหน้า /login]
+    B --> C{มี Token<br/>ใน localStorage?}
+    C -- มี --> D{Token<br/>ยังไม่หมดอายุ?}
+    D -- ยังใช้ได้ --> E[Redirect ไป /home]
+    D -- หมดอายุ --> F[ลบ Token เก่า]
+    F --> G[แสดงฟอร์ม Login]
+    C -- ไม่มี --> G
+
+    G --> H{มี Remember Me<br/>credentials?}
+    H -- มี --> I[โหลด username ที่บันทึกไว้]
+    I --> J[กรอก Password]
+    H -- ไม่มี --> J
+
+    J --> K[กด Login]
+    K --> L["POST /api/auth/login"]
+    L --> M{Server ตรวจสอบ}
+    M -- User not found --> N[แสดง Error: User not found]
+    N --> J
+    M -- Password ผิด --> O[แสดง Error: Invalid credentials]
+    O --> J
+    M -- สำเร็จ --> P[รับ JWT Token + Role]
+    P --> Q[เก็บ Token ใน localStorage]
+    Q --> R{เลือก<br/>Remember Me?}
+    R -- ใช่ --> S[บันทึก username ใน localStorage]
+    R -- ไม่ --> T[ลบ Remembered credentials]
+    S --> U[เริ่ม Session Timeout 30 นาที]
+    T --> U
+    U --> V[Redirect ไป /home]
+    V --> W([จบ])
+        </div>
+    </div>
+
+    <!-- Invoice Flow -->
+    <div class="diagram-container">
+        <h2>Flowchart — กระบวนการจัดการใบแจ้งหนี้</h2>
+        <div class="mermaid">
+flowchart TD
+    A([Admin สร้างใบแจ้งหนี้]) --> B[เลือกห้อง / เดือน-ปี]
+    B --> C[กรอกค่ามิเตอร์น้ำ<br/>prev_meter, curr_meter, unit_price]
+    C --> D[กรอกค่ามิเตอร์ไฟ<br/>prev_meter, curr_meter, unit_price]
+    D --> E[กรอก ค่าส่วนกลาง / ค่าเช่า]
+    E --> F{เพิ่มรายการ<br/>Extra?}
+    F -- ใช่ --> G[เพิ่ม label + amount]
+    G --> F
+    F -- ไม่ --> H["คำนวณ:<br/>water_fee = (curr - prev) × unit_price<br/>electricity_fee = (curr - prev) × unit_price"]
+    H --> I["POST /api/invoice"]
+    I --> J[บันทึกลง DB: invoices + invoice_extras]
+    J --> K[บันทึก Admin Log]
+    K --> L([สร้างใบแจ้งหนี้สำเร็จ])
+
+    M([ผู้พักอาศัยดูใบแจ้งหนี้]) --> N["GET /api/invoice"]
+    N --> O[แสดงรายการใบแจ้งหนี้]
+    O --> P{ต้องการ<br/>ชำระเงิน?}
+    P -- ใช่ --> Q[อัปโหลดสลิปชำระเงิน]
+    Q --> R["POST /api/invoice/:id/proof"]
+    R --> S[payment_status = waiting_review]
+    S --> T([รอ Admin ตรวจสอบ])
+    P -- ไม่ --> U{ดาวน์โหลด PDF?}
+    U -- ใช่ --> V[สร้าง PDF ฝั่ง Client]
+    V --> W([ดาวน์โหลดสำเร็จ])
+    U -- ไม่ --> X([จบ])
+
+    T --> Y([Admin ตรวจสอบสลิป])
+    Y --> Z{สลิปถูกต้อง?}
+    Z -- ใช่ --> AA["PATCH /api/invoice/:id/paid<br/>payment_status = paid"]
+    Z -- ไม่ --> AB[ปฏิเสธ / แจ้งผู้พักอาศัย]
+    AA --> AC[บันทึก Admin Log]
+    AB --> AC
+    AC --> AD([จบกระบวนการ])
+        </div>
+    </div>
+
+    <!-- Parcel + LINE Flow -->
+    <div class="diagram-container">
+        <h2>Flowchart — กระบวนการจัดการพัสดุ &amp; LINE Notification</h2>
+        <div class="mermaid">
+flowchart TD
+    A([Admin ลงทะเบียนพัสดุ]) --> B[กรอก room_number, description]
+    B --> C["POST /api/parcels"]
+    C --> D[INSERT INTO parcels]
+    D --> E["SELECT line_user_id<br/>FROM users WHERE room_number = ?"]
+    E --> F{ผู้พักอาศัยเชื่อม<br/>LINE แล้ว?}
+    F -- มี line_user_id --> G["เรียก LINE Messaging API<br/>ส่ง Flex Message"]
+    G --> H{ส่งสำเร็จ?}
+    H -- สำเร็จ --> I["Response: line_sent = true"]
+    H -- ล้มเหลว --> J["Response: line_sent = false"]
+    F -- ไม่มี line_user_id --> J
+    I --> K([แจ้งเตือนสำเร็จ])
+    J --> K
+
+    L([ผู้พักอาศัยรับพัสดุ]) --> M[ดูรายการพัสดุ]
+    M --> N{มีพัสดุ<br/>รอรับ?}
+    N -- มี --> O[กดยืนยันรับพัสดุ]
+    O --> P["PATCH /api/parcels/:id/toggle"]
+    P --> Q["UPDATE picked_up = 1<br/>picked_up_at = NOW()"]
+    Q --> R([รับพัสดุสำเร็จ])
+    N -- ไม่มี --> S([ไม่มีพัสดุ])
+        </div>
+    </div>
+
+    <!-- Repair Flow -->
+    <div class="diagram-container">
+        <h2>Flowchart — กระบวนการแจ้งซ่อม</h2>
+        <div class="mermaid">
+flowchart TD
+    A([ผู้พักอาศัยแจ้งซ่อม]) --> B[กรอก title, description]
+    B --> C["POST /api/repair"]
+    C --> D["INSERT repair_requests<br/>status = pending"]
+    D --> E([สร้างคำขอสำเร็จ])
+
+    F([Admin จัดการคำขอซ่อม]) --> G["GET /api/repair/all"]
+    G --> H[แสดงรายการคำขอซ่อมทั้งหมด]
+    H --> I{เลือกดำเนินการ}
+    I -- อัปเดตสถานะ --> J{เลือกสถานะ}
+    J -- กำลังดำเนินการ --> K["PATCH status = in_progress"]
+    J -- ซ่อมเสร็จ --> L["PATCH status = completed"]
+    K --> M[บันทึก Admin Log]
+    L --> M
+    I -- ลบคำขอ --> N["DELETE /api/repair/:id"]
+    N --> M
+    M --> O([อัปเดตสำเร็จ])
+        </div>
+    </div>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'dark',
+            flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' },
+            themeVariables: {
+                primaryColor: '#1e3a5f',
+                primaryTextColor: '#e2e8f0',
+                primaryBorderColor: '#38bdf8',
+                lineColor: '#64748b',
+                secondaryColor: '#1e293b',
+                tertiaryColor: '#0f172a'
+            }
+        });
+    </script>
+</body>
+</html>

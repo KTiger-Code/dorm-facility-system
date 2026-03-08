@@ -1,0 +1,32 @@
+---
+title: Technology Stack
+---
+graph LR
+    subgraph Frontend
+        A["Angular 20<br/>TypeScript"]
+        B["HTML / CSS<br/>Responsive Design"]
+    end
+
+    subgraph Backend
+        C["Node.js<br/>Express 5"]
+        D["JWT Authentication<br/>bcrypt"]
+    end
+
+    subgraph Database
+        E["MySQL 8.0<br/>dorm_pwa"]
+    end
+
+    subgraph External
+        F["LINE Messaging API<br/>Flex Messages"]
+    end
+
+    A <-- "HTTP / REST API<br/>Proxy :4200 → :3000" --> C
+    C <-- "mysql2<br/>Connection Pool" --> E
+    C -- "Push Messages" --> F
+
+    style A fill:#dd0031,stroke:#c3002f,color:#fff
+    style B fill:#e44d26,stroke:#f16529,color:#fff
+    style C fill:#339933,stroke:#2d882d,color:#fff
+    style D fill:#1e3a5f,stroke:#38bdf8,color:#e2e8f0
+    style E fill:#00758f,stroke:#f29111,color:#fff
+    style F fill:#06c755,stroke:#04b74e,color:#fff

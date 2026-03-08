@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ER-Diagram - Dorm Facility System</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0f172a; color: #e2e8f0; padding: 20px; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { font-size: 2rem; color: #38bdf8; }
+        .header p { color: #94a3b8; margin-top: 8px; }
+        .nav { text-align: center; margin-bottom: 30px; }
+        .nav a { color: #38bdf8; text-decoration: none; margin: 0 10px; padding: 8px 16px; border: 1px solid #334155; border-radius: 8px; display: inline-block; margin-bottom: 8px; transition: all 0.2s; }
+        .nav a:hover { background: #1e3a5f; border-color: #38bdf8; }
+        .nav a.active { background: #1e3a5f; border-color: #38bdf8; }
+        .diagram-container { background: #1e293b; border-radius: 12px; padding: 30px; margin: 20px auto; max-width: 1400px; border: 1px solid #334155; }
+        .diagram-container h2 { color: #38bdf8; margin-bottom: 15px; font-size: 1.3rem; }
+        .diagram-container p { color: #94a3b8; margin-bottom: 20px; line-height: 1.6; }
+        .mermaid { display: flex; justify-content: center; }
+        .mermaid svg { max-width: 100%; }
+        .description { background: #0f172a; border-radius: 8px; padding: 20px; margin-top: 20px; border: 1px solid #334155; }
+        .description h3 { color: #f59e0b; margin-bottom: 10px; }
+        .description ul { padding-left: 20px; }
+        .description li { margin-bottom: 6px; color: #cbd5e1; }
+        .rel-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .rel-table th, .rel-table td { padding: 10px 12px; text-align: left; border: 1px solid #334155; }
+        .rel-table th { background: #1e3a5f; color: #38bdf8; }
+        .rel-table td { color: #cbd5e1; }
+        .rel-table tr:nth-child(even) { background: #1e293b; }
+        .rel-table tr:nth-child(odd) { background: #0f172a; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📊 ER-Diagram</h1>
+        <p>Dorm Facility and Service System — แผนภาพความสัมพันธ์ของข้อมูล (Entity-Relationship Diagram)</p>
+    </div>
+
+    <div class="nav">
+        <a href="index.html">🏠 หน้าหลัก</a>
+        <a href="1_context_diagram.html">Context Diagram</a>
+        <a href="2_dfd.html">DFD</a>
+        <a href="3_system_flowchart.html">System Flowchart</a>
+        <a href="4_er_diagram.html" class="active">ER-Diagram</a>
+        <a href="5_data_dictionary.html">Data Dictionary</a>
+        <a href="6_ux_ui.html">UX/UI</a>
+    </div>
+
+    <div class="diagram-container">
+        <h2>Entity-Relationship Diagram — ฐานข้อมูล dorm_pwa</h2>
+        <p>แสดงตาราง (Entity) ทั้ง 10 ตาราง พร้อมคอลัมน์ (Attribute) และความสัมพันธ์ (Relationship) ระหว่างตาราง</p>
+        <div class="mermaid">
+erDiagram
+    users {
+        int id PK "AUTO_INCREMENT"
+        varchar username UK "NOT NULL, UNIQUE"
+        varchar password "NOT NULL, bcrypt hash"
+        varchar fullname "ชื่อ-นามสกุล"
+        varchar room_number "เลขห้อง"
+        enum role "resident | admin"
+        timestamp created_at "DEFAULT CURRENT_TIMESTAMP"
+        varchar line_user_id "LINE User ID"
+    }
+
+    announcements {
+        int id PK "AUTO_INCREMENT"
+        varchar title "หัวข้อประกาศ"
+        text content "เนื้อหาประกาศ"
+        int posted_by FK "อ้างอิง users.id"
+        timestamp posted_at "DEFAULT CURRENT_TIMESTAMP"
+        int updated_by FK "ผู้แก้ไขล่าสุด"
+        timestamp updated_at "วันที่แก้ไขล่าสุด"
+    }
+
+    invoices {
+        int id PK "AUTO_INCREMENT"
+        int user_id FK "NOT NULL, อ้างอิง users.id"
+        decimal water_fee "ค่าน้ำ"
+        decimal electricity_fee "ค่าไฟ"
+        decimal common_fee "ค่าส่วนกลาง"
+        decimal room_rent "ค่าเช่าห้อง"
+        char month_year "เดือน-ปี (MM/YYYY)"
+        tinyint paid "สถานะจ่ายแล้ว 0/1"
+        datetime paid_at "วันที่จ่าย"
+        timestamp created_at "DEFAULT CURRENT_TIMESTAMP"
+        decimal water_prev_meter "มิเตอร์น้ำก่อนหน้า"
+        decimal water_curr_meter "มิเตอร์น้ำปัจจุบัน"
+        decimal water_unit_price "ราคาต่อหน่วยน้ำ"
+        decimal electricity_prev_meter "มิเตอร์ไฟก่อนหน้า"
+        decimal electricity_curr_meter "มิเตอร์ไฟปัจจุบัน"
+        decimal electricity_unit_price "ราคาต่อหน่วยไฟ"
+        varchar payment_status "waiting_payment | waiting_review | paid"
+        varchar payment_proof "ไฟล์สลิปชำระเงิน"
+    }
+
+    invoice_extras {
+        int id PK "AUTO_INCREMENT"
+        int invoice_id FK "NOT NULL, อ้างอิง invoices.id"
+        varchar label "รายการเพิ่มเติม"
+        decimal amount "จำนวนเงิน"
+    }
+
+    facility_bookings {
+        int id PK "AUTO_INCREMENT"
+        int user_id FK "อ้างอิง users.id"
+        varchar facility_name "ชื่อสถานที่"
+        date booking_date "วันที่จอง"
+        int number_of_people "จำนวนคน"
+        timestamp created_at "DEFAULT CURRENT_TIMESTAMP"
+        time time_slot_start "เวลาเริ่ม"
+        time time_slot_end "เวลาสิ้นสุด"
+        enum status "pending | approved | rejected"
+    }
+
+    repair_requests {
+        int id PK "AUTO_INCREMENT"
+        int user_id FK "อ้างอิง users.id"
+        varchar title "หัวข้อแจ้งซ่อม"
+        text description "รายละเอียด"
+        varchar room_number "เลขห้อง"
+        enum status "pending | in_progress | completed"
+        timestamp created_at "DEFAULT CURRENT_TIMESTAMP"
+        timestamp updated_at "วันที่อัปเดต"
+    }
+
+    parcels {
+        int id PK "AUTO_INCREMENT"
+        varchar room_number "เลขห้อง"
+        text description "รายละเอียดพัสดุ"
+        timestamp received_at "DEFAULT CURRENT_TIMESTAMP"
+        tinyint picked_up "สถานะรับแล้ว 0/1"
+        timestamp picked_up_at "วันที่รับพัสดุ"
+    }
+
+    checkins {
+        int id PK "AUTO_INCREMENT"
+        int user_id FK "อ้างอิง users.id"
+        varchar facility_name "ชื่อสถานที่"
+        timestamp checkin_time "DEFAULT CURRENT_TIMESTAMP"
+    }
+
+    qr_checkins {
+        int id PK "AUTO_INCREMENT"
+        int user_id "NOT NULL"
+        varchar room_number "NOT NULL"
+        datetime checkin_time "NOT NULL"
+        timestamp created_at "DEFAULT CURRENT_TIMESTAMP"
+    }
+
+    admin_logs {
+        int id PK "AUTO_INCREMENT"
+        int admin_id FK "NOT NULL, อ้างอิง users.id"
+        varchar action "การกระทำ"
+        varchar target_table "ตารางเป้าหมาย"
+        int target_id "ID เป้าหมาย"
+        text details "รายละเอียด"
+        varchar ip_address "IP Address"
+        timestamp created_at "DEFAULT CURRENT_TIMESTAMP"
+    }
+
+    users ||--o{ announcements : "posted_by"
+    users ||--o{ announcements : "updated_by"
+    users ||--o{ invoices : "user_id"
+    users ||--o{ facility_bookings : "user_id"
+    users ||--o{ repair_requests : "user_id"
+    users ||--o{ checkins : "user_id"
+    users ||--o{ admin_logs : "admin_id"
+    invoices ||--o{ invoice_extras : "invoice_id"
+        </div>
+    </div>
+
+    <!-- Relationships -->
+    <div class="diagram-container">
+        <div class="description">
+            <h3>📋 ตารางความสัมพันธ์ (Relationships)</h3>
+            <table class="rel-table">
+                <thead>
+                    <tr><th>ตารางหลัก</th><th>ตารางอ้างอิง</th><th>FK Column</th><th>ประเภท</th><th>On Delete</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>users</td><td>announcements</td><td>posted_by</td><td>One-to-Many</td><td>SET NULL</td></tr>
+                    <tr><td>users</td><td>announcements</td><td>updated_by</td><td>One-to-Many</td><td>SET NULL</td></tr>
+                    <tr><td>users</td><td>invoices</td><td>user_id</td><td>One-to-Many</td><td>RESTRICT</td></tr>
+                    <tr><td>users</td><td>facility_bookings</td><td>user_id</td><td>One-to-Many</td><td>RESTRICT</td></tr>
+                    <tr><td>users</td><td>repair_requests</td><td>user_id</td><td>One-to-Many</td><td>RESTRICT</td></tr>
+                    <tr><td>users</td><td>checkins</td><td>user_id</td><td>One-to-Many</td><td>RESTRICT</td></tr>
+                    <tr><td>users</td><td>admin_logs</td><td>admin_id</td><td>One-to-Many</td><td>CASCADE</td></tr>
+                    <tr><td>invoices</td><td>invoice_extras</td><td>invoice_id</td><td>One-to-Many</td><td>CASCADE</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="description" style="margin-top: 15px;">
+            <h3>📋 สรุปจำนวน Entity &amp; Attributes</h3>
+            <table class="rel-table">
+                <thead>
+                    <tr><th>ตาราง (Entity)</th><th>จำนวน Attributes</th><th>Primary Key</th><th>Foreign Keys</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>users</td><td>8</td><td>id</td><td>-</td></tr>
+                    <tr><td>announcements</td><td>7</td><td>id</td><td>posted_by, updated_by → users</td></tr>
+                    <tr><td>invoices</td><td>18</td><td>id</td><td>user_id → users</td></tr>
+                    <tr><td>invoice_extras</td><td>4</td><td>id</td><td>invoice_id → invoices</td></tr>
+                    <tr><td>facility_bookings</td><td>9</td><td>id</td><td>user_id → users</td></tr>
+                    <tr><td>repair_requests</td><td>8</td><td>id</td><td>user_id → users</td></tr>
+                    <tr><td>parcels</td><td>6</td><td>id</td><td>-</td></tr>
+                    <tr><td>checkins</td><td>4</td><td>id</td><td>user_id → users</td></tr>
+                    <tr><td>qr_checkins</td><td>5</td><td>id</td><td>-</td></tr>
+                    <tr><td>admin_logs</td><td>8</td><td>id</td><td>admin_id → users</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'dark',
+            er: { useMaxWidth: true },
+            themeVariables: {
+                primaryColor: '#1e3a5f',
+                primaryTextColor: '#e2e8f0',
+                primaryBorderColor: '#38bdf8',
+                lineColor: '#64748b'
+            }
+        });
+    </script>
+</body>
+</html>

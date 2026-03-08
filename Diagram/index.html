@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagram - Dorm Facility &amp; Service System</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; }
+        .container { max-width: 900px; width: 100%; }
+        .header { text-align: center; margin-bottom: 40px; }
+        .header h1 { font-size: 2.5rem; color: #38bdf8; margin-bottom: 8px; }
+        .header h2 { font-size: 1.2rem; color: #94a3b8; font-weight: 400; }
+        .header .subtitle { color: #64748b; margin-top: 8px; font-size: 0.9rem; }
+        .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+        .card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 24px; transition: all 0.3s; text-decoration: none; display: block; }
+        .card:hover { border-color: #38bdf8; transform: translateY(-4px); box-shadow: 0 8px 30px rgba(56, 189, 248, 0.15); }
+        .card-icon { font-size: 2.5rem; margin-bottom: 12px; }
+        .card-title { color: #38bdf8; font-size: 1.1rem; font-weight: 600; margin-bottom: 8px; }
+        .card-desc { color: #94a3b8; font-size: 0.85rem; line-height: 1.5; }
+        .card-num { color: #475569; font-size: 0.8rem; margin-top: 12px; }
+        .footer { text-align: center; margin-top: 40px; color: #475569; font-size: 0.8rem; }
+        .tech { display: flex; gap: 12px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
+        .tech-badge { background: #1e293b; border: 1px solid #334155; border-radius: 20px; padding: 6px 14px; color: #94a3b8; font-size: 0.75rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 System Diagrams</h1>
+            <h2>Dorm Facility and Service System</h2>
+            <div class="subtitle">ระบบบริหารจัดการหอพักและบริการส่วนกลาง — เอกสาร Diagram</div>
+        </div>
+
+        <div class="cards">
+            <a href="1_context_diagram.html" class="card">
+                <div class="card-icon">🌐</div>
+                <div class="card-title">1. Context Diagram</div>
+                <div class="card-desc">แผนภาพบริบท แสดงภาพรวมความสัมพันธ์ระหว่าง External Entities กับระบบหลัก (Level 0)</div>
+                <div class="card-num">Entities: Resident, Admin, LINE Platform, Database</div>
+            </a>
+
+            <a href="2_dfd.html" class="card">
+                <div class="card-icon">📊</div>
+                <div class="card-title">2. Data Flow Diagram (DFD)</div>
+                <div class="card-desc">แผนภาพกระแสข้อมูล Level 1 และ Level 2 แสดง Process, Data Store และ Data Flow ทั้งหมด</div>
+                <div class="card-num">8 Processes, 8 Data Stores, Level 2 สำหรับ Invoice, Facility, Parcel</div>
+            </a>
+
+            <a href="3_system_flowchart.html" class="card">
+                <div class="card-icon">🔀</div>
+                <div class="card-title">3. System Flowchart</div>
+                <div class="card-desc">แผนผังการทำงานของระบบ ตั้งแต่ Login, Routing, จนถึงทุก Feature</div>
+                <div class="card-num">Flowchart: Main, Login, Invoice, Parcel+LINE, Repair</div>
+            </a>
+
+            <a href="4_er_diagram.html" class="card">
+                <div class="card-icon">🗄️</div>
+                <div class="card-title">4. ER-Diagram</div>
+                <div class="card-desc">แผนภาพความสัมพันธ์ของข้อมูล แสดง Entity, Attribute และ Relationship ทั้งหมด</div>
+                <div class="card-num">10 ตาราง, 77 คอลัมน์, 8 Foreign Keys</div>
+            </a>
+
+            <a href="5_data_dictionary.html" class="card">
+                <div class="card-icon">📖</div>
+                <div class="card-title">5. Data Dictionary</div>
+                <div class="card-desc">พจนานุกรมข้อมูล อธิบายทุกตาราง ทุกคอลัมน์ พร้อม Data Type และ Constraints</div>
+                <div class="card-num">10 ตาราง: users, invoices, facility_bookings, repair_requests, ...</div>
+            </a>
+
+            <a href="6_ux_ui.html" class="card">
+                <div class="card-icon">🎨</div>
+                <div class="card-title">6. UX/UI Design</div>
+                <div class="card-desc">Sitemap, User Flow (Resident &amp; Admin), Wireframe หน้าจอหลัก และ Technology Stack</div>
+                <div class="card-num">14 หน้าเว็บ, 9 Wireframes, Tech Stack Diagram</div>
+            </a>
+        </div>
+
+        <div class="tech">
+            <span class="tech-badge">Angular 20</span>
+            <span class="tech-badge">Node.js / Express 5</span>
+            <span class="tech-badge">MySQL 8.0</span>
+            <span class="tech-badge">LINE Messaging API</span>
+            <span class="tech-badge">JWT Auth</span>
+            <span class="tech-badge">Mermaid.js</span>
+        </div>
+
+        <div class="footer">
+            <p>Dorm Facility and Service System © 2025 — สร้างด้วย Mermaid.js สำหรับ Diagram Visualization</p>
+        </div>
+    </div>
+</body>
+</html>
