@@ -1,0 +1,39 @@
+---
+title: DFD Level 2 - กระบวนการจัดการเข้าสู่ระบบ (Process 1.0)
+---
+graph TB
+    R["👤 ผู้พักอาศัย"]
+    A["👨‍💼 Admin"]
+    LINE["📱 LINE Platform"]
+
+    P11(["1.1<br/>รับข้อมูล Login"])
+    P12(["1.2<br/>ตรวจสอบ<br/>Username/Password"])
+    P13(["1.3<br/>สร้าง JWT Token"])
+    P14(["1.4<br/>LINE Login<br/>(OAuth)"])
+    P15(["1.5<br/>จัดการ Session<br/>Timeout"])
+
+    D1[("D1: users")]
+
+    R -- "username, password" --> P11
+    A -- "username, password" --> P11
+    P11 -- "ส่งข้อมูลตรวจสอบ" --> P12
+    P12 -- "SELECT username, password" --> D1
+    D1 -- "ข้อมูลผู้ใช้ (hash)" --> P12
+    P12 -- "bcrypt.compare" --> P12
+    P12 -- "ผลการตรวจสอบ (สำเร็จ)" --> P13
+    P12 -- "Error: Invalid credentials" --> R
+    P12 -- "Error: Invalid credentials" --> A
+    P13 -- "สร้าง JWT (id, username, role)" --> P13
+    P13 -- "JWT Token + Role" --> R
+    P13 -- "JWT Token + Role" --> A
+    P13 -- "เริ่มนับเวลา" --> P15
+    P15 -- "5 นาที (resident) / 20 นาที (admin)" --> P15
+    P15 -- "Session หมดอายุ → Logout" --> R
+
+    R -- "กดปุ่ม LINE Login" --> P14
+    P14 -- "OAuth Authorization" --> LINE
+    LINE -- "Authorization Code" --> P14
+    P14 -- "แลก Access Token" --> LINE
+    LINE -- "LINE Profile (user_id)" --> P14
+    P14 -- "บันทึก line_user_id" --> D1
+    P14 -- "JWT Token + Role" --> R

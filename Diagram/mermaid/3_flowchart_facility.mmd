@@ -1,0 +1,32 @@
+---
+title: Flowchart - กระบวนการจองพื้นที่ส่วนกลาง
+---
+flowchart TD
+    A([ผู้พักอาศัยจองพื้นที่]) --> B[เลือก สถานที่/กิจกรรม]
+    B --> C[เลือกวันที่จอง]
+    C --> D[เลือกเวลาเริ่ม - เวลาสิ้นสุด]
+    D --> E[ระบุจำนวนผู้ใช้ 1-50 คน]
+    E --> F["POST /api/facility-booking"]
+    F --> G["INSERT facility_bookings<br/>status = pending"]
+    G --> H([ส่งคำขอจองสำเร็จ<br/>สถานะ: รอยืนยัน])
+
+    I([Admin จัดการการจอง]) --> J["GET /api/facility-booking/all"]
+    J --> K[แสดงรายการจองทั้งหมด]
+    K --> L{เลือกดำเนินการ}
+
+    L -- อนุมัติ --> M["PATCH status = approved"]
+    L -- ปฏิเสธ --> N["PATCH status = rejected"]
+    L -- แก้ไข --> O[เปิด Inline Edit<br/>แก้ไข สถานที่/วัน/เวลา/จำนวนคน]
+    O --> P["PATCH /api/facility-booking/:id"]
+    L -- ลบ --> Q["DELETE /api/facility-booking/:id"]
+
+    M --> R[บันทึก Admin Log]
+    N --> R
+    P --> R
+    Q --> R
+    R --> S([อัปเดตสำเร็จ])
+
+    T([ผู้พักอาศัยยกเลิกการจอง]) --> U{เวลาปัจจุบัน<br/>< 1 ชม. ก่อนเวลาจอง?}
+    U -- ใช่ --> V["DELETE /api/facility-booking/:id"]
+    V --> W([ยกเลิกสำเร็จ])
+    U -- ไม่ --> X([ไม่สามารถยกเลิกได้<br/>เลยเวลาที่กำหนด])

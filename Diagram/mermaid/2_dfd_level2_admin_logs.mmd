@@ -1,0 +1,32 @@
+---
+title: DFD Level 2 - กระบวนการบันทึก Admin Logs (Process 8.0)
+---
+graph TB
+    A["👨‍💼 Admin"]
+
+    P81(["8.1<br/>บันทึก Log<br/>อัตโนมัติ"])
+    P82(["8.2<br/>แสดง Logs<br/>/ สถิติ"])
+
+    PP2(["Process 2.0<br/>ใบแจ้งหนี้"])
+    PP3(["Process 3.0<br/>แจ้งซ่อม"])
+    PP4(["Process 4.0<br/>จองพื้นที่"])
+    PP5(["Process 5.0<br/>พัสดุ"])
+    PP6(["Process 6.0<br/>ประกาศ"])
+    PP7(["Process 7.0<br/>ผู้ใช้"])
+
+    D7[("D7: admin_logs")]
+    D1[("D1: users")]
+
+    PP2 -- "CREATE/UPDATE/DELETE invoice" --> P81
+    PP3 -- "UPDATE status repair" --> P81
+    PP4 -- "APPROVE/REJECT booking" --> P81
+    PP5 -- "CREATE parcel" --> P81
+    PP6 -- "CREATE/UPDATE/DELETE announcement" --> P81
+    PP7 -- "CREATE/UPDATE/DELETE user" --> P81
+
+    P81 -- "INSERT (admin_id, action,<br/>target_table, target_id,<br/>details, ip_address)" --> D7
+
+    A -- "ดู Logs / กรอง" --> P82
+    P82 -- "SELECT + pagination" --> D7
+    P82 -- "JOIN ชื่อ admin" --> D1
+    P82 -- "รายการ Logs + สถิติ<br/>(วันนี้, 7 วัน, Top Actions)" --> A

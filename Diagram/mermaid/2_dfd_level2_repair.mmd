@@ -1,0 +1,35 @@
+---
+title: DFD Level 2 - กระบวนการจัดการแจ้งซ่อม (Process 3.0)
+---
+graph TB
+    R["👤 ผู้พักอาศัย"]
+    A["👨‍💼 Admin"]
+
+    P31(["3.1<br/>สร้างคำขอแจ้งซ่อม"])
+    P32(["3.2<br/>แสดงรายการ<br/>แจ้งซ่อม"])
+    P33(["3.3<br/>อัปเดตสถานะซ่อม"])
+    P34(["3.4<br/>ลบคำขอซ่อม"])
+
+    D3[("D3: repair_requests")]
+    D1[("D1: users")]
+
+    R -- "title, description" --> P31
+    P31 -- "ดึง room_number จาก token" --> D1
+    P31 -- "INSERT (status=pending)" --> D3
+    P31 -- "ยืนยันสร้างสำเร็จ" --> R
+
+    R -- "ดูคำขอของฉัน" --> P32
+    P32 -- "SELECT WHERE user_id" --> D3
+    P32 -- "รายการคำขอซ่อม + สถิติ" --> R
+    A -- "ดูคำขอทั้งหมด" --> P32
+    P32 -- "SELECT ALL + filter" --> D3
+    P32 -- "รายการคำขอซ่อมทั้งหมด" --> A
+
+    A -- "เลือกสถานะใหม่<br/>(in_progress / completed)" --> P33
+    P33 -- "UPDATE status" --> D3
+    P33 -- "ผลอัปเดต" --> A
+
+    A -- "ลบคำขอ" --> P34
+    R -- "ยกเลิกคำขอ (pending)" --> P34
+    P34 -- "DELETE WHERE id" --> D3
+    P34 -- "ยืนยันลบ" --> A

@@ -1,0 +1,33 @@
+---
+title: Flowchart - กระบวนการจัดการประกาศ
+---
+flowchart TD
+    A([Admin สร้างประกาศ]) --> B["กรอก Title (สูงสุด 100 ตัวอักษร)"]
+    B --> C["กรอก Content (สูงสุด 500 ตัวอักษร)"]
+    C --> D[ดูตัวอย่าง Preview]
+    D --> E{ยืนยัน<br/>โพสต์?}
+    E -- ใช่ --> F["POST /api/announcements"]
+    F --> G["INSERT announcements<br/>posted_by = admin_id"]
+    G --> H[บันทึก Admin Log]
+    H --> I([โพสต์ประกาศสำเร็จ])
+    E -- ไม่ --> J[กลับแก้ไข / ล้างฟอร์ม]
+    J --> B
+
+    K([Admin แก้ไขประกาศ]) --> L[กดปุ่ม Edit ที่ประกาศ]
+    L --> M[โหลดข้อมูลเดิมเข้าฟอร์ม]
+    M --> N[แก้ไข Title / Content]
+    N --> O["PUT /api/announcements/:id"]
+    O --> P["UPDATE + updated_by, updated_at"]
+    P --> Q[บันทึก Admin Log]
+    Q --> R([แก้ไขสำเร็จ])
+
+    S([Admin ลบประกาศ]) --> T[กดปุ่ม Delete]
+    T --> U{ยืนยันลบ?}
+    U -- ใช่ --> V["DELETE /api/announcements/:id"]
+    V --> W[บันทึก Admin Log]
+    W --> X([ลบสำเร็จ])
+    U -- ไม่ --> Y([ยกเลิก])
+
+    Z([ผู้พักอาศัยดูประกาศ]) --> AA["GET /api/announcements"]
+    AA --> AB[แสดงรายการประกาศ<br/>เรียงจากล่าสุด]
+    AB --> AC([อ่านประกาศ])

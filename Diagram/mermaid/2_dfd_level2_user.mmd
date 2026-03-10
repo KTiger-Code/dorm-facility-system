@@ -1,0 +1,39 @@
+---
+title: DFD Level 2 - กระบวนการจัดการผู้ใช้ (Process 7.0)
+---
+graph TB
+    R["👤 ผู้พักอาศัย"]
+    A["👨‍💼 Admin"]
+
+    P71(["7.1<br/>สร้างผู้ใช้ใหม่"])
+    P72(["7.2<br/>แสดงรายการผู้ใช้"])
+    P73(["7.3<br/>แก้ไขข้อมูลผู้ใช้"])
+    P74(["7.4<br/>ลบผู้ใช้"])
+    P75(["7.5<br/>เปลี่ยนรหัสผ่าน"])
+
+    D1[("D1: users")]
+
+    A -- "username, password,<br/>fullname, room_number, role" --> P71
+    P71 -- "bcrypt.hash(password)" --> P71
+    P71 -- "INSERT INTO users" --> D1
+    P71 -- "ยืนยันสร้างสำเร็จ" --> A
+
+    A -- "ค้นหา / ดูรายการ" --> P72
+    P72 -- "SELECT ALL users" --> D1
+    P72 -- "รายการผู้ใช้ + สถิติ" --> A
+
+    A -- "แก้ไข fullname,<br/>room_number, role" --> P73
+    P73 -- "UPDATE users SET" --> D1
+    P73 -- "ผลแก้ไข" --> A
+
+    A -- "ลบผู้ใช้" --> P74
+    P74 -- "DELETE WHERE id" --> D1
+    P74 -- "ยืนยันลบ" --> A
+
+    R -- "old_password, new_password" --> P75
+    A -- "old_password, new_password" --> P75
+    P75 -- "SELECT password (verify old)" --> D1
+    P75 -- "bcrypt.hash(new_password)" --> P75
+    P75 -- "UPDATE password" --> D1
+    P75 -- "เปลี่ยนรหัสสำเร็จ → Logout" --> R
+    P75 -- "เปลี่ยนรหัสสำเร็จ → Logout" --> A

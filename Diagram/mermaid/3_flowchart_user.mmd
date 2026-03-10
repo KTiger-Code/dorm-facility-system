@@ -1,0 +1,33 @@
+---
+title: Flowchart - กระบวนการจัดการผู้ใช้
+---
+flowchart TD
+    A([Admin เพิ่มผู้ใช้ใหม่]) --> B[กดปุ่ม + เพิ่มผู้ใช้ใหม่]
+    B --> C[กรอก Username]
+    C --> D[กรอก Password]
+    D --> E[กรอก ชื่อ-นามสกุล]
+    E --> F[กรอก เลขห้อง]
+    F --> G["เลือก Role:<br/>resident / admin"]
+    G --> H["POST /api/users"]
+    H --> I["bcrypt.hash(password)"]
+    I --> J[INSERT INTO users]
+    J --> K[บันทึก Admin Log]
+    K --> L([สร้างผู้ใช้สำเร็จ])
+
+    M([Admin แก้ไขผู้ใช้]) --> N[กดปุ่ม Edit ที่ผู้ใช้]
+    N --> O[โหลดข้อมูลเดิมเข้าฟอร์ม]
+    O --> P[แก้ไขข้อมูลที่ต้องการ]
+    P --> Q{เปลี่ยน<br/>Password?}
+    Q -- ใช่ --> R[กรอก Password ใหม่]
+    R --> S["PUT /api/users/:id<br/>bcrypt.hash(new_password)"]
+    Q -- ไม่ --> S
+    S --> T[UPDATE users SET]
+    T --> U[บันทึก Admin Log]
+    U --> V([แก้ไขสำเร็จ])
+
+    W([Admin ลบผู้ใช้]) --> X[กดปุ่ม Delete]
+    X --> Y{ยืนยันลบ?}
+    Y -- ใช่ --> Z["DELETE /api/users/:id"]
+    Z --> AA[บันทึก Admin Log]
+    AA --> AB([ลบสำเร็จ])
+    Y -- ไม่ --> AC([ยกเลิก])

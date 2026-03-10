@@ -129,6 +129,49 @@ graph TB
         </div>
     </div>
 
+    <!-- DFD Level 2: Authentication -->
+    <div class="diagram-container">
+        <h2>DFD Level 2 — กระบวนการจัดการเข้าสู่ระบบ (Process 1.0)</h2>
+        <div class="mermaid">
+graph TB
+    R["👤 ผู้พักอาศัย"]
+    A["👨‍💼 Admin"]
+    LINE["📱 LINE Platform"]
+
+    P11(["1.1<br/>รับข้อมูล Login"])
+    P12(["1.2<br/>ตรวจสอบ<br/>Username/Password"])
+    P13(["1.3<br/>สร้าง JWT Token"])
+    P14(["1.4<br/>LINE Login<br/>(OAuth)"])
+    P15(["1.5<br/>จัดการ Session<br/>Timeout"])
+
+    D1[("D1: users")]
+
+    R -- "username, password" --> P11
+    A -- "username, password" --> P11
+    P11 -- "ส่งข้อมูลตรวจสอบ" --> P12
+    P12 -- "SELECT username, password" --> D1
+    D1 -- "ข้อมูลผู้ใช้ (hash)" --> P12
+    P12 -- "bcrypt.compare" --> P12
+    P12 -- "ผลการตรวจสอบ (สำเร็จ)" --> P13
+    P12 -- "Error: Invalid credentials" --> R
+    P12 -- "Error: Invalid credentials" --> A
+    P13 -- "สร้าง JWT (id, username, role)" --> P13
+    P13 -- "JWT Token + Role" --> R
+    P13 -- "JWT Token + Role" --> A
+    P13 -- "เริ่มนับเวลา" --> P15
+    P15 -- "5 นาที (resident) / 20 นาที (admin)" --> P15
+    P15 -- "Session หมดอายุ → Logout" --> R
+
+    R -- "กดปุ่ม LINE Login" --> P14
+    P14 -- "OAuth Authorization" --> LINE
+    LINE -- "Authorization Code" --> P14
+    P14 -- "แลก Access Token" --> LINE
+    LINE -- "LINE Profile (user_id)" --> P14
+    P14 -- "บันทึก line_user_id" --> D1
+    P14 -- "JWT Token + Role" --> R
+        </div>
+    </div>
+
     <!-- DFD Level 2: Invoice -->
     <div class="diagram-container">
         <h2>DFD Level 2 — กระบวนการจัดการใบแจ้งหนี้ (Process 2.0)</h2>
@@ -168,6 +211,45 @@ graph TB
     P25 -- "ดึงข้อมูลใบแจ้งหนี้" --> D2
     P25 -- "ดึงข้อมูลรายการเพิ่ม" --> D8
     P25 -- "ไฟล์ PDF" --> R
+        </div>
+    </div>
+
+    <!-- DFD Level 2: Repair -->
+    <div class="diagram-container">
+        <h2>DFD Level 2 — กระบวนการจัดการแจ้งซ่อม (Process 3.0)</h2>
+        <div class="mermaid">
+graph TB
+    R["👤 ผู้พักอาศัย"]
+    A["👨‍💼 Admin"]
+
+    P31(["3.1<br/>สร้างคำขอแจ้งซ่อม"])
+    P32(["3.2<br/>แสดงรายการ<br/>แจ้งซ่อม"])
+    P33(["3.3<br/>อัปเดตสถานะซ่อม"])
+    P34(["3.4<br/>ลบคำขอซ่อม"])
+
+    D3[("D3: repair_requests")]
+    D1[("D1: users")]
+
+    R -- "title, description" --> P31
+    P31 -- "ดึง room_number จาก token" --> D1
+    P31 -- "INSERT (status=pending)" --> D3
+    P31 -- "ยืนยันสร้างสำเร็จ" --> R
+
+    R -- "ดูคำขอของฉัน" --> P32
+    P32 -- "SELECT WHERE user_id" --> D3
+    P32 -- "รายการคำขอซ่อม + สถิติ" --> R
+    A -- "ดูคำขอทั้งหมด" --> P32
+    P32 -- "SELECT ALL + filter" --> D3
+    P32 -- "รายการคำขอซ่อมทั้งหมด" --> A
+
+    A -- "เลือกสถานะใหม่<br/>(in_progress / completed)" --> P33
+    P33 -- "UPDATE status" --> D3
+    P33 -- "ผลอัปเดต" --> A
+
+    A -- "ลบคำขอ" --> P34
+    R -- "ยกเลิกคำขอ (pending)" --> P34
+    P34 -- "DELETE WHERE id" --> D3
+    P34 -- "ยืนยันลบ" --> A
         </div>
     </div>
 
@@ -238,6 +320,122 @@ graph TB
     P54 -- "รายการพัสดุ" --> R
     A -- "ดูพัสดุทั้งหมด" --> P54
     P54 -- "รายการพัสดุทั้งหมด + สถิติ" --> A
+        </div>
+    </div>
+
+    <!-- DFD Level 2: Announcement -->
+    <div class="diagram-container">
+        <h2>DFD Level 2 — กระบวนการจัดการประกาศ (Process 6.0)</h2>
+        <div class="mermaid">
+graph TB
+    R["👤 ผู้พักอาศัย"]
+    A["👨‍💼 Admin"]
+
+    P61(["6.1<br/>สร้างประกาศ"])
+    P62(["6.2<br/>แสดงรายการ<br/>ประกาศ"])
+    P63(["6.3<br/>แก้ไขประกาศ"])
+    P64(["6.4<br/>ลบประกาศ"])
+
+    D6[("D6: announcements")]
+    D1[("D1: users")]
+
+    A -- "title, content" --> P61
+    P61 -- "INSERT (posted_by=admin_id)" --> D6
+    P61 -- "ยืนยันสร้างสำเร็จ" --> A
+
+    R -- "ดูประกาศทั้งหมด" --> P62
+    A -- "ดูประกาศทั้งหมด" --> P62
+    P62 -- "SELECT + JOIN users" --> D6
+    P62 -- "ดึงชื่อผู้โพสต์" --> D1
+    P62 -- "รายการประกาศ + ผู้โพสต์" --> R
+    P62 -- "รายการประกาศ + สถิติ" --> A
+
+    A -- "แก้ไข title, content" --> P63
+    P63 -- "UPDATE + updated_by, updated_at" --> D6
+    P63 -- "ผลแก้ไข" --> A
+
+    A -- "ลบประกาศ" --> P64
+    P64 -- "DELETE WHERE id" --> D6
+    P64 -- "ยืนยันลบ" --> A
+        </div>
+    </div>
+
+    <!-- DFD Level 2: User Management -->
+    <div class="diagram-container">
+        <h2>DFD Level 2 — กระบวนการจัดการผู้ใช้ (Process 7.0)</h2>
+        <div class="mermaid">
+graph TB
+    R["👤 ผู้พักอาศัย"]
+    A["👨‍💼 Admin"]
+
+    P71(["7.1<br/>สร้างผู้ใช้ใหม่"])
+    P72(["7.2<br/>แสดงรายการผู้ใช้"])
+    P73(["7.3<br/>แก้ไขข้อมูลผู้ใช้"])
+    P74(["7.4<br/>ลบผู้ใช้"])
+    P75(["7.5<br/>เปลี่ยนรหัสผ่าน"])
+
+    D1[("D1: users")]
+
+    A -- "username, password,<br/>fullname, room_number, role" --> P71
+    P71 -- "bcrypt.hash(password)" --> P71
+    P71 -- "INSERT INTO users" --> D1
+    P71 -- "ยืนยันสร้างสำเร็จ" --> A
+
+    A -- "ค้นหา / ดูรายการ" --> P72
+    P72 -- "SELECT ALL users" --> D1
+    P72 -- "รายการผู้ใช้ + สถิติ" --> A
+
+    A -- "แก้ไข fullname,<br/>room_number, role" --> P73
+    P73 -- "UPDATE users SET" --> D1
+    P73 -- "ผลแก้ไข" --> A
+
+    A -- "ลบผู้ใช้" --> P74
+    P74 -- "DELETE WHERE id" --> D1
+    P74 -- "ยืนยันลบ" --> A
+
+    R -- "old_password, new_password" --> P75
+    A -- "old_password, new_password" --> P75
+    P75 -- "SELECT password (verify old)" --> D1
+    P75 -- "bcrypt.hash(new_password)" --> P75
+    P75 -- "UPDATE password" --> D1
+    P75 -- "เปลี่ยนรหัสสำเร็จ → Logout" --> R
+    P75 -- "เปลี่ยนรหัสสำเร็จ → Logout" --> A
+        </div>
+    </div>
+
+    <!-- DFD Level 2: Admin Logs -->
+    <div class="diagram-container">
+        <h2>DFD Level 2 — กระบวนการบันทึก Admin Logs (Process 8.0)</h2>
+        <div class="mermaid">
+graph TB
+    A["👨‍💼 Admin"]
+
+    P81(["8.1<br/>บันทึก Log<br/>อัตโนมัติ"])
+    P82(["8.2<br/>แสดง Logs<br/>/ สถิติ"])
+
+    PP2(["Process 2.0<br/>ใบแจ้งหนี้"])
+    PP3(["Process 3.0<br/>แจ้งซ่อม"])
+    PP4(["Process 4.0<br/>จองพื้นที่"])
+    PP5(["Process 5.0<br/>พัสดุ"])
+    PP6(["Process 6.0<br/>ประกาศ"])
+    PP7(["Process 7.0<br/>ผู้ใช้"])
+
+    D7[("D7: admin_logs")]
+    D1[("D1: users")]
+
+    PP2 -- "CREATE/UPDATE/DELETE invoice" --> P81
+    PP3 -- "UPDATE status repair" --> P81
+    PP4 -- "APPROVE/REJECT booking" --> P81
+    PP5 -- "CREATE parcel" --> P81
+    PP6 -- "CREATE/UPDATE/DELETE announcement" --> P81
+    PP7 -- "CREATE/UPDATE/DELETE user" --> P81
+
+    P81 -- "INSERT (admin_id, action,<br/>target_table, target_id,<br/>details, ip_address)" --> D7
+
+    A -- "ดู Logs / กรอง" --> P82
+    P82 -- "SELECT + pagination" --> D7
+    P82 -- "JOIN ชื่อ admin" --> D1
+    P82 -- "รายการ Logs + สถิติ<br/>(วันนี้, 7 วัน, Top Actions)" --> A
         </div>
     </div>
 

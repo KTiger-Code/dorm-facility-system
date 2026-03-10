@@ -195,6 +195,42 @@ flowchart TD
         </div>
     </div>
 
+    <!-- Facility Booking Flow -->
+    <div class="diagram-container">
+        <h2>Flowchart — กระบวนการจองพื้นที่ส่วนกลาง</h2>
+        <div class="mermaid">
+flowchart TD
+    A([ผู้พักอาศัยจองพื้นที่]) --> B[เลือก สถานที่/กิจกรรม]
+    B --> C[เลือกวันที่จอง]
+    C --> D[เลือกเวลาเริ่ม - เวลาสิ้นสุด]
+    D --> E[ระบุจำนวนผู้ใช้ 1-50 คน]
+    E --> F["POST /api/facility-booking"]
+    F --> G["INSERT facility_bookings<br/>status = pending"]
+    G --> H([ส่งคำขอจองสำเร็จ<br/>สถานะ: รอยืนยัน])
+
+    I([Admin จัดการการจอง]) --> J["GET /api/facility-booking/all"]
+    J --> K[แสดงรายการจองทั้งหมด]
+    K --> L{เลือกดำเนินการ}
+
+    L -- อนุมัติ --> M["PATCH status = approved"]
+    L -- ปฏิเสธ --> N["PATCH status = rejected"]
+    L -- แก้ไข --> O[เปิด Inline Edit<br/>แก้ไข สถานที่/วัน/เวลา/จำนวนคน]
+    O --> P["PATCH /api/facility-booking/:id"]
+    L -- ลบ --> Q["DELETE /api/facility-booking/:id"]
+
+    M --> R[บันทึก Admin Log]
+    N --> R
+    P --> R
+    Q --> R
+    R --> S([อัปเดตสำเร็จ])
+
+    T([ผู้พักอาศัยยกเลิกการจอง]) --> U{เวลาปัจจุบัน<br/>< 1 ชม. ก่อนเวลาจอง?}
+    U -- ใช่ --> V["DELETE /api/facility-booking/:id"]
+    V --> W([ยกเลิกสำเร็จ])
+    U -- ไม่ --> X([ไม่สามารถยกเลิกได้<br/>เลยเวลาที่กำหนด])
+        </div>
+    </div>
+
     <!-- Repair Flow -->
     <div class="diagram-container">
         <h2>Flowchart — กระบวนการแจ้งซ่อม</h2>
@@ -216,6 +252,112 @@ flowchart TD
     I -- ลบคำขอ --> N["DELETE /api/repair/:id"]
     N --> M
     M --> O([อัปเดตสำเร็จ])
+        </div>
+    </div>
+
+    <!-- Announcement Flow -->
+    <div class="diagram-container">
+        <h2>Flowchart — กระบวนการจัดการประกาศ</h2>
+        <div class="mermaid">
+flowchart TD
+    A([Admin สร้างประกาศ]) --> B["กรอก Title (สูงสุด 100 ตัวอักษร)"]
+    B --> C["กรอก Content (สูงสุด 500 ตัวอักษร)"]
+    C --> D[ดูตัวอย่าง Preview]
+    D --> E{ยืนยัน<br/>โพสต์?}
+    E -- ใช่ --> F["POST /api/announcements"]
+    F --> G["INSERT announcements<br/>posted_by = admin_id"]
+    G --> H[บันทึก Admin Log]
+    H --> I([โพสต์ประกาศสำเร็จ])
+    E -- ไม่ --> J[กลับแก้ไข / ล้างฟอร์ม]
+    J --> B
+
+    K([Admin แก้ไขประกาศ]) --> L[กดปุ่ม Edit ที่ประกาศ]
+    L --> M[โหลดข้อมูลเดิมเข้าฟอร์ม]
+    M --> N[แก้ไข Title / Content]
+    N --> O["PUT /api/announcements/:id"]
+    O --> P["UPDATE + updated_by, updated_at"]
+    P --> Q[บันทึก Admin Log]
+    Q --> R([แก้ไขสำเร็จ])
+
+    S([Admin ลบประกาศ]) --> T[กดปุ่ม Delete]
+    T --> U{ยืนยันลบ?}
+    U -- ใช่ --> V["DELETE /api/announcements/:id"]
+    V --> W[บันทึก Admin Log]
+    W --> X([ลบสำเร็จ])
+    U -- ไม่ --> Y([ยกเลิก])
+
+    Z([ผู้พักอาศัยดูประกาศ]) --> AA["GET /api/announcements"]
+    AA --> AB[แสดงรายการประกาศ<br/>เรียงจากล่าสุด]
+    AB --> AC([อ่านประกาศ])
+        </div>
+    </div>
+
+    <!-- User Management Flow -->
+    <div class="diagram-container">
+        <h2>Flowchart — กระบวนการจัดการผู้ใช้</h2>
+        <div class="mermaid">
+flowchart TD
+    A([Admin เพิ่มผู้ใช้ใหม่]) --> B[กดปุ่ม + เพิ่มผู้ใช้ใหม่]
+    B --> C[กรอก Username]
+    C --> D[กรอก Password]
+    D --> E[กรอก ชื่อ-นามสกุล]
+    E --> F[กรอก เลขห้อง]
+    F --> G["เลือก Role:<br/>resident / admin"]
+    G --> H["POST /api/users"]
+    H --> I["bcrypt.hash(password)"]
+    I --> J[INSERT INTO users]
+    J --> K[บันทึก Admin Log]
+    K --> L([สร้างผู้ใช้สำเร็จ])
+
+    M([Admin แก้ไขผู้ใช้]) --> N[กดปุ่ม Edit ที่ผู้ใช้]
+    N --> O[โหลดข้อมูลเดิมเข้าฟอร์ม]
+    O --> P[แก้ไขข้อมูลที่ต้องการ]
+    P --> Q{เปลี่ยน<br/>Password?}
+    Q -- ใช่ --> R[กรอก Password ใหม่]
+    R --> S["PUT /api/users/:id<br/>bcrypt.hash(new_password)"]
+    Q -- ไม่ --> S
+    S --> T[UPDATE users SET]
+    T --> U[บันทึก Admin Log]
+    U --> V([แก้ไขสำเร็จ])
+
+    W([Admin ลบผู้ใช้]) --> X[กดปุ่ม Delete]
+    X --> Y{ยืนยันลบ?}
+    Y -- ใช่ --> Z["DELETE /api/users/:id"]
+    Z --> AA[บันทึก Admin Log]
+    AA --> AB([ลบสำเร็จ])
+    Y -- ไม่ --> AC([ยกเลิก])
+        </div>
+    </div>
+
+    <!-- Change Password Flow -->
+    <div class="diagram-container">
+        <h2>Flowchart — กระบวนการเปลี่ยนรหัสผ่าน</h2>
+        <div class="mermaid">
+flowchart TD
+    A([เปิดหน้าเปลี่ยนรหัสผ่าน]) --> B[กรอก รหัสผ่านเดิม]
+    B --> C[กรอก รหัสผ่านใหม่]
+    C --> D[กรอก ยืนยันรหัสผ่านใหม่]
+    D --> E{ตรวจสอบ<br/>ฝั่ง Client}
+
+    E -- "รหัสใหม่ < 6 ตัว" --> F[แสดง Error:<br/>ต้องมีอย่างน้อย 6 ตัวอักษร]
+    F --> C
+    E -- "รหัสใหม่ ≠ ยืนยัน" --> G[แสดง Error:<br/>รหัสผ่านไม่ตรงกัน]
+    G --> D
+    E -- "รหัสใหม่ = รหัสเดิม" --> H[แสดง Error:<br/>ต้องไม่ซ้ำกับรหัสเดิม]
+    H --> C
+    E -- ผ่าน --> I[กดปุ่ม บันทึกรหัสผ่านใหม่]
+
+    I --> J["PATCH /api/users/change-password"]
+    J --> K{Server ตรวจสอบ<br/>รหัสเดิม}
+    K -- "bcrypt.compare ไม่ตรง" --> L[แสดง Error:<br/>รหัสผ่านเดิมไม่ถูกต้อง]
+    L --> B
+    K -- ถูกต้อง --> M["bcrypt.hash(new_password)"]
+    M --> N[UPDATE users SET password]
+    N --> O[แสดง: เปลี่ยนรหัสผ่านสำเร็จ!]
+    O --> P["รอ 2 วินาที"]
+    P --> Q[ลบ Token จาก localStorage]
+    Q --> R[Redirect ไป /login]
+    R --> S([จบ — Login ใหม่ด้วยรหัสใหม่])
         </div>
     </div>
 
